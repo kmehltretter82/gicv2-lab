@@ -102,9 +102,23 @@ maintenance event, or physical IRQ on 2026-08-22. The tested source revision,
 stage-2 and linked-image audit, and raw trace are preserved in
 `results/2026-08-22-h4d-qemu-pi4/`.
 
-Later H4 scenarios add level reassertion, multi-source SGIs, List Register
-overflow, WFI wakeup, and paused-vCPU save/restore one focused contract at a
-time.
+### H4e — Active+Pending redelivery (completed)
+
+- Re-pend one software virtual interrupt while its first delivery remains
+  active, producing the List Register Pending+Active state.
+- In split EOI mode, prove that EOIR only drops priority and that the first
+  DIR converts Pending+Active back to Pending.
+- Require HPPIR eligibility only after deactivation, exactly one second
+  acknowledgement, and a final Active-to-Invalid transition.
+
+Exit gate: the frozen strict H4e oracle passed 100 consecutive fresh qemu-pi4
+processes without an unexpected exception, register state, reset, hang,
+maintenance event, physical IRQ, or extra/missing delivery on 2026-08-22. The
+tested source revision, stage-2 and linked-image audit, and raw trace are
+preserved in `results/2026-08-22-h4e-qemu-pi4/`.
+
+Later H4 scenarios add multi-source SGIs, List Register overflow, WFI wakeup,
+and paused-vCPU save/restore one focused contract at a time.
 
 ## H5 — differential runner
 
@@ -114,7 +128,7 @@ any one-sided forbidden outcome to its smallest sequence.
 
 ## H6 — first real Pi 400 boot (later)
 
-The H1–H4d QEMU prerequisite is satisfied. Physical execution remains opt-in
+The H1–H4e QEMU prerequisite is satisfied. Physical execution remains opt-in
 and requires the user's explicit request. The first image:
 
 1. uses a recoverable boot medium and serial capture;

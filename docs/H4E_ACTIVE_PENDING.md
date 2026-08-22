@@ -96,3 +96,13 @@ strict oracle, with no forbidden outcome. The tested source revision, image
 and QEMU hashes, toolchain, host, exact command, linked-image audit, and
 lossless final serial trace must be preserved under `results/` before H4e is
 marked complete.
+
+## Recorded QEMU result
+
+The frozen implementation at `78f080a7db62784521ac7fd0c2ef331cda638e71`
+passed 100 consecutive fresh qemu-pi4 processes on 2026-08-22. The exact
+image, emulator, environment, linked-image audit, and lossless final trace are
+recorded in `results/2026-08-22-h4e-qemu-pi4/manifest.md`.
+
+The observed result matched this contract. H4e therefore produced no
+divergent behavior and no QEMU upstream bug candidate.
