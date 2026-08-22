@@ -13,11 +13,11 @@ interrupt transition observable, replayable, and comparable across:
 
 ## Status
 
-H4c is complete under qemu-pi4. It deliberately stays QEMU-only and now has:
+H4d is complete under qemu-pi4. It deliberately stays QEMU-only and now has:
 
 - the H1 EL2 monitor and H2 one-vCPU EL1 guest with a validated, resumable
   stage-2 translation fault;
-- a stage-2 mapping for only the 4 KiB GICV virtual CPU-interface page;
+- a stage-2 mapping for exactly the 8 KiB GICV virtual CPU-interface block;
 - dynamic List Register discovery and deterministic GICD/GICC/GICH setup;
 - staged injection of software virtual INTIDs 42 and 43 through LR0 and LR1;
 - EL1 acknowledgement and EOI through GICV, including one controlled nested
@@ -26,18 +26,21 @@ H4c is complete under qemu-pi4. It deliberately stays QEMU-only and now has:
 - exact empty, pending, active, post-EOI, and cleared LR snapshots, including
   their corresponding GICH_APR transitions;
 - an isolated underflow-maintenance transition with two valid software LRs,
-  a masked pending reserve, and no EOI/EISR cause; and
+  a masked pending reserve, and no EOI/EISR cause;
 - BPR 2 priority preemption from INTID 42 at priority `0x80` to INTID 43 at
-  priority `0x20`, with exact both-active and reverse-completion checkpoints.
+  priority `0x20`, with exact both-active and reverse-completion checkpoints;
+- split EOI mode for one software virtual interrupt, with guest-visible RPR
+  and exact LR/APR state proving that EOIR drops priority while DIR performs
+  the later deactivation.
 
-The strict H4c exit gate passed 100 consecutive fresh qemu-pi4 processes on
+The strict H4d exit gate passed 100 consecutive fresh qemu-pi4 processes on
 2026-08-22. The tested revision, hashes, environment, and final raw trace are
-preserved in `results/2026-08-22-h4c-qemu-pi4/`.
+preserved in `results/2026-08-22-h4d-qemu-pi4/`.
 
 The QEMU prerequisite for the first real Pi 400 boot is now satisfied, but no
 physical boot has been performed. Hardware execution remains a separate,
-explicitly approved H6 step. H4d's split priority-drop/deactivation scenario
-is the next QEMU-only development milestone. See ROADMAP.md.
+explicitly approved H6 step. Active-plus-pending level reassertion is the next
+QEMU-only state-machine milestone. See ROADMAP.md.
 
 ## Build
 
@@ -66,7 +69,7 @@ Override QEMU to test another build:
     make LLVM_BIN=/opt/homebrew/opt/llvm/bin \
       QEMU=/path/to/qemu-system-aarch64 smoke
 
-Run the H4c exit-gate loop (100 consecutive boots by default) with:
+Run the H4d exit-gate loop (100 consecutive boots by default) with:
 
     make LLVM_BIN=/opt/homebrew/opt/llvm/bin smoke-repeat
 
@@ -76,16 +79,16 @@ The test loads the ELF directly at 0x80000 and uses
 -cpu cortex-a72,has_el3=off. That prevents QEMU's optional synthetic EL3 from
 obscuring the non-secure EL2 environment the Pi 400 exposes to this lab. It
 checks the H1 and H2 descriptors and exceptions, the virtual-interrupt path,
-every H4c LR/APR/MISR/EISR/ELRSR snapshot, the exact nested acknowledgement
-and reverse EOI order, and the final PASS marker. It never writes a physical
-boot medium.
+every H4d LR/APR/MISR/EISR/ELRSR snapshot, the guest-visible RPR values, the
+distinct EOIR priority-drop and DIR deactivation transitions, and the final
+PASS marker. It never writes a physical boot medium.
 
 The H2 architectural contract and fixed memory map are documented in
 docs/H2_STAGE2.md. The virtual-interrupt contract is in docs/H3_GICV2.md, the
 LR lifecycle is in docs/H4A_LR_LIFECYCLE.md, underflow maintenance is in
 docs/H4B_UNDERFLOW.md, priority preemption is in
-docs/H4C_PRIORITY_PREEMPTION.md, and the guest call interface is in
-docs/HVC_ABI.md.
+docs/H4C_PRIORITY_PREEMPTION.md, split EOI is in docs/H4D_SPLIT_EOI.md, and
+the guest call interface is in docs/HVC_ABI.md.
 
 ## Repository boundaries
 

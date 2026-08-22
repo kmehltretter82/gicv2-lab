@@ -87,17 +87,20 @@ maintenance event, or physical IRQ on 2026-08-22. The tested source revision,
 linked vector audit, and raw trace are preserved in
 `results/2026-08-22-h4c-qemu-pi4/`.
 
-### H4d — split priority drop and deactivation (next)
+### H4d — split priority drop and deactivation (completed)
 
 - Enable the virtual CPU interface's split EOI mode for one focused software
   virtual interrupt.
 - Observe and distinguish the priority drop performed by GICV_EOIR from the
   later deactivation performed by GICV_DIR.
-- Freeze the exact LR, APR, MISR, EISR, and ELRSR state before expanding the
-  stage-2 GICV mapping or implementing the guest sequence.
+- Validate the exact LR, APR, MISR, EISR, ELRSR, and guest-visible RPR state
+  at the active, priority-drop, deactivated, and cleared checkpoints.
 
-Exit gate: freeze the allowed EOImode state machine first, then require 100
-consecutive fresh qemu-pi4 processes and preserve the final raw trace.
+Exit gate: the frozen strict H4d oracle passed 100 consecutive fresh qemu-pi4
+processes without an unexpected exception, register state, reset, hang,
+maintenance event, or physical IRQ on 2026-08-22. The tested source revision,
+stage-2 and linked-image audit, and raw trace are preserved in
+`results/2026-08-22-h4d-qemu-pi4/`.
 
 Later H4 scenarios add level reassertion, multi-source SGIs, List Register
 overflow, WFI wakeup, and paused-vCPU save/restore one focused contract at a
@@ -111,7 +114,7 @@ any one-sided forbidden outcome to its smallest sequence.
 
 ## H6 — first real Pi 400 boot (later)
 
-The H1–H4c QEMU prerequisite is satisfied. Physical execution remains opt-in
+The H1–H4d QEMU prerequisite is satisfied. Physical execution remains opt-in
 and requires the user's explicit request. The first image:
 
 1. uses a recoverable boot medium and serial capture;
