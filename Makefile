@@ -59,7 +59,7 @@ smoke-repeat: all
 			scripts/smoke-qemu.sh "$(TARGET).elf" || exit 1; \
 		run=$$((run + 1)); \
 	done; \
-	echo "gicv2-lab: $(SMOKE_RUNS) consecutive H4a smoke runs passed"
+	echo "gicv2-lab: $(SMOKE_RUNS) consecutive H4b smoke runs passed"
 
 clean:
 	rm -rf $(BUILD)

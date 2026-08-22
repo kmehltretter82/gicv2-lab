@@ -11,7 +11,8 @@
 #define GICD_MAINTENANCE_BIT \
     (UINT32_C(1) << GICV2_MAINTENANCE_INTID)
 #define GICD_MAINTENANCE_PRIORITY UINT32_C(0x20)
-#define H3_VIRTUAL_PRIORITY UINT32_C(0x20)
+#define H4B_PRIMARY_PRIORITY UINT32_C(0x20)
+#define H4B_RESERVE_PRIORITY GICV2_GICV_PMR_EXPECTED
 #define GICD_MAINTENANCE_PRIORITY_OFFSET \
     (GICD_IPRIORITYR + (GICV2_MAINTENANCE_INTID & ~UINT32_C(3)))
 #define GICD_MAINTENANCE_PRIORITY_SHIFT \
@@ -23,8 +24,11 @@
 #define GIC_PRIORITY_MASK    UINT32_C(0xff)
 #define GIC_BINARY_POINT     UINT32_C(7)
 
-#define GICH_HCR_ENABLE UINT32_C(1)
-#define GICH_MISR_EOI   UINT32_C(1)
+#define GICH_HCR_ENABLE           UINT32_C(1)
+#define GICH_HCR_UNDERFLOW_ENABLE (UINT32_C(1) << 1)
+#define GICH_HCR_UNDERFLOW_ARMED \
+    (GICH_HCR_ENABLE | GICH_HCR_UNDERFLOW_ENABLE)
+#define GICH_MISR_UNDERFLOW (UINT32_C(1) << 1)
 
 #define GICH_VMCR_ENABLE_GRP0 UINT32_C(1)
 #define GICH_VMCR_VIRTUAL_ABPR (UINT32_C(7) << 18)
@@ -34,21 +38,27 @@
     (GICH_VMCR_PRIORITY_MASK | GICH_VMCR_VIRTUAL_BPR | \
      GICH_VMCR_VIRTUAL_ABPR | GICH_VMCR_ENABLE_GRP0)
 
-#define GICH_LR_EOI          (UINT32_C(1) << 19)
-#define GICH_LR_PRIORITY     ((H3_VIRTUAL_PRIORITY >> 3) << 23)
-#define GICH_LR_PENDING      (UINT32_C(1) << 28)
-#define GICH_LR_ACTIVE       (UINT32_C(2) << 28)
-#define GICH_LR_TEST_PENDING \
-    (GICH_LR_PENDING | GICH_LR_PRIORITY | GICH_LR_EOI | \
-     H3_VIRTUAL_INTID)
-#define GICH_LR_TEST_ACTIVE \
-    (GICH_LR_ACTIVE | GICH_LR_PRIORITY | GICH_LR_EOI | \
-     H3_VIRTUAL_INTID)
-#define GICH_LR_TEST_POST_EOI \
-    (GICH_LR_PRIORITY | GICH_LR_EOI | H3_VIRTUAL_INTID)
-#define GICH_APR_TEST_ACTIVE UINT32_C(1)
+#define GICH_LR_PRIORITY(value) (((value) >> 3) << 23)
+#define GICH_LR_PENDING         (UINT32_C(1) << 28)
+#define GICH_LR_ACTIVE          (UINT32_C(2) << 28)
+#define GICH_LR_PRIMARY_BASE \
+    (GICH_LR_PRIORITY(H4B_PRIMARY_PRIORITY) | GICV2_PRIMARY_INTID)
+#define GICH_LR_PRIMARY_PENDING \
+    (GICH_LR_PENDING | GICH_LR_PRIMARY_BASE)
+#define GICH_LR_PRIMARY_ACTIVE \
+    (GICH_LR_ACTIVE | GICH_LR_PRIMARY_BASE)
+#define GICH_LR_PRIMARY_POST_EOI GICH_LR_PRIMARY_BASE
+#define GICH_LR_RESERVE_PENDING \
+    (GICH_LR_PENDING | GICH_LR_PRIORITY(H4B_RESERVE_PRIORITY) | \
+     GICV2_RESERVE_INTID)
+#define GICH_APR_PRIMARY_ACTIVE UINT32_C(1)
 
 static uint32_t implemented_lrs;
+
+_Static_assert(GICV2_PRIMARY_INTID != GICV2_RESERVE_INTID,
+               "H4b requires two distinct virtual INTIDs");
+_Static_assert(H4B_RESERVE_PRIORITY == GICV2_GICV_PMR_EXPECTED,
+               "the H4b reserve LR must be masked by GICV_PMR");
 
 static void gic_barrier(void)
 {
@@ -139,7 +149,7 @@ static bool init_physical_interface(void)
            ((config >> GICD_MAINTENANCE_CONFIG_SHIFT) & UINT32_C(3)) == 0;
 }
 
-void gicv2_capture_lr0(struct gicv2_lr_snapshot *snapshot)
+void gicv2_capture_lrs(struct gicv2_lr_snapshot *snapshot)
 {
     snapshot->hcr = mmio_read32(PI400_GICH_BASE + GICH_HCR);
     snapshot->vmcr = mmio_read32(PI400_GICH_BASE + GICH_VMCR);
@@ -149,41 +159,50 @@ void gicv2_capture_lr0(struct gicv2_lr_snapshot *snapshot)
     snapshot->elrsr[0] = mmio_read32(PI400_GICH_BASE + GICH_ELRSR0);
     snapshot->elrsr[1] = read_elrsr1();
     snapshot->apr = mmio_read32(PI400_GICH_BASE + GICH_APR);
-    snapshot->lr0 = mmio_read32(PI400_GICH_BASE + GICH_LR0);
+    snapshot->lr[0] = mmio_read32(PI400_GICH_BASE + GICH_LR0);
+    snapshot->lr[1] = mmio_read32(PI400_GICH_BASE + GICH_LR0 + 4);
 }
 
-static bool snapshot_control_valid(const struct gicv2_lr_snapshot *snapshot)
+static bool snapshot_control_valid(const struct gicv2_lr_snapshot *snapshot,
+                                   uint32_t expected_hcr)
 {
-    return snapshot->hcr == GICH_HCR_ENABLE &&
+    return snapshot->hcr == expected_hcr &&
            snapshot->vmcr == GICH_VMCR_INITIAL;
 }
 
 static bool empty_snapshot_valid(const struct gicv2_lr_snapshot *snapshot)
 {
-    return snapshot_control_valid(snapshot) && snapshot->misr == 0 &&
+    return snapshot_control_valid(snapshot, GICH_HCR_ENABLE) &&
+           snapshot->misr == 0 &&
            snapshot->eisr[0] == 0 && snapshot->eisr[1] == 0 &&
            snapshot->elrsr[0] == empty_mask_low() &&
            snapshot->elrsr[1] == empty_mask_high() &&
-           snapshot->apr == 0 && snapshot->lr0 == 0;
+           snapshot->apr == 0 && snapshot->lr[0] == 0 &&
+           snapshot->lr[1] == 0;
 }
 
-static bool pending_snapshot_valid(const struct gicv2_lr_snapshot *snapshot)
+static bool armed_snapshot_valid(const struct gicv2_lr_snapshot *snapshot)
 {
-    return snapshot_control_valid(snapshot) && snapshot->misr == 0 &&
+    return snapshot_control_valid(snapshot, GICH_HCR_UNDERFLOW_ARMED) &&
+           snapshot->misr == 0 &&
            snapshot->eisr[0] == 0 && snapshot->eisr[1] == 0 &&
-           snapshot->elrsr[0] == (empty_mask_low() & ~UINT32_C(1)) &&
+           snapshot->elrsr[0] == (empty_mask_low() & ~UINT32_C(3)) &&
            snapshot->elrsr[1] == empty_mask_high() &&
-           snapshot->apr == 0 && snapshot->lr0 == GICH_LR_TEST_PENDING;
+           snapshot->apr == 0 &&
+           snapshot->lr[0] == GICH_LR_PRIMARY_PENDING &&
+           snapshot->lr[1] == GICH_LR_RESERVE_PENDING;
 }
 
 bool gicv2_active_snapshot_valid(const struct gicv2_lr_snapshot *snapshot)
 {
-    return snapshot_control_valid(snapshot) && snapshot->misr == 0 &&
+    return snapshot_control_valid(snapshot, GICH_HCR_UNDERFLOW_ARMED) &&
+           snapshot->misr == 0 &&
            snapshot->eisr[0] == 0 && snapshot->eisr[1] == 0 &&
-           snapshot->elrsr[0] == (empty_mask_low() & ~UINT32_C(1)) &&
+           snapshot->elrsr[0] == (empty_mask_low() & ~UINT32_C(3)) &&
            snapshot->elrsr[1] == empty_mask_high() &&
-           snapshot->apr == GICH_APR_TEST_ACTIVE &&
-           snapshot->lr0 == GICH_LR_TEST_ACTIVE;
+           snapshot->apr == GICH_APR_PRIMARY_ACTIVE &&
+           snapshot->lr[0] == GICH_LR_PRIMARY_ACTIVE &&
+           snapshot->lr[1] == GICH_LR_RESERVE_PENDING;
 }
 
 static void init_virtual_interface(void)
@@ -202,7 +221,7 @@ static void init_virtual_interface(void)
 
 bool gicv2_init(uint32_t lr_count, struct gicv2_lr_snapshot *initial)
 {
-    if (lr_count == 0 || lr_count > 64) {
+    if (lr_count < GICV2_SNAPSHOT_LRS || lr_count > 64) {
         return false;
     }
 
@@ -212,56 +231,66 @@ bool gicv2_init(uint32_t lr_count, struct gicv2_lr_snapshot *initial)
     }
 
     init_virtual_interface();
-    gicv2_capture_lr0(initial);
+    gicv2_capture_lrs(initial);
     return empty_snapshot_valid(initial);
 }
 
-bool gicv2_inject_test_irq(struct gicv2_lr_snapshot *pending)
+bool gicv2_arm_underflow(struct gicv2_lr_snapshot *armed)
 {
     struct gicv2_lr_snapshot before;
 
-    if (implemented_lrs == 0) {
+    if (implemented_lrs < GICV2_SNAPSHOT_LRS) {
         return false;
     }
 
-    gicv2_capture_lr0(&before);
+    gicv2_capture_lrs(&before);
     if (!empty_snapshot_valid(&before)) {
         return false;
     }
 
-    mmio_write32(PI400_GICH_BASE + GICH_LR0, GICH_LR_TEST_PENDING);
+    mmio_write32(PI400_GICH_BASE + GICH_LR0,
+                 GICH_LR_PRIMARY_PENDING);
+    mmio_write32(PI400_GICH_BASE + GICH_LR0 + 4,
+                 GICH_LR_RESERVE_PENDING);
     gic_barrier();
-    gicv2_capture_lr0(pending);
-    return pending_snapshot_valid(pending);
+    mmio_write32(PI400_GICH_BASE + GICH_HCR,
+                 GICH_HCR_UNDERFLOW_ARMED);
+    gic_barrier();
+    gicv2_capture_lrs(armed);
+    return armed_snapshot_valid(armed);
 }
 
-void gicv2_acknowledge_maintenance(struct gicv2_maintenance_trace *trace)
+void gicv2_acknowledge_underflow(struct gicv2_maintenance_trace *trace)
 {
     trace->iar = mmio_read32(PI400_GICC_BASE + GICC_IAR);
-    gicv2_capture_lr0(&trace->before);
+    gicv2_capture_lrs(&trace->before);
 
+    mmio_write32(PI400_GICH_BASE + GICH_HCR, GICH_HCR_ENABLE);
+    gic_barrier();
     mmio_write32(PI400_GICH_BASE + GICH_LR0, 0);
+    mmio_write32(PI400_GICH_BASE + GICH_LR0 + 4, 0);
     gic_barrier();
     if ((trace->iar & UINT32_C(0x3ff)) < 1020) {
         mmio_write32(PI400_GICC_BASE + GICC_EOIR, trace->iar);
         gic_barrier();
     }
 
-    gicv2_capture_lr0(&trace->after);
+    gicv2_capture_lrs(&trace->after);
 }
 
-bool gicv2_maintenance_trace_valid(
+bool gicv2_underflow_trace_valid(
     const struct gicv2_maintenance_trace *trace)
 {
     return trace->iar == GICV2_MAINTENANCE_INTID &&
-           snapshot_control_valid(&trace->before) &&
-           trace->before.misr == GICH_MISR_EOI &&
-           trace->before.eisr[0] == UINT32_C(1) &&
-           trace->before.eisr[1] == 0 &&
+           snapshot_control_valid(&trace->before,
+                                  GICH_HCR_UNDERFLOW_ARMED) &&
+           trace->before.misr == GICH_MISR_UNDERFLOW &&
+           trace->before.eisr[0] == 0 && trace->before.eisr[1] == 0 &&
            trace->before.elrsr[0] ==
-               (empty_mask_low() & ~UINT32_C(1)) &&
+               (empty_mask_low() & ~UINT32_C(2)) &&
            trace->before.elrsr[1] == empty_mask_high() &&
            trace->before.apr == 0 &&
-           trace->before.lr0 == GICH_LR_TEST_POST_EOI &&
+           trace->before.lr[0] == GICH_LR_PRIMARY_POST_EOI &&
+           trace->before.lr[1] == GICH_LR_RESERVE_PENDING &&
            empty_snapshot_valid(&trace->after);
 }

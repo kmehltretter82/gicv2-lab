@@ -6,6 +6,8 @@
 #include <stdbool.h>
 #include <stdint.h>
 
+#define GICV2_SNAPSHOT_LRS 2
+
 struct gicv2_lr_snapshot {
     uint32_t hcr;
     uint32_t vmcr;
@@ -13,7 +15,7 @@ struct gicv2_lr_snapshot {
     uint32_t eisr[2];
     uint32_t elrsr[2];
     uint32_t apr;
-    uint32_t lr0;
+    uint32_t lr[GICV2_SNAPSHOT_LRS];
 };
 
 struct gicv2_maintenance_trace {
@@ -23,11 +25,12 @@ struct gicv2_maintenance_trace {
 };
 
 bool gicv2_init(uint32_t lr_count, struct gicv2_lr_snapshot *initial);
-bool gicv2_inject_test_irq(struct gicv2_lr_snapshot *pending);
-void gicv2_capture_lr0(struct gicv2_lr_snapshot *snapshot);
+bool gicv2_arm_underflow(struct gicv2_lr_snapshot *armed);
+void gicv2_capture_lrs(struct gicv2_lr_snapshot *snapshot);
 bool gicv2_active_snapshot_valid(const struct gicv2_lr_snapshot *snapshot);
-void gicv2_acknowledge_maintenance(struct gicv2_maintenance_trace *trace);
-bool gicv2_maintenance_trace_valid(
+void gicv2_acknowledge_underflow(
+    struct gicv2_maintenance_trace *trace);
+bool gicv2_underflow_trace_valid(
     const struct gicv2_maintenance_trace *trace);
 
 #endif

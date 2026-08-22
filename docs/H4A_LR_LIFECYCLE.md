@@ -47,7 +47,10 @@ once before EXIT.
 
 A missing or duplicate checkpoint, a wrong IAR, a changed control register,
 any other LR/APR/MISR/EISR/ELRSR value, an unexpected exception, reset, hang,
-or early exit is forbidden. The strict oracle is `scripts/smoke-qemu.sh`.
+or early exit is forbidden. At the recorded H4a source revision
+`c965ac10b0f539ff54ff7903650a70c354f10e69`, the strict oracle was
+`scripts/smoke-qemu.sh`. Later milestones reuse that filename for their current
+scenario, so the recorded revision and result manifest pin the H4a oracle.
 
 Register encodings and state transitions are defined by the [Arm Generic
 Interrupt Controller Architecture Specification, version

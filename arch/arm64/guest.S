@@ -120,7 +120,7 @@ guest_irq_entry:
     movk x2, #PI400_GICV_BASE_HI, lsl #16
     ldr w1, [x2, #GICV_IAR]
     and w3, w1, #0x3ff
-    cmp w3, #H3_VIRTUAL_INTID
+    cmp w3, #GICV2_PRIMARY_INTID
     b.ne guest_irq_bad
 
     dsb sy

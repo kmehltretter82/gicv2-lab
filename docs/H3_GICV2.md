@@ -64,8 +64,12 @@ forbidden outcome. The guest deliberately spins on memory flags in H3; WFI
 wakeup is a separate H4 state-machine scenario and is not a precondition of
 this test.
 
-The strict oracle is `scripts/smoke-qemu.sh`. Register encodings and behavior
-are defined by the [Arm Generic Interrupt Controller Architecture
+At the recorded H3 source revision
+`8890a4d2a41092c1f8feb6dd228682ec54ef4588`, the strict oracle was
+`scripts/smoke-qemu.sh`. Later milestones reuse that filename for their current
+scenario, so the recorded revision and result manifest pin the H3 oracle.
+Register encodings and behavior are defined by the [Arm Generic Interrupt
+Controller Architecture
 Specification, version 2](https://developer.arm.com/documentation/ihi0048/latest/).
 The [Armv8-A virtualization
 guide](https://developer.arm.com/-/media/Arm%20Developer%20Community/PDF/Learn%20the%20Architecture/Armv8-A%20virtualization.pdf?revision=a765a7df-1a00-434d-b241-357bfda2dd31)
