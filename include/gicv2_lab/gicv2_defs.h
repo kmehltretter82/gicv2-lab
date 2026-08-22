@@ -39,13 +39,14 @@
 #define GICH_APR    0x0f0
 #define GICH_LR0    0x100
 
-#define GICV_CTLR 0x000
-#define GICV_PMR  0x004
-#define GICV_BPR  0x008
-#define GICV_IAR  0x00c
-#define GICV_EOIR 0x010
-#define GICV_RPR  0x014
-#define GICV_DIR  0x1000
+#define GICV_CTLR  0x000
+#define GICV_PMR   0x004
+#define GICV_BPR   0x008
+#define GICV_IAR   0x00c
+#define GICV_EOIR  0x010
+#define GICV_RPR   0x014
+#define GICV_HPPIR 0x018
+#define GICV_DIR   0x1000
 
 #define GICV2_TEST_INTID          42
 #define GICV2_TEST_PRIORITY       0x80
@@ -54,5 +55,7 @@
 #define GICV2_GICV_BPR_EXPECTED  0x02
 #define GICV2_GICV_RPR_ACTIVE_EXPECTED GICV2_TEST_PRIORITY
 #define GICV2_GICV_RPR_IDLE_EXPECTED   0xff
+#define GICV2_GICV_HPPIR_PENDING_EXPECTED GICV2_TEST_INTID
+#define GICV2_GICV_HPPIR_SPURIOUS_EXPECTED 1023
 
 #endif

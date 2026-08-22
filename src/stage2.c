@@ -48,7 +48,7 @@ _Static_assert(MONITOR_LOAD_BASE < GUEST_IPA_BASE,
 _Static_assert((PI400_GICV_BASE & UINT64_C(0x1fff)) == 0,
                "GICV base must be 8 KiB aligned");
 _Static_assert(GICV_DIR == UINT64_C(0x1000),
-               "H4d requires DIR in the second GICV page");
+               "split EOI requires DIR in the second GICV page");
 _Static_assert((uint64_t)PI400_GICV_BASE + GICV_DIR ==
                    UINT64_C(0xff847000),
                "unexpected Pi 400 GICV DIR address");

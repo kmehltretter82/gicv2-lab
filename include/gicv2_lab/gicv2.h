@@ -25,6 +25,11 @@ struct gicv2_lr_transition {
 
 bool gicv2_init(uint32_t gich_vtr, struct gicv2_lr_snapshot *initial);
 bool gicv2_inject(struct gicv2_lr_snapshot *pending);
+bool gicv2_repend_active(struct gicv2_lr_transition *transition);
+bool gicv2_capture_active_pending_drop(
+    struct gicv2_lr_snapshot *priority_drop);
+bool gicv2_capture_redelivery_pending(
+    struct gicv2_lr_snapshot *pending);
 bool gicv2_capture_active(struct gicv2_lr_snapshot *active);
 bool gicv2_capture_priority_drop(struct gicv2_lr_snapshot *priority_drop);
 bool gicv2_finish_deactivation(struct gicv2_lr_transition *transition);

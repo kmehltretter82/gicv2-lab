@@ -7,7 +7,7 @@ image=${1:?usage: smoke-qemu.sh IMAGE}
 qemu=${QEMU:?set QEMU to qemu-system-aarch64}
 log=build/smoke-qemu.log
 stderr_log=build/smoke-qemu.stderr
-marker='[gicv2-lab] H4d PASS'
+marker='[gicv2-lab] H4e PASS'
 deadline=$(( $(date +%s) + 10 ))
 poll_interval=${SMOKE_POLL_INTERVAL:-0.1}
 pid=
@@ -55,6 +55,25 @@ reject_line()
     fi
 }
 
+require_snapshot()
+{
+    snapshot_suffix=$1
+    snapshot_lr0=$2
+    snapshot_apr=$3
+    snapshot_elrsr0=$4
+
+    require_line "GICH_HCR_${snapshot_suffix}=0x0000000000000001"
+    require_line "GICH_VMCR_${snapshot_suffix}=0x00000000f85c0201"
+    require_line "GICH_MISR_${snapshot_suffix}=0x0000000000000000"
+    require_line "GICH_EISR0_${snapshot_suffix}=0x0000000000000000"
+    require_line "GICH_EISR1_${snapshot_suffix}=0x0000000000000000"
+    require_line "GICH_ELRSR0_${snapshot_suffix}=${snapshot_elrsr0}"
+    require_line "GICH_ELRSR1_${snapshot_suffix}=0x0000000000000000"
+    require_line "GICH_APR_${snapshot_suffix}=${snapshot_apr}"
+    require_line "GICH_LR0_${snapshot_suffix}=${snapshot_lr0}"
+    require_line "GICH_LR1_${snapshot_suffix}=0x0000000000000000"
+}
+
 trap cleanup EXIT INT TERM
 
 rm -f "$log" "$stderr_log"
@@ -73,7 +92,7 @@ while test "$(date +%s)" -lt "$deadline"; do
         if test "${SMOKE_QUIET:-0}" != 1; then
             cat "$log"
         fi
-        require_once '[gicv2-lab] H4d EL2 monitor'
+        require_once '[gicv2-lab] H4e EL2 monitor'
         require_once "$marker"
         require_line 'CurrentEL=2'
         require_line 'GICH_LRS=4'
@@ -106,72 +125,57 @@ while test "$(date +%s)" -lt "$deadline"; do
         require_line 'GuestGICV_CTLR=0x0000000000000201'
         require_line 'GuestGICV_PMR=0x00000000000000f8'
         require_line 'GuestGICV_BPR=0x0000000000000002'
-        require_once '[gicv2-lab] split-EOI virtual IRQ pending'
-        require_line 'GICH_HCR_pending=0x0000000000000001'
-        require_line 'GICH_VMCR_pending=0x00000000f85c0201'
-        require_line 'GICH_MISR_pending=0x0000000000000000'
-        require_line 'GICH_EISR0_pending=0x0000000000000000'
-        require_line 'GICH_EISR1_pending=0x0000000000000000'
-        require_line 'GICH_ELRSR0_pending=0x000000000000000e'
-        require_line 'GICH_ELRSR1_pending=0x0000000000000000'
-        require_line 'GICH_APR_pending=0x0000000000000000'
-        require_line 'GICH_LR0_pending=0x000000001800002a'
-        require_line 'GICH_LR1_pending=0x0000000000000000'
-        require_once '[gicv2-lab] split-EOI virtual IRQ active'
-        require_line 'GuestIAR_active=42'
-        require_line 'GuestRPR_active=0x0000000000000080'
-        require_line 'GICH_HCR_active=0x0000000000000001'
-        require_line 'GICH_VMCR_active=0x00000000f85c0201'
-        require_line 'GICH_MISR_active=0x0000000000000000'
-        require_line 'GICH_EISR0_active=0x0000000000000000'
-        require_line 'GICH_EISR1_active=0x0000000000000000'
-        require_line 'GICH_ELRSR0_active=0x000000000000000e'
-        require_line 'GICH_ELRSR1_active=0x0000000000000000'
-        require_line 'GICH_APR_active=0x0000000000010000'
-        require_line 'GICH_LR0_active=0x000000002800002a'
-        require_line 'GICH_LR1_active=0x0000000000000000'
-        require_once '[gicv2-lab] EOIR priority drop without deactivation'
-        require_line 'GuestIAR_priority_drop=42'
-        require_line 'GuestRPR_priority_drop=0x00000000000000ff'
-        require_line 'GICH_HCR_priority_drop=0x0000000000000001'
-        require_line 'GICH_VMCR_priority_drop=0x00000000f85c0201'
-        require_line 'GICH_MISR_priority_drop=0x0000000000000000'
-        require_line 'GICH_EISR0_priority_drop=0x0000000000000000'
-        require_line 'GICH_EISR1_priority_drop=0x0000000000000000'
-        require_line 'GICH_ELRSR0_priority_drop=0x000000000000000e'
-        require_line 'GICH_ELRSR1_priority_drop=0x0000000000000000'
-        require_line 'GICH_APR_priority_drop=0x0000000000000000'
-        require_line 'GICH_LR0_priority_drop=0x000000002800002a'
-        require_line 'GICH_LR1_priority_drop=0x0000000000000000'
-        require_once '[gicv2-lab] DIR deactivated virtual IRQ'
-        require_line 'GuestIAR_deactivate=42'
-        require_line 'GuestRPR_deactivate=0x00000000000000ff'
-        require_line 'GICH_HCR_deactivated=0x0000000000000001'
-        require_line 'GICH_VMCR_deactivated=0x00000000f85c0201'
-        require_line 'GICH_MISR_deactivated=0x0000000000000000'
-        require_line 'GICH_EISR0_deactivated=0x0000000000000000'
-        require_line 'GICH_EISR1_deactivated=0x0000000000000000'
-        require_line 'GICH_ELRSR0_deactivated=0x000000000000000f'
-        require_line 'GICH_ELRSR1_deactivated=0x0000000000000000'
-        require_line 'GICH_APR_deactivated=0x0000000000000000'
-        require_line 'GICH_LR0_deactivated=0x000000000800002a'
-        require_line 'GICH_LR1_deactivated=0x0000000000000000'
+        require_once '[gicv2-lab] active-plus-pending virtual IRQ pending'
+        require_snapshot pending 0x000000001800002a \
+            0x0000000000000000 0x000000000000000e
+        require_once '[gicv2-lab] first virtual IRQ active'
+        require_line 'GuestIAR_first_active=42'
+        require_line 'GuestRPR_first_active=0x0000000000000080'
+        require_line 'GuestHPPIR_first_active=1023'
+        require_snapshot first_active 0x000000002800002a \
+            0x0000000000010000 0x000000000000000e
+        require_once '[gicv2-lab] virtual source re-pended while active'
+        require_snapshot active_pending 0x000000003800002a \
+            0x0000000000010000 0x000000000000000e
+        require_once '[gicv2-lab] first EOIR priority drop'
+        require_line 'GuestIAR_first_priority_drop=42'
+        require_line 'GuestRPR_first_priority_drop=0x00000000000000ff'
+        require_line 'GuestHPPIR_first_priority_drop=1023'
+        require_snapshot first_priority_drop 0x000000003800002a \
+            0x0000000000000000 0x000000000000000e
+        require_once '[gicv2-lab] first DIR exposed pending redelivery'
+        require_line 'GuestIAR_redelivery_pending=42'
+        require_line 'GuestRPR_redelivery_pending=0x00000000000000ff'
+        require_line 'GuestHPPIR_redelivery_pending=42'
+        require_snapshot redelivery_pending 0x000000001800002a \
+            0x0000000000000000 0x000000000000000e
+        require_once '[gicv2-lab] virtual IRQ delivered again'
+        require_line 'GuestIAR_second_active=42'
+        require_line 'GuestRPR_second_active=0x0000000000000080'
+        require_line 'GuestHPPIR_second_active=1023'
+        require_snapshot second_active 0x000000002800002a \
+            0x0000000000010000 0x000000000000000e
+        require_once '[gicv2-lab] second EOIR priority drop'
+        require_line 'GuestIAR_second_priority_drop=42'
+        require_line 'GuestRPR_second_priority_drop=0x00000000000000ff'
+        require_line 'GuestHPPIR_second_priority_drop=1023'
+        require_snapshot second_priority_drop 0x000000002800002a \
+            0x0000000000000000 0x000000000000000e
+        require_once '[gicv2-lab] second DIR deactivated virtual IRQ'
+        require_line 'GuestIAR_final_deactivate=42'
+        require_line 'GuestRPR_final_deactivate=0x00000000000000ff'
+        require_line 'GuestHPPIR_final_deactivate=1023'
+        require_snapshot final_deactivated 0x000000000800002a \
+            0x0000000000000000 0x000000000000000f
         require_once '[gicv2-lab] virtual interface restored'
-        require_line 'GICH_HCR_cleared=0x0000000000000001'
-        require_line 'GICH_VMCR_cleared=0x00000000f85c0201'
-        require_line 'GICH_MISR_cleared=0x0000000000000000'
-        require_line 'GICH_EISR0_cleared=0x0000000000000000'
-        require_line 'GICH_EISR1_cleared=0x0000000000000000'
-        require_line 'GICH_ELRSR0_cleared=0x000000000000000f'
-        require_line 'GICH_ELRSR1_cleared=0x0000000000000000'
-        require_line 'GICH_APR_cleared=0x0000000000000000'
-        require_line 'GICH_LR0_cleared=0x0000000000000000'
-        require_line 'GICH_LR1_cleared=0x0000000000000000'
+        require_snapshot cleared 0x0000000000000000 \
+            0x0000000000000000 0x000000000000000f
         reject_line '[gicv2-lab] H3 FAIL:'
         reject_line '[gicv2-lab] H4a FAIL:'
         reject_line '[gicv2-lab] H4b FAIL:'
         reject_line '[gicv2-lab] H4c FAIL:'
         reject_line '[gicv2-lab] H4d FAIL:'
+        reject_line '[gicv2-lab] H4e FAIL:'
         reject_line '[gicv2-lab] unexpected physical IRQ'
         exit 0
     fi
@@ -183,5 +187,5 @@ done
 
 test -f "$log" && cat "$log"
 test ! -s "$stderr_log" || cat "$stderr_log" >&2
-echo "gicv2-lab: QEMU smoke test did not observe the H4d marker" >&2
+echo "gicv2-lab: QEMU smoke test did not observe the H4e marker" >&2
 exit 1

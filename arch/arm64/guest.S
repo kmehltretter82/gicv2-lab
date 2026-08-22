@@ -36,7 +36,7 @@ guest_start:
     msr vbar_el1, x2
     isb
 
-    adr x2, guest_irq_done
+    adr x2, guest_irq_count
     str wzr, [x2]
 
     mrs x1, CurrentEL
@@ -63,10 +63,11 @@ guest_start:
     msr daifclr, #2
     isb
 
-    adr x2, guest_irq_done
+    adr x2, guest_irq_count
 1:
     ldr w3, [x2]
-    cbz w3, 1b
+    cmp w3, #2
+    b.ne 1b
 
     msr daifset, #2
     isb
@@ -97,6 +98,17 @@ guest_start:
     .space 96
 .endm
 
+.macro REPORT_IRQ_STATE operation
+    ldr w3, [x2, #GICV_RPR]
+    mov w1, w1
+    orr x1, x1, x3, lsl #32
+    ldr w3, [x2, #GICV_HPPIR]
+    orr x1, x1, x3, lsl #40
+    dsb sy
+    mov x0, #\operation
+    hvc #0
+.endm
+
 guest_vectors:
     GUEST_VECTOR 0, guest_unexpected
     GUEST_VECTOR 1, guest_unexpected
@@ -116,6 +128,14 @@ guest_vectors:
     GUEST_VECTOR 15, guest_unexpected
 
 guest_irq_entry:
+    adr x2, guest_irq_count
+    ldr w3, [x2]
+    cbz w3, guest_first_irq
+    cmp w3, #1
+    b.eq guest_second_irq
+    b guest_irq_bad
+
+guest_first_irq:
     movz x2, #PI400_GICV_BASE_LO
     movk x2, #PI400_GICV_BASE_HI, lsl #16
     ldr w1, [x2, #GICV_IAR]
@@ -123,34 +143,42 @@ guest_irq_entry:
     cmp w3, #GICV2_TEST_INTID
     b.ne guest_irq_bad
 
-    ldr w3, [x2, #GICV_RPR]
-    orr x1, x1, x3, lsl #32
-    dsb sy
-    mov x0, #HVC_IRQ_ACTIVE
-    hvc #0
+    REPORT_IRQ_STATE HVC_IRQ_ACTIVE
 
     str w1, [x2, #GICV_EOIR]
     dsb sy
-
-    ldr w3, [x2, #GICV_RPR]
-    mov w1, w1
-    orr x1, x1, x3, lsl #32
-    dsb sy
-    mov x0, #HVC_IRQ_EOI
-    hvc #0
+    REPORT_IRQ_STATE HVC_IRQ_EOI
 
     str w1, [x2, #GICV_DIR]
     dsb sy
+    REPORT_IRQ_STATE HVC_IRQ_DEACTIVATE
 
-    ldr w3, [x2, #GICV_RPR]
-    mov w1, w1
-    orr x1, x1, x3, lsl #32
-    dsb sy
-    mov x0, #HVC_IRQ_DEACTIVATE
-    hvc #0
-
-    adr x2, guest_irq_done
+    adr x2, guest_irq_count
     mov w3, #1
+    str w3, [x2]
+    dsb sy
+    b guest_irq_return
+
+guest_second_irq:
+    movz x2, #PI400_GICV_BASE_LO
+    movk x2, #PI400_GICV_BASE_HI, lsl #16
+    ldr w1, [x2, #GICV_IAR]
+    and w3, w1, #0x3ff
+    cmp w3, #GICV2_TEST_INTID
+    b.ne guest_irq_bad
+
+    REPORT_IRQ_STATE HVC_IRQ_REDELIVERED
+
+    str w1, [x2, #GICV_EOIR]
+    dsb sy
+    REPORT_IRQ_STATE HVC_IRQ_SECOND_EOI
+
+    str w1, [x2, #GICV_DIR]
+    dsb sy
+    REPORT_IRQ_STATE HVC_IRQ_SECOND_DEACTIVATE
+
+    adr x2, guest_irq_count
+    mov w3, #2
     str w3, [x2]
     dsb sy
 
@@ -180,8 +208,8 @@ guest_halt:
 
 .section .guest.data, "aw"
 .align 2
-.global guest_irq_done
-.type guest_irq_done, %object
-guest_irq_done:
+.global guest_irq_count
+.type guest_irq_count, %object
+guest_irq_count:
     .word 0
-.size guest_irq_done, . - guest_irq_done
+.size guest_irq_count, . - guest_irq_count
