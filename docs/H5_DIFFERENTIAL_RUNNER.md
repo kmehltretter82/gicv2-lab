@@ -153,3 +153,12 @@ are retained together:
 Passing this gate establishes QEMU-side capture and comparison determinism. It
 does not establish that QEMU matches a Pi 400 or KVM; that conclusion requires
 separately approved H6/H7 evidence.
+
+## Recorded QEMU baseline
+
+The implementation commit `2f0bea750192c96b2196f3a3e1e739f9cb2874d3` passed
+the QEMU-only gate on 2026-08-22: seven host-tool unit tests, a clean build,
+one strict H4i UART oracle, twenty fresh explicitly-TCG captures, and a
+manifest-pinned replay all passed. The raw serial and stderr, run manifest,
+repeat summary, replay comparison, hashes, and environment are retained in
+`results/2026-08-22-h5-qemu-pi4/manifest.md`.

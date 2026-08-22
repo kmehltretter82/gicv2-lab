@@ -177,7 +177,7 @@ maintenance event, physical IRQ, unexpected exception, reset, hang, or early
 exit on 2026-08-22. The exact revision, linked-image audit, and raw trace are
 preserved in `results/2026-08-22-h4i-qemu-pi4/`.
 
-## H5 — differential runner (QEMU host-tool baseline in progress)
+## H5 — differential runner (QEMU host-tool baseline completed)
 
 Run the same payload and scenario input on QEMU, real hardware, and KVM.
 Compare only architecturally meaningful fields. Preserve raw traces and reduce
@@ -198,6 +198,13 @@ This baseline does not boot physical hardware or invoke KVM. H6/H7 output
 will be imported passively into the same trace contract after those steps are
 explicitly approved. The current reducer shortens diagnostic trace evidence;
 data-driven operation-level delta reduction remains a later H5 extension.
+
+Exit gate: the frozen implementation at
+`2f0bea750192c96b2196f3a3e1e739f9cb2874d3` passed seven unit tests, a clean
+build, one strict H4i UART oracle, twenty fresh QEMU TCG captures, and a
+manifest-pinned replay on 2026-08-22. Every normalized repeat trace matched
+run 1. The exact artifacts are retained in
+`results/2026-08-22-h5-qemu-pi4/`.
 
 ## H6 — first real Pi 400 boot (later)
 

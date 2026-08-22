@@ -1,0 +1,44 @@
+{
+  "backend": "qemu-tcg",
+  "command": [
+    "/Users/kmehltretter/codex/linux-work/qemu-rpi4/qemu-pi4/build-pi4-native-fdt/qemu-system-aarch64",
+    "-machine",
+    "raspi400",
+    "-accel",
+    "tcg",
+    "-cpu",
+    "cortex-a72,has_el3=off",
+    "-kernel",
+    "/Users/kmehltretter/codex/linux-work/gicv2-lab/build/h5-final/gicv2-lab.elf",
+    "-display",
+    "none",
+    "-monitor",
+    "none",
+    "-serial",
+    "file:/Users/kmehltretter/codex/linux-work/gicv2-lab/build/h5-final/repeat-20/run-001/serial.log",
+    "-no-reboot"
+  ],
+  "image": {
+    "path": "/Users/kmehltretter/codex/linux-work/gicv2-lab/build/h5-final/gicv2-lab.elf",
+    "sha256": "0bef6082deb828d5b423bc5e081965f05bfa601eaced8dc853bee554541ddec2"
+  },
+  "qemu": {
+    "path": "/Users/kmehltretter/codex/linux-work/qemu-rpi4/qemu-pi4/build-pi4-native-fdt/qemu-system-aarch64",
+    "sha256": "bf3e2f36b451af4225d3fd71eabe8981dd8ea05558977825a355690f21426c16",
+    "version": "QEMU emulator version 11.1.0 (v0.1.0-bootstrap-18-g8460833e53-dirty)\nCopyright (c) 2003-2026 Fabrice Bellard and the QEMU Project developers"
+  },
+  "runner_version": "1",
+  "scenario_path": "/Users/kmehltretter/codex/linux-work/gicv2-lab/scenarios/h4i-context-save-restore-v1.json",
+  "scenario_sha256": "54e8d2ad32f29350a15d6159c2e026e854cefc3222d32b5732efb8284ce3e2e9",
+  "schema": "gicv2-lab.run.v1",
+  "serial": {
+    "path": "/Users/kmehltretter/codex/linux-work/gicv2-lab/build/h5-final/repeat-20/run-001/serial.log",
+    "sha256": "ecf96261e7a9e7ed5c553bdbed0d4f7f56b78637a89db12df9e8bd166fabf457"
+  },
+  "status": "pass",
+  "stderr": {
+    "path": "/Users/kmehltretter/codex/linux-work/gicv2-lab/build/h5-final/repeat-20/run-001/stderr.log",
+    "sha256": "8ab33f18f988535b6bb32a9889c726d203b70e3e793da15b1b537f444ad8d07d"
+  },
+  "timeout_seconds": 10.0
+}

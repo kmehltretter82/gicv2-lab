@@ -57,10 +57,12 @@ All planned QEMU-only H4 milestones are complete. No physical boot has been
 performed. Hardware execution remains a separate, explicitly approved H6
 step. See ROADMAP.md.
 
-H5 now has a QEMU-only host-tool baseline: it captures raw serial output,
+H5's QEMU-only host-tool baseline is complete: it captures raw serial output,
 pins the ELF and scenario hashes, normalizes selected architectural state,
-compares fresh runs, and reduces a mismatch to its first trace prefix. It
-does not boot hardware. See docs/H5_DIFFERENTIAL_RUNNER.md.
+compares fresh runs, and reduces a mismatch to its first trace prefix. The
+frozen 20-process gate and replay evidence are in
+`results/2026-08-22-h5-qemu-pi4/`. It does not boot hardware. See
+docs/H5_DIFFERENTIAL_RUNNER.md.
 
 ## Build
 
