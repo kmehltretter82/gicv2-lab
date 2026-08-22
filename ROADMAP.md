@@ -162,7 +162,7 @@ physical IRQ, maintenance event, extra/missing wake, unexpected exception,
 reset, or hang on 2026-08-22. The exact revision, linked-image audit, and raw
 trace are preserved in `results/2026-08-22-h4h-qemu-pi4/`.
 
-### H4i — paused virtual-interface save and restore (exit gate pending)
+### H4i — paused virtual-interface save and restore (completed)
 
 - Pause at EL2 with one virtual interrupt active and another pending, then
   save HCR, VMCR, APR, and every implemented LR.
@@ -171,11 +171,11 @@ trace are preserved in `results/2026-08-22-h4h-qemu-pi4/`.
 - Resume and require both guest completions in order. This tests architectural
   vCPU-interface context switching, not QEMU migration or QMP state transfer.
 
-Exit gate: 100 consecutive fresh qemu-pi4 processes accepted by a frozen
-strict oracle.
-
-The implementation and strict oracle pass a single-process pre-gate run. The
-100-process repetition gate and evidence manifest remain to be completed.
+Exit gate: the frozen strict H4i oracle passed 100 consecutive fresh qemu-pi4
+processes without a save/restore mismatch, incorrect nested delivery,
+maintenance event, physical IRQ, unexpected exception, reset, hang, or early
+exit on 2026-08-22. The exact revision, linked-image audit, and raw trace are
+preserved in `results/2026-08-22-h4i-qemu-pi4/`.
 
 ## H5 — differential runner
 
@@ -185,7 +185,7 @@ any one-sided forbidden outcome to its smallest sequence.
 
 ## H6 — first real Pi 400 boot (later)
 
-The H1–H4h QEMU prerequisite is satisfied. Physical execution remains opt-in
+The H1–H4i QEMU prerequisite is satisfied. Physical execution remains opt-in
 and requires the user's explicit request. The first image:
 
 1. uses a recoverable boot medium and serial capture;

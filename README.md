@@ -13,8 +13,7 @@ interrupt transition observable, replayable, and comparable across:
 
 ## Status
 
-H4h is complete under qemu-pi4, and the H4i implementation passes its strict
-single-process pre-gate run. The QEMU-only lab now has:
+H4i is complete under qemu-pi4. The QEMU-only lab now has:
 
 - the H1 EL2 monitor and H2 one-vCPU EL1 guest with a validated, resumable
   stage-2 translation fault;
@@ -47,15 +46,14 @@ single-process pre-gate run. The QEMU-only lab now has:
   VMCR, APR, and all four LRs, replaced by a distinct quiescent context, and
   restored with HCR enabled last before nested delivery and split completion.
 
-The strict H4h exit gate passed 100 consecutive fresh qemu-pi4 processes on
+The strict H4i exit gate passed 100 consecutive fresh qemu-pi4 processes on
 2026-08-22. Its exact revision, hashes, environment, linked-image audit, and
-final raw trace are preserved in `results/2026-08-22-h4h-qemu-pi4/`. H4h
+final raw trace are preserved in `results/2026-08-22-h4i-qemu-pi4/`. H4i
 matched its frozen contract and produced no QEMU bug candidate. H4f's earlier
 fork candidate and its separate pre-fix evidence remain recorded under the
 H4f result directory.
 
-The H4i implementation and strict oracle still require their frozen
-100-process exit gate and evidence manifest. No physical boot has been
+All planned QEMU-only H4 milestones are complete. No physical boot has been
 performed. Hardware execution remains a separate, explicitly approved H6
 step. See ROADMAP.md.
 

@@ -103,6 +103,14 @@ source revision, image and emulator hashes, toolchain, host, command line,
 linked-image audit, and lossless final trace under `results/` before marking
 H4i complete.
 
-The implementation and strict oracle are frozen together by the source
-revision that will be named in the result manifest. The 100-process exit gate
-has not yet been run for that revision.
+## Recorded QEMU result
+
+The frozen implementation at `0e4374701ff73860a300e20ba76c75d45cf14d04`
+passed 100 consecutive fresh qemu-pi4 processes on 2026-08-22. The exact
+image, emulator, environment, linked-image audit, and lossless final trace are
+recorded in `results/2026-08-22-h4i-qemu-pi4/manifest.md`.
+
+The observed result matched this contract. H4i produced no divergent
+behavior and no QEMU bug candidate. A pre-freeze literal-zero VMCR readback
+expectation was corrected to the architecturally canonical minimum BPR/ABPR
+readback before the implementation was frozen.
