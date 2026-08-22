@@ -46,10 +46,33 @@ processes without an unexpected exception, register state, reset, or hang on
 
 ## H4 — deterministic GICv2 state machine
 
-Add one scenario at a time: List Register state transitions, underflow and EOI
-maintenance events, priority/preemption, EOImode, level reassertion,
+### H4a — List Register lifecycle (completed)
+
+- Snapshot LR0 and the hypervisor control state while LR0 is empty, pending,
+  active, invalid after EOI, and empty again after EL2 clears it.
+- Validate the matching GICH_APR transition at the active checkpoint.
+- Keep the existing EOI maintenance event isolated from WFI and preemption.
+
+Exit gate: the strict H4a smoke oracle passed 100 consecutive fresh qemu-pi4
+processes without an unexpected exception, register state, reset, or hang on
+2026-08-22. The tested source revision and raw trace are preserved in
+`results/2026-08-22-h4a-qemu-pi4/`.
+
+### H4b — underflow maintenance (next)
+
+- Start with exactly two valid pending software LRs and EOI maintenance
+  disabled so the underflow cause is isolated.
+- Enable underflow maintenance and have the guest acknowledge and EOI the
+  higher-priority interrupt, reducing the valid-LR count from two to one.
+- Require `GICH_MISR.U`, no EISR bit, the expected remaining pending LR, and a
+  single maintenance PPI before restoring an empty, quiescent interface.
+
+Exit gate: freeze the allowed state transition first, then require 100
+consecutive fresh qemu-pi4 processes and preserve the final raw trace.
+
+Later H4 scenarios add priority/preemption, EOImode, level reassertion,
 multi-source SGIs, List Register overflow, WFI wakeup, and paused-vCPU
-save/restore.
+save/restore one focused contract at a time.
 
 ## H5 — differential runner
 
@@ -59,7 +82,7 @@ any one-sided forbidden outcome to its smallest sequence.
 
 ## H6 — first real Pi 400 boot (later)
 
-The H1–H3 QEMU prerequisite is satisfied. Physical execution remains opt-in
+The H1–H4a QEMU prerequisite is satisfied. Physical execution remains opt-in
 and requires the user's explicit request. The first image:
 
 1. uses a recoverable boot medium and serial capture;
