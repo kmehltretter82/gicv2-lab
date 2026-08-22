@@ -13,7 +13,7 @@ interrupt transition observable, replayable, and comparable across:
 
 ## Status
 
-H4a is complete under qemu-pi4. It deliberately stays QEMU-only and now has:
+H4b is complete under qemu-pi4. It deliberately stays QEMU-only and now has:
 
 - the H1 EL2 monitor and H2 one-vCPU EL1 guest with a validated, resumable
   stage-2 translation fault;
@@ -24,15 +24,17 @@ H4a is complete under qemu-pi4. It deliberately stays QEMU-only and now has:
 - EL2 capture, validation, clearing, and physical EOI of maintenance PPI 25;
   and
 - exact empty, pending, active, post-EOI, and cleared LR0 snapshots, including
-  the corresponding GICH_APR transition.
+  the corresponding GICH_APR transition; and
+- an isolated underflow-maintenance transition with two valid software LRs,
+  a masked pending reserve, and no EOI/EISR cause.
 
-The strict H4a exit gate passed 100 consecutive fresh qemu-pi4 processes on
+The strict H4b exit gate passed 100 consecutive fresh qemu-pi4 processes on
 2026-08-22. The tested revision, hashes, environment, and final raw trace are
-preserved in `results/2026-08-22-h4a-qemu-pi4/`.
+preserved in `results/2026-08-22-h4b-qemu-pi4/`.
 
 The QEMU prerequisite for the first real Pi 400 boot is now satisfied, but no
 physical boot has been performed. Hardware execution remains a separate,
-explicitly approved H6 step. H4b's isolated underflow-maintenance scenario is
+explicitly approved H6 step. H4c's virtual-priority and preemption scenario is
 the next QEMU-only development milestone. See ROADMAP.md.
 
 ## Build
@@ -62,7 +64,7 @@ Override QEMU to test another build:
     make LLVM_BIN=/opt/homebrew/opt/llvm/bin \
       QEMU=/path/to/qemu-system-aarch64 smoke
 
-Run the H4a exit-gate loop (100 consecutive boots by default) with:
+Run the H4b exit-gate loop (100 consecutive boots by default) with:
 
     make LLVM_BIN=/opt/homebrew/opt/llvm/bin smoke-repeat
 
@@ -71,14 +73,14 @@ Set `SMOKE_RUNS=N` to select a different count.
 The test loads the ELF directly at 0x80000 and uses
 -cpu cortex-a72,has_el3=off. That prevents QEMU's optional synthetic EL3 from
 obscuring the non-secure EL2 environment the Pi 400 exposes to this lab. It
-checks the H1 and H2 descriptors and exceptions, the H3 virtual-interrupt
-path, every H4a LR/APR snapshot, the maintenance event, and the final PASS
-marker. It never writes a physical boot medium.
+checks the H1 and H2 descriptors and exceptions, the virtual-interrupt path,
+every H4b LR/APR/MISR/EISR/ELRSR snapshot, the isolated underflow maintenance
+event, and the final PASS marker. It never writes a physical boot medium.
 
 The H2 architectural contract and fixed memory map are documented in
 docs/H2_STAGE2.md. The virtual-interrupt contract is in docs/H3_GICV2.md, the
-LR lifecycle is in docs/H4A_LR_LIFECYCLE.md, and the guest call interface is
-in docs/HVC_ABI.md.
+LR lifecycle is in docs/H4A_LR_LIFECYCLE.md, underflow maintenance is in
+docs/H4B_UNDERFLOW.md, and the guest call interface is in docs/HVC_ABI.md.
 
 ## Repository boundaries
 

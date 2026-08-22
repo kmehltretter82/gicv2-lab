@@ -58,7 +58,7 @@ processes without an unexpected exception, register state, reset, or hang on
 2026-08-22. The tested source revision and raw trace are preserved in
 `results/2026-08-22-h4a-qemu-pi4/`.
 
-### H4b — underflow maintenance (next)
+### H4b — underflow maintenance (completed)
 
 - Start with exactly two valid pending software LRs and EOI maintenance
   disabled so the underflow cause is isolated.
@@ -67,12 +67,27 @@ processes without an unexpected exception, register state, reset, or hang on
 - Require `GICH_MISR.U`, no EISR bit, the expected remaining pending LR, and a
   single maintenance PPI before restoring an empty, quiescent interface.
 
-Exit gate: freeze the allowed state transition first, then require 100
-consecutive fresh qemu-pi4 processes and preserve the final raw trace.
+Exit gate: the strict H4b smoke oracle passed 100 consecutive fresh qemu-pi4
+processes without an unexpected exception, register state, reset, or hang on
+2026-08-22. The tested source revision and raw trace are preserved in
+`results/2026-08-22-h4b-qemu-pi4/`.
 
-Later H4 scenarios add priority/preemption, EOImode, level reassertion,
-multi-source SGIs, List Register overflow, WFI wakeup, and paused-vCPU
-save/restore one focused contract at a time.
+### H4c — virtual priority and preemption (next)
+
+- Make one lower-priority virtual interrupt active before injecting a second
+  interrupt at a genuinely higher preemption level.
+- Permit one controlled nested EL1 IRQ and validate the LR state, APR bits,
+  acknowledgement order, and reverse completion order at each checkpoint.
+- Keep maintenance causes disabled so the priority/preemption transition is
+  isolated.
+
+Exit gate: freeze the allowed nested-interrupt state machine first, then
+require 100 consecutive fresh qemu-pi4 processes and preserve the final raw
+trace.
+
+Later H4 scenarios add EOImode, level reassertion, multi-source SGIs, List
+Register overflow, WFI wakeup, and paused-vCPU save/restore one focused
+contract at a time.
 
 ## H5 — differential runner
 
@@ -82,7 +97,7 @@ any one-sided forbidden outcome to its smallest sequence.
 
 ## H6 — first real Pi 400 boot (later)
 
-The H1–H4a QEMU prerequisite is satisfied. Physical execution remains opt-in
+The H1–H4b QEMU prerequisite is satisfied. Physical execution remains opt-in
 and requires the user's explicit request. The first image:
 
 1. uses a recoverable boot medium and serial capture;

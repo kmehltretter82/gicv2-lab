@@ -69,3 +69,11 @@ The exit gate is 100 consecutive fresh qemu-pi4 processes accepted by the
 strict oracle, with no forbidden outcome. The tested source revision, image
 and QEMU hashes, toolchain, host, exact command, and lossless final serial
 trace must be preserved under `results/` before H4b is marked complete.
+
+## Recorded result
+
+The strict oracle passed 100 consecutive fresh qemu-pi4 processes on
+2026-08-22 with no forbidden outcome. The exact tested lab revision, artifact
+and QEMU binary hashes, toolchain, command line, host environment, and final
+raw serial trace are recorded in
+`../results/2026-08-22-h4b-qemu-pi4/manifest.md`.
