@@ -13,7 +13,7 @@ interrupt transition observable, replayable, and comparable across:
 
 ## Status
 
-H4f is complete under qemu-pi4. It deliberately stays QEMU-only and now has:
+H4g is complete under qemu-pi4. It deliberately stays QEMU-only and now has:
 
 - the H1 EL2 monitor and H2 one-vCPU EL1 guest with a validated, resumable
   stage-2 translation fault;
@@ -36,18 +36,21 @@ H4f is complete under qemu-pi4. It deliberately stays QEMU-only and now has:
   Pending exposure at the first DIR, exactly one second delivery, and final
   deactivation all checked against exact LR/APR state; and
 - two software virtual SGIs with distinct source CPUID fields carried through
-  raw HPPIR, IAR, split EOI, and deactivation values.
+  raw HPPIR, IAR, split EOI, and deactivation values; and
+- full four-LR exhaustion, one fifth interrupt held in an EL2 software queue,
+  and a single validated empty-slot refill followed by five ordered
+  completions.
 
-The frozen H4f test first exposed a missing virtual-SGI source field in
-qemu-pi4's HPPIR result. A focused fork fix then passed 100 consecutive fresh
-processes on 2026-08-22. The pre-fix failure, exact revisions, hashes,
-environment, and raw traces are preserved in
-`results/2026-08-22-h4f-qemu-pi4/`. This is not yet an upstream-ready result.
+The strict H4g exit gate passed 100 consecutive fresh qemu-pi4 processes on
+2026-08-22. Its exact revision, hashes, environment, and final raw trace are
+preserved in `results/2026-08-22-h4g-qemu-pi4/`. H4g matched its frozen
+contract and produced no QEMU bug candidate. H4f's earlier fork candidate and
+its separate pre-fix evidence remain recorded under the H4f result directory.
 
 The QEMU prerequisite for the first real Pi 400 boot is now satisfied, but no
 physical boot has been performed. Hardware execution remains a separate,
-explicitly approved H6 step. List Register exhaustion and software refill are
-the next QEMU-only state-machine milestone. See ROADMAP.md.
+explicitly approved H6 step. WFI wakeup is the next QEMU-only state-machine
+milestone. See ROADMAP.md.
 
 ## Build
 
@@ -76,7 +79,7 @@ Override QEMU to test another build:
     make LLVM_BIN=/opt/homebrew/opt/llvm/bin \
       QEMU=/path/to/qemu-system-aarch64 smoke
 
-Run the H4f exit-gate loop (100 consecutive boots by default) with:
+Run the H4g exit-gate loop (100 consecutive boots by default) with:
 
     make LLVM_BIN=/opt/homebrew/opt/llvm/bin smoke-repeat
 
@@ -86,9 +89,9 @@ The test loads the ELF directly at 0x80000 and uses
 -cpu cortex-a72,has_el3=off. That prevents QEMU's optional synthetic EL3 from
 obscuring the non-secure EL2 environment the Pi 400 exposes to this lab. It
 checks the H1 and H2 descriptors and exceptions, the virtual-interrupt path,
-every H4f LR/APR/MISR/EISR/ELRSR snapshot, the guest-visible raw IAR, RPR, and
-13-bit HPPIR values, both source-tagged deliveries, and the final PASS marker.
-It never writes a physical boot medium.
+every H4g LR/APR/MISR/EISR/ELRSR snapshot, the guest-visible IAR/RPR/HPPIR
+values, the queue/refill boundary, all five ordered deliveries, and the final
+PASS marker. It never writes a physical boot medium.
 
 The H2 architectural contract and fixed memory map are documented in
 docs/H2_STAGE2.md. The virtual-interrupt contract is in docs/H3_GICV2.md, the
@@ -96,8 +99,8 @@ LR lifecycle is in docs/H4A_LR_LIFECYCLE.md, underflow maintenance is in
 docs/H4B_UNDERFLOW.md, priority preemption is in
 docs/H4C_PRIORITY_PREEMPTION.md, split EOI is in docs/H4D_SPLIT_EOI.md, and
 Active+Pending redelivery is in docs/H4E_ACTIVE_PENDING.md. Multi-source SGIs
-are in docs/H4F_MULTI_SOURCE_SGI.md, and the guest call interface is in
-docs/HVC_ABI.md.
+are in docs/H4F_MULTI_SOURCE_SGI.md, LR exhaustion/refill is in
+docs/H4G_LR_REFILL.md, and the guest call interface is in docs/HVC_ABI.md.
 
 ## Repository boundaries
 

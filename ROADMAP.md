@@ -132,7 +132,7 @@ image's pre-fix forbidden outcome, exact revisions, linked-image audit, and
 raw traces are preserved in `results/2026-08-22-h4f-qemu-pi4/`. The result is
 a fork defect candidate and has not been qualified for an upstream report.
 
-### H4g — List Register exhaustion and refill
+### H4g — List Register exhaustion and refill (completed)
 
 - Fill every implemented LR with a unique pending virtual interrupt and hold
   one lower-priority interrupt in an EL2 software queue.
@@ -141,8 +141,11 @@ a fork defect candidate and has not been qualified for an upstream report.
 - Validate every LR, APR, ELRSR, IAR, RPR, and HPPIR transition without using
   a maintenance or physical interrupt as an implicit refill trigger.
 
-Exit gate: 100 consecutive fresh qemu-pi4 processes accepted by a frozen
-strict oracle.
+Exit gate: the frozen strict H4g oracle passed 100 consecutive fresh qemu-pi4
+processes without an unexpected state, exception, reset, hang, maintenance
+event, physical IRQ, or extra/missing delivery on 2026-08-22. The exact
+revision, linked-image audit, and raw trace are preserved in
+`results/2026-08-22-h4g-qemu-pi4/`.
 
 ### H4h — WFI wakeup
 
@@ -176,7 +179,7 @@ any one-sided forbidden outcome to its smallest sequence.
 
 ## H6 — first real Pi 400 boot (later)
 
-The H1–H4e QEMU prerequisite is satisfied. Physical execution remains opt-in
+The H1–H4g QEMU prerequisite is satisfied. Physical execution remains opt-in
 and requires the user's explicit request. The first image:
 
 1. uses a recoverable boot medium and serial capture;
