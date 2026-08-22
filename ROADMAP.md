@@ -117,8 +117,56 @@ maintenance event, physical IRQ, or extra/missing delivery on 2026-08-22. The
 tested source revision, stage-2 and linked-image audit, and raw trace are
 preserved in `results/2026-08-22-h4e-qemu-pi4/`.
 
-Later H4 scenarios add multi-source SGIs, List Register overflow, WFI wakeup,
-and paused-vCPU save/restore one focused contract at a time.
+### H4f — virtual SGI source tags (completed)
+
+- Install two software-originated virtual SGIs with unique VirtualIDs and
+  distinct CPUID source fields.
+- Require each raw source tag in HPPIR and IAR and preserve it through split
+  priority drop and deactivation.
+- Keep maintenance and physical interrupts disabled so the source-field
+  contract is isolated.
+
+Exit gate: the frozen H4f oracle passed 100 consecutive fresh qemu-pi4
+processes with focused fork fix `8460833e53` on 2026-08-22. The same frozen
+image's pre-fix forbidden outcome, exact revisions, linked-image audit, and
+raw traces are preserved in `results/2026-08-22-h4f-qemu-pi4/`. The result is
+a fork defect candidate and has not been qualified for an upstream report.
+
+### H4g — List Register exhaustion and refill
+
+- Fill every implemented LR with a unique pending virtual interrupt and hold
+  one lower-priority interrupt in an EL2 software queue.
+- After the first guest completion makes one LR empty, refill exactly that LR
+  and require all five interrupts in deterministic priority order.
+- Validate every LR, APR, ELRSR, IAR, RPR, and HPPIR transition without using
+  a maintenance or physical interrupt as an implicit refill trigger.
+
+Exit gate: 100 consecutive fresh qemu-pi4 processes accepted by a frozen
+strict oracle.
+
+### H4h — WFI wakeup
+
+- Trap the guest's first WFI with HCR.TWI to prove the exact wait instruction
+  and checkpoint, then re-execute it untrapped.
+- Arm one EL2 physical timer event and use it to inject exactly one virtual
+  interrupt that wakes the waiting guest.
+- Forbid every unrelated physical interrupt, maintenance cause, duplicate
+  wake, or completion without the validated WFI trap.
+
+Exit gate: 100 consecutive fresh qemu-pi4 processes accepted by a frozen
+strict oracle.
+
+### H4i — paused virtual-interface save and restore
+
+- Pause at EL2 with one virtual interrupt active and another pending, then
+  save HCR, VMCR, APR, and every implemented LR.
+- Install and validate a distinct quiescent virtual-interface context before
+  restoring the saved context exactly, with HCR enabled last.
+- Resume and require both guest completions in order. This tests architectural
+  vCPU-interface context switching, not QEMU migration or QMP state transfer.
+
+Exit gate: 100 consecutive fresh qemu-pi4 processes accepted by a frozen
+strict oracle.
 
 ## H5 — differential runner
 

@@ -74,3 +74,18 @@ strict H4f oracle. Preserve the frozen source revision, exact image and QEMU
 hashes, toolchain, host, command line, linked-image audit, and lossless final
 trace under `results/` before marking H4f complete. Any pre-fix forbidden
 outcome must be preserved separately rather than overwritten by a later pass.
+
+## Recorded QEMU result
+
+The frozen implementation at `720149dbd00dc4eecb390125fd54afe5ce4fcc0c`
+first exposed a missing CPUID field in qemu-pi4's `GICV_HPPIR` result, then
+passed 100 consecutive fresh processes with focused fork fix
+`8460833e53a91458fd3ba63ff19fb6c4932e8bb4` on 2026-08-22. The exact pre-fix
+failure, passing image and emulator, environment, linked-image audit, and
+lossless traces are recorded in
+`results/2026-08-22-h4f-qemu-pi4/manifest.md`.
+
+This remains a fork defect candidate, not an upstream-ready finding. It still
+requires independent reproduction on unmodified current upstream master,
+prior-report research, and manual user validation. No external report or
+patch was sent.
