@@ -36,11 +36,7 @@ guest_start:
     msr vbar_el1, x2
     isb
 
-    adr x2, guest_irq_depth
-    str wzr, [x2]
-    adr x2, guest_low_done
-    str wzr, [x2]
-    adr x2, guest_high_done
+    adr x2, guest_irq_done
     str wzr, [x2]
 
     mrs x1, CurrentEL
@@ -67,7 +63,7 @@ guest_start:
     msr daifclr, #2
     isb
 
-    adr x2, guest_low_done
+    adr x2, guest_irq_done
 1:
     ldr w3, [x2]
     cbz w3, 1b
@@ -120,82 +116,40 @@ guest_vectors:
     GUEST_VECTOR 15, guest_unexpected
 
 guest_irq_entry:
-    adr x2, guest_irq_depth
-    ldr w3, [x2]
-    cbz w3, guest_low_irq
-    cmp w3, #1
-    b.eq guest_high_irq
-    b guest_irq_bad
-
-guest_low_irq:
     movz x2, #PI400_GICV_BASE_LO
     movk x2, #PI400_GICV_BASE_HI, lsl #16
     ldr w1, [x2, #GICV_IAR]
     and w3, w1, #0x3ff
-    cmp w3, #GICV2_LOW_INTID
+    cmp w3, #GICV2_TEST_INTID
     b.ne guest_irq_bad
 
+    ldr w3, [x2, #GICV_RPR]
+    orr x1, x1, x3, lsl #32
     dsb sy
     mov x0, #HVC_IRQ_ACTIVE
     hvc #0
 
-    adr x2, guest_irq_depth
-    mov w3, #1
-    str w3, [x2]
-    dsb sy
-    msr daifclr, #2
-    isb
-
-    adr x2, guest_high_done
-1:
-    ldr w3, [x2]
-    cbz w3, 1b
-
-    msr daifset, #2
-    isb
-
-    movz x2, #PI400_GICV_BASE_LO
-    movk x2, #PI400_GICV_BASE_HI, lsl #16
     str w1, [x2, #GICV_EOIR]
     dsb sy
 
+    ldr w3, [x2, #GICV_RPR]
+    mov w1, w1
+    orr x1, x1, x3, lsl #32
+    dsb sy
     mov x0, #HVC_IRQ_EOI
     hvc #0
 
-    adr x2, guest_irq_depth
-    str wzr, [x2]
-    adr x2, guest_low_done
-    mov w3, #1
-    str w3, [x2]
-    dsb sy
-    b guest_irq_return
-
-guest_high_irq:
-    adr x2, guest_irq_depth
-    mov w3, #2
-    str w3, [x2]
+    str w1, [x2, #GICV_DIR]
     dsb sy
 
-    movz x2, #PI400_GICV_BASE_LO
-    movk x2, #PI400_GICV_BASE_HI, lsl #16
-    ldr w1, [x2, #GICV_IAR]
-    and w3, w1, #0x3ff
-    cmp w3, #GICV2_HIGH_INTID
-    b.ne guest_irq_bad
-
-    mov x0, #HVC_IRQ_NESTED_ACTIVE
+    ldr w3, [x2, #GICV_RPR]
+    mov w1, w1
+    orr x1, x1, x3, lsl #32
+    dsb sy
+    mov x0, #HVC_IRQ_DEACTIVATE
     hvc #0
 
-    str w1, [x2, #GICV_EOIR]
-    dsb sy
-
-    mov x0, #HVC_IRQ_NESTED_EOI
-    hvc #0
-
-    adr x2, guest_high_done
-    mov w3, #1
-    str w3, [x2]
-    adr x2, guest_irq_depth
+    adr x2, guest_irq_done
     mov w3, #1
     str w3, [x2]
     dsb sy
@@ -226,20 +180,8 @@ guest_halt:
 
 .section .guest.data, "aw"
 .align 2
-.global guest_irq_depth
-.type guest_irq_depth, %object
-guest_irq_depth:
+.global guest_irq_done
+.type guest_irq_done, %object
+guest_irq_done:
     .word 0
-.size guest_irq_depth, . - guest_irq_depth
-
-.global guest_low_done
-.type guest_low_done, %object
-guest_low_done:
-    .word 0
-.size guest_low_done, . - guest_low_done
-
-.global guest_high_done
-.type guest_high_done, %object
-guest_high_done:
-    .word 0
-.size guest_high_done, . - guest_high_done
+.size guest_irq_done, . - guest_irq_done

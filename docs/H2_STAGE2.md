@@ -32,9 +32,10 @@ IMPLEMENTATION DEFINED choice.
 
 ## Fixed memory map
 
-H3 preserves the H2 guest mapping and fault target, and adds the minimum MMIO
-mapping needed for the virtual interrupt scenario. The current tables expose
-no other peripheral page to EL1.
+H3 preserves the H2 guest mapping and fault target, and adds the first GICV
+MMIO page needed for a virtual interrupt. H4d adds exactly the adjacent page
+containing GICV_DIR at offset `0x1000`. The current tables expose no other
+peripheral page to EL1.
 
 | Address range | Owner | Current stage-2 view |
 | --- | --- | --- |
@@ -42,11 +43,13 @@ no other peripheral page to EL1.
 | `0x00200000` to `0x003fffff` | EL1 guest 2 MiB block | identity-mapped normal RWX memory |
 | `0x00200000` | H2 guest payload | guest entry point |
 | `0x003ff000` | initial `SP_EL1` | stack grows downward if used |
-| `0xff846000` to `0xff846fff` | GICV virtual CPU-interface frame | identity-mapped Device-nGnRE, inner-shareable, RW, XN page |
+| `0xff846000` to `0xff847fff` | 8 KiB GICV virtual CPU-interface frame | two identity-mapped Device-nGnRE, inner-shareable, RW, XN pages |
 
-The GICV page descriptor is `0x00400000ff8467c7` in the qemu-pi4 smoke
-configuration. GICD, GICC, GICH, PL011, and the rest of the GICV surrounding
-region remain unmapped at stage 2.
+The GICV descriptors are `0x00400000ff8467c7` and
+`0x00400000ff8477c7` in the H4d qemu-pi4 smoke configuration. GICD, GICC,
+GICH, PL011, and the GICV surrounding region remain unmapped at stage 2. The
+recorded H3 through H4c revisions mapped only the first page; their manifests
+pin those historical images and oracles.
 
 RWX is intentional for this first single-block experiment, not a security
 model. A later scenario can split code and data permissions when that

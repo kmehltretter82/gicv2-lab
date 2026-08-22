@@ -9,5 +9,6 @@ void stage2_enable(void);
 uint64_t stage2_root_address(void);
 uint64_t stage2_guest_descriptor(void);
 uint64_t stage2_gicv_descriptor(void);
+uint64_t stage2_gicv_dir_descriptor(void);
 
 #endif

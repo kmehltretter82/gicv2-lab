@@ -1,6 +1,6 @@
-# H2-H4c guest call ABI
+# H2-H4d guest call ABI
 
-H2 through H4c use a deliberately private call ABI. It is not SMCCC and is
+H2 through H4d use a deliberately private call ABI. It is not SMCCC and is
 not intended for Linux guests.
 
 The AArch64 guest executes `HVC #0` with the operation in `x0` and its single
@@ -13,12 +13,11 @@ protocol operations rather than general hypervisor services.
 | `0x100` | REPORT | raw `CurrentEL`; H2 requires `4` (EL1) | mark the guest report seen and return |
 | `0x101` | PASS | magic `0x600d` | require the report and expected fault, then return |
 | `0x102` | FAIL | scenario-defined | print a failure and halt |
-| `0x103` | EXIT | zero | require the complete H4c sequence, print H4c PASS, and halt |
-| `0x104` | IRQ_READY | GICV `CTLR` in bits 31:0, `PMR` in bits 39:32, `BPR` in bits 42:40, all other bits zero | validate the virtual interface, inject low-priority INTID 42 into LR0, and return |
-| `0x105` | IRQ_EOI | the value read from `GICV_IAR`; H4c requires 42 | validate low EOI after nested completion, clear both LRs, and return |
-| `0x106` | IRQ_ACTIVE | the value read from `GICV_IAR`; H4c requires 42 | validate active low-priority LR0, inject high-priority INTID 43 into LR1, and return |
-| `0x107` | IRQ_NESTED_ACTIVE | the value read from `GICV_IAR`; H4c requires 43 | validate that both LRs and both APR bits are active, then return |
-| `0x108` | IRQ_NESTED_EOI | the value read from `GICV_IAR`; H4c requires 43 | validate high EOI while low LR0 remains active, then return |
+| `0x103` | EXIT | zero | require the complete H4d sequence, print H4d PASS, and halt |
+| `0x104` | IRQ_READY | GICV `CTLR` in bits 31:0, `PMR` in bits 39:32, `BPR` in bits 42:40, all other bits zero | require `CTLR=0x201`, validate the virtual interface, inject INTID 42 into LR0, and return |
+| `0x105` | IRQ_EOI | raw GICV IAR in bits 31:0, GICV RPR in bits 39:32, all other bits zero | require IAR 42 and RPR `0xff`, then validate that EOIR dropped priority without deactivating LR0 |
+| `0x106` | IRQ_ACTIVE | raw GICV IAR in bits 31:0, GICV RPR in bits 39:32, all other bits zero | require IAR 42 and RPR `0x80`, then validate active LR0 and APR bit 16 |
+| `0x107` | IRQ_DEACTIVATE | raw GICV IAR in bits 31:0, GICV RPR in bits 39:32, all other bits zero | require IAR 42 and RPR `0xff`, validate DIR deactivation, clear LR0, and return |
 
 The H2 prefix is REPORT, the deliberate data abort, then PASS. H3 continues
 with IRQ_READY and injects the virtual IRQ during that call. H4a adds
@@ -37,6 +36,16 @@ EXIT is accepted once and only in that order.
 
 All H4c maintenance enables remain clear. A physical IRQ is therefore a
 forbidden outcome rather than part of the call sequence.
+
+H4d keeps one LR and enables `GICV_CTLR.EOImode`. IRQ_ACTIVE precedes the
+guest's EOIR write. IRQ_EOI then requires the priority to have dropped while
+LR0 remains active. Only after that call returns does the guest write the same
+IAR value to GICV_DIR and call IRQ_DEACTIVATE. EL2 requires LR0 invalid,
+clears it, and accepts EXIT only after all three checkpoints occurred once in
+that order. H4d also includes GICV_RPR in each interrupt-state argument so the
+guest-visible running-priority transition is checked directly.
+
+All H4d maintenance enables remain clear. A physical IRQ is forbidden.
 
 The monitor rejects duplicate calls, invalid arguments, unknown operations,
 and an early exit. An HVC resumes at the architecturally supplied return

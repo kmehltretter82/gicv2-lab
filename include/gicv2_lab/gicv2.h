@@ -24,11 +24,10 @@ struct gicv2_lr_transition {
 };
 
 bool gicv2_init(uint32_t gich_vtr, struct gicv2_lr_snapshot *initial);
-bool gicv2_inject_low(struct gicv2_lr_snapshot *pending);
-bool gicv2_inject_high(struct gicv2_lr_transition *transition);
-bool gicv2_capture_both_active(struct gicv2_lr_snapshot *active);
-bool gicv2_capture_high_eoi(struct gicv2_lr_snapshot *eoi);
-bool gicv2_finish_priority_test(struct gicv2_lr_transition *transition);
+bool gicv2_inject(struct gicv2_lr_snapshot *pending);
+bool gicv2_capture_active(struct gicv2_lr_snapshot *active);
+bool gicv2_capture_priority_drop(struct gicv2_lr_snapshot *priority_drop);
+bool gicv2_finish_deactivation(struct gicv2_lr_transition *transition);
 uint32_t gicv2_acknowledge_physical_irq(void);
 
 #endif

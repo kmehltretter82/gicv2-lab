@@ -45,8 +45,15 @@ _Static_assert(GUEST_STACK_TOP >= GUEST_IPA_BASE &&
                "guest stack must be inside the mapped block");
 _Static_assert(MONITOR_LOAD_BASE < GUEST_IPA_BASE,
                "fault target must be outside the guest block");
-_Static_assert((PI400_GICV_BASE & UINT64_C(0xfff)) == 0,
-               "GICV base must be 4 KiB aligned");
+_Static_assert((PI400_GICV_BASE & UINT64_C(0x1fff)) == 0,
+               "GICV base must be 8 KiB aligned");
+_Static_assert(GICV_DIR == UINT64_C(0x1000),
+               "H4d requires DIR in the second GICV page");
+_Static_assert((uint64_t)PI400_GICV_BASE + GICV_DIR ==
+                   UINT64_C(0xff847000),
+               "unexpected Pi 400 GICV DIR address");
+_Static_assert((((uint64_t)PI400_GICV_BASE >> 12) & UINT64_C(0x1ff)) < 511,
+               "GICV mapping must have room for the DIR page");
 
 static void zero_table(uint64_t *table)
 {
@@ -94,6 +101,9 @@ void stage2_enable(void)
     s2_gicv_l3[((uint64_t)PI400_GICV_BASE >> 12) & UINT64_C(0x1ff)] =
         PI400_GICV_BASE | gicv_attributes |
         S2_DESC_TABLE | S2_DESC_VALID;
+    s2_gicv_l3[(((uint64_t)PI400_GICV_BASE >> 12) & UINT64_C(0x1ff)) + 1] =
+        ((uint64_t)PI400_GICV_BASE + GICV_DIR) |
+        gicv_attributes | S2_DESC_TABLE | S2_DESC_VALID;
 
     vtcr = VTCR_RES1 | VTCR_SH0_INNER | VTCR_ORGN0_WBWA |
            VTCR_IRGN0_WBWA | VTCR_SL0_LEVEL1 | VTCR_T0SZ_32BIT_IPA;
@@ -133,4 +143,10 @@ uint64_t stage2_gicv_descriptor(void)
 {
     return s2_gicv_l3[((uint64_t)PI400_GICV_BASE >> 12) &
                       UINT64_C(0x1ff)];
+}
+
+uint64_t stage2_gicv_dir_descriptor(void)
+{
+    return s2_gicv_l3[(((uint64_t)PI400_GICV_BASE >> 12) &
+                       UINT64_C(0x1ff)) + 1];
 }
