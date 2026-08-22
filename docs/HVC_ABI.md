@@ -1,6 +1,6 @@
-# H2-H4e guest call ABI
+# H2-H4f guest call ABI
 
-H2 through H4e use a deliberately private call ABI. It is not SMCCC and is
+H2 through H4f use a deliberately private call ABI. It is not SMCCC and is
 not intended for Linux guests.
 
 The AArch64 guest executes `HVC #0` with the operation in `x0` and its single
@@ -13,14 +13,15 @@ protocol operations rather than general hypervisor services.
 | `0x100` | REPORT | raw `CurrentEL`; H2 requires `4` (EL1) | mark the guest report seen and return |
 | `0x101` | PASS | magic `0x600d` | require the report and expected fault, then return |
 | `0x102` | FAIL | scenario-defined | print a failure and halt |
-| `0x103` | EXIT | zero | require the complete H4e sequence, print H4e PASS, and halt |
-| `0x104` | IRQ_READY | GICV `CTLR` in bits 31:0, `PMR` in bits 39:32, `BPR` in bits 42:40, all other bits zero | require `CTLR=0x201`, validate the virtual interface, inject INTID 42 into LR0, and return |
-| `0x105` | IRQ_EOI | interrupt-state tuple | validate the first EOIR priority drop while LR0 remains Pending+Active |
-| `0x106` | IRQ_ACTIVE | interrupt-state tuple | validate the first Active state, then perform the sole EL2 re-pend to Pending+Active |
-| `0x107` | IRQ_DEACTIVATE | interrupt-state tuple | validate that the first DIR exposed LR0 as Pending and leave it for redelivery |
-| `0x108` | IRQ_REDELIVERED | interrupt-state tuple | validate the second acknowledgement and Active state |
-| `0x109` | IRQ_SECOND_EOI | interrupt-state tuple | validate the second EOIR priority drop while LR0 remains Active |
-| `0x10a` | IRQ_SECOND_DEACTIVATE | interrupt-state tuple | validate the second DIR, clear LR0, and return |
+| `0x103` | EXIT | zero | require the complete H4f sequence, print H4f PASS, and halt |
+| `0x104` | IRQ_READY | GICV `CTLR` in bits 31:0, `PMR` in bits 39:32, `BPR` in bits 42:40, all other bits zero | require `CTLR=0x201`, validate the virtual interface, inject both source-tagged SGIs, and return |
+| `0x105` | SGI_PENDING | raw HPPIR | require SGI 5 with CPUID 1 (`0x0405`) before IRQ unmask |
+| `0x106` | SGI_FIRST_ACTIVE | SGI interrupt-state tuple | validate the first raw IAR, source tag, Active LR0, APR, RPR, and pending second SGI |
+| `0x107` | SGI_FIRST_EOI | SGI interrupt-state tuple | validate the first priority drop and unchanged second source tag |
+| `0x108` | SGI_FIRST_DEACTIVATE | SGI interrupt-state tuple | validate invalid LR0 and still-pending LR1 |
+| `0x109` | SGI_SECOND_ACTIVE | SGI interrupt-state tuple | validate the second raw IAR, source tag, Active LR1, APR, and RPR |
+| `0x10a` | SGI_SECOND_EOI | SGI interrupt-state tuple | validate the second priority drop |
+| `0x10b` | SGI_SECOND_DEACTIVATE | SGI interrupt-state tuple | validate both invalid LRs, clear them, and return |
 
 For H4e, an interrupt-state tuple places the raw GICV IAR in bits 31:0,
 GICV RPR in bits 39:32, and the low ten bits of GICV HPPIR in bits 49:40. All
@@ -69,6 +70,17 @@ order. HPPIR proves that the Active+Pending entry was not eligible before
 deactivation and that the resulting Pending entry was eligible afterward.
 
 All H4e maintenance enables remain clear. A physical IRQ is forbidden.
+
+H4f replaces the H4e operations from `0x105` onward with the source-tagged
+SGI calls in the current table. An SGI interrupt-state tuple places the raw
+GICV IAR, including CPUID bits [12:10], in bits 31:0; RPR in bits 39:32; and
+the low 13 raw HPPIR bits, including CPUID, in bits 52:40. All other bits are
+zero. The first tuple requires IAR `0x0405`; while the second SGI is pending,
+HPPIR must be `0x0c06`. The second tuple requires IAR `0x0c06`; after that
+acknowledgement HPPIR must be 1023. EXIT is accepted only after the two
+split-EOI completion sequences occur once in priority order.
+
+All H4f maintenance enables remain clear. A physical IRQ is forbidden.
 
 The monitor rejects duplicate calls, invalid arguments, unknown operations,
 and an early exit. An HVC resumes at the architecturally supplied return

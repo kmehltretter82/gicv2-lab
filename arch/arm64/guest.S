@@ -60,6 +60,12 @@ guest_start:
     mov x0, #HVC_IRQ_READY
     hvc #0
 
+    movz x2, #PI400_GICV_BASE_LO
+    movk x2, #PI400_GICV_BASE_HI, lsl #16
+    ldr w1, [x2, #GICV_HPPIR]
+    mov x0, #HVC_SGI_PENDING
+    hvc #0
+
     msr daifclr, #2
     isb
 
@@ -139,19 +145,18 @@ guest_first_irq:
     movz x2, #PI400_GICV_BASE_LO
     movk x2, #PI400_GICV_BASE_HI, lsl #16
     ldr w1, [x2, #GICV_IAR]
-    and w3, w1, #0x3ff
-    cmp w3, #GICV2_TEST_INTID
+    cmp w1, #GICV2_FIRST_SGI_IAR
     b.ne guest_irq_bad
 
-    REPORT_IRQ_STATE HVC_IRQ_ACTIVE
+    REPORT_IRQ_STATE HVC_SGI_FIRST_ACTIVE
 
     str w1, [x2, #GICV_EOIR]
     dsb sy
-    REPORT_IRQ_STATE HVC_IRQ_EOI
+    REPORT_IRQ_STATE HVC_SGI_FIRST_EOI
 
     str w1, [x2, #GICV_DIR]
     dsb sy
-    REPORT_IRQ_STATE HVC_IRQ_DEACTIVATE
+    REPORT_IRQ_STATE HVC_SGI_FIRST_DEACTIVATE
 
     adr x2, guest_irq_count
     mov w3, #1
@@ -163,19 +168,18 @@ guest_second_irq:
     movz x2, #PI400_GICV_BASE_LO
     movk x2, #PI400_GICV_BASE_HI, lsl #16
     ldr w1, [x2, #GICV_IAR]
-    and w3, w1, #0x3ff
-    cmp w3, #GICV2_TEST_INTID
+    cmp w1, #GICV2_SECOND_SGI_IAR
     b.ne guest_irq_bad
 
-    REPORT_IRQ_STATE HVC_IRQ_REDELIVERED
+    REPORT_IRQ_STATE HVC_SGI_SECOND_ACTIVE
 
     str w1, [x2, #GICV_EOIR]
     dsb sy
-    REPORT_IRQ_STATE HVC_IRQ_SECOND_EOI
+    REPORT_IRQ_STATE HVC_SGI_SECOND_EOI
 
     str w1, [x2, #GICV_DIR]
     dsb sy
-    REPORT_IRQ_STATE HVC_IRQ_SECOND_DEACTIVATE
+    REPORT_IRQ_STATE HVC_SGI_SECOND_DEACTIVATE
 
     adr x2, guest_irq_count
     mov w3, #2

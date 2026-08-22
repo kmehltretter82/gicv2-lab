@@ -7,7 +7,7 @@ image=${1:?usage: smoke-qemu.sh IMAGE}
 qemu=${QEMU:?set QEMU to qemu-system-aarch64}
 log=build/smoke-qemu.log
 stderr_log=build/smoke-qemu.stderr
-marker='[gicv2-lab] H4e PASS'
+marker='[gicv2-lab] H4f PASS'
 deadline=$(( $(date +%s) + 10 ))
 poll_interval=${SMOKE_POLL_INTERVAL:-0.1}
 pid=
@@ -59,8 +59,9 @@ require_snapshot()
 {
     snapshot_suffix=$1
     snapshot_lr0=$2
-    snapshot_apr=$3
-    snapshot_elrsr0=$4
+    snapshot_lr1=$3
+    snapshot_apr=$4
+    snapshot_elrsr0=$5
 
     require_line "GICH_HCR_${snapshot_suffix}=0x0000000000000001"
     require_line "GICH_VMCR_${snapshot_suffix}=0x00000000f85c0201"
@@ -71,7 +72,7 @@ require_snapshot()
     require_line "GICH_ELRSR1_${snapshot_suffix}=0x0000000000000000"
     require_line "GICH_APR_${snapshot_suffix}=${snapshot_apr}"
     require_line "GICH_LR0_${snapshot_suffix}=${snapshot_lr0}"
-    require_line "GICH_LR1_${snapshot_suffix}=0x0000000000000000"
+    require_line "GICH_LR1_${snapshot_suffix}=${snapshot_lr1}"
 }
 
 trap cleanup EXIT INT TERM
@@ -92,7 +93,7 @@ while test "$(date +%s)" -lt "$deadline"; do
         if test "${SMOKE_QUIET:-0}" != 1; then
             cat "$log"
         fi
-        require_once '[gicv2-lab] H4e EL2 monitor'
+        require_once '[gicv2-lab] H4f EL2 monitor'
         require_once "$marker"
         require_line 'CurrentEL=2'
         require_line 'GICH_LRS=4'
@@ -125,57 +126,66 @@ while test "$(date +%s)" -lt "$deadline"; do
         require_line 'GuestGICV_CTLR=0x0000000000000201'
         require_line 'GuestGICV_PMR=0x00000000000000f8'
         require_line 'GuestGICV_BPR=0x0000000000000002'
-        require_once '[gicv2-lab] active-plus-pending virtual IRQ pending'
-        require_snapshot pending 0x000000001800002a \
-            0x0000000000000000 0x000000000000000e
-        require_once '[gicv2-lab] first virtual IRQ active'
-        require_line 'GuestIAR_first_active=42'
-        require_line 'GuestRPR_first_active=0x0000000000000080'
-        require_line 'GuestHPPIR_first_active=1023'
-        require_snapshot first_active 0x000000002800002a \
-            0x0000000000010000 0x000000000000000e
-        require_once '[gicv2-lab] virtual source re-pended while active'
-        require_snapshot active_pending 0x000000003800002a \
-            0x0000000000010000 0x000000000000000e
-        require_once '[gicv2-lab] first EOIR priority drop'
-        require_line 'GuestIAR_first_priority_drop=42'
-        require_line 'GuestRPR_first_priority_drop=0x00000000000000ff'
-        require_line 'GuestHPPIR_first_priority_drop=1023'
-        require_snapshot first_priority_drop 0x000000003800002a \
-            0x0000000000000000 0x000000000000000e
-        require_once '[gicv2-lab] first DIR exposed pending redelivery'
-        require_line 'GuestIAR_redelivery_pending=42'
-        require_line 'GuestRPR_redelivery_pending=0x00000000000000ff'
-        require_line 'GuestHPPIR_redelivery_pending=42'
-        require_snapshot redelivery_pending 0x000000001800002a \
-            0x0000000000000000 0x000000000000000e
-        require_once '[gicv2-lab] virtual IRQ delivered again'
-        require_line 'GuestIAR_second_active=42'
-        require_line 'GuestRPR_second_active=0x0000000000000080'
-        require_line 'GuestHPPIR_second_active=1023'
-        require_snapshot second_active 0x000000002800002a \
-            0x0000000000010000 0x000000000000000e
-        require_once '[gicv2-lab] second EOIR priority drop'
-        require_line 'GuestIAR_second_priority_drop=42'
-        require_line 'GuestRPR_second_priority_drop=0x00000000000000ff'
-        require_line 'GuestHPPIR_second_priority_drop=1023'
-        require_snapshot second_priority_drop 0x000000002800002a \
-            0x0000000000000000 0x000000000000000e
-        require_once '[gicv2-lab] second DIR deactivated virtual IRQ'
-        require_line 'GuestIAR_final_deactivate=42'
-        require_line 'GuestRPR_final_deactivate=0x00000000000000ff'
-        require_line 'GuestHPPIR_final_deactivate=1023'
-        require_snapshot final_deactivated 0x000000000800002a \
-            0x0000000000000000 0x000000000000000f
-        require_once '[gicv2-lab] virtual interface restored'
+        require_once '[gicv2-lab] two source-tagged virtual SGIs pending'
+        require_snapshot both_pending 0x0000000012000405 \
+            0x0000000018000c06 0x0000000000000000 \
+            0x000000000000000c
+        require_line 'GuestHPPIR_both_pending_observed=0x0000000000000405'
+        require_once '[gicv2-lab] first source tag visible in HPPIR'
+        require_line 'GuestHPPIR_both_pending=0x0000000000000405'
+        require_once '[gicv2-lab] first source-tagged SGI active'
+        require_line 'GuestIAR_first_sgi_active=0x0000000000000405'
+        require_line 'GuestRPR_first_sgi_active=0x0000000000000020'
+        require_line 'GuestHPPIR_first_sgi_active=0x0000000000000c06'
+        require_snapshot first_sgi_active 0x0000000022000405 \
+            0x0000000018000c06 0x0000000000000010 \
+            0x000000000000000c
+        require_once '[gicv2-lab] first SGI priority dropped'
+        require_line 'GuestIAR_first_sgi_drop=0x0000000000000405'
+        require_line 'GuestRPR_first_sgi_drop=0x00000000000000ff'
+        require_line 'GuestHPPIR_first_sgi_drop=0x0000000000000c06'
+        require_snapshot first_sgi_drop 0x0000000022000405 \
+            0x0000000018000c06 0x0000000000000000 \
+            0x000000000000000c
+        require_once '[gicv2-lab] first SGI deactivated with source intact'
+        require_line 'GuestIAR_first_sgi_deactivated=0x0000000000000405'
+        require_line 'GuestRPR_first_sgi_deactivated=0x00000000000000ff'
+        require_line 'GuestHPPIR_first_sgi_deactivated=0x0000000000000c06'
+        require_snapshot first_sgi_deactivated 0x0000000002000405 \
+            0x0000000018000c06 0x0000000000000000 \
+            0x000000000000000d
+        require_once '[gicv2-lab] second source-tagged SGI active'
+        require_line 'GuestIAR_second_sgi_active=0x0000000000000c06'
+        require_line 'GuestRPR_second_sgi_active=0x0000000000000080'
+        require_line 'GuestHPPIR_second_sgi_active=0x00000000000003ff'
+        require_snapshot second_sgi_active 0x0000000002000405 \
+            0x0000000028000c06 0x0000000000010000 \
+            0x000000000000000d
+        require_once '[gicv2-lab] second SGI priority dropped'
+        require_line 'GuestIAR_second_sgi_drop=0x0000000000000c06'
+        require_line 'GuestRPR_second_sgi_drop=0x00000000000000ff'
+        require_line 'GuestHPPIR_second_sgi_drop=0x00000000000003ff'
+        require_snapshot second_sgi_drop 0x0000000002000405 \
+            0x0000000028000c06 0x0000000000000000 \
+            0x000000000000000d
+        require_once '[gicv2-lab] second SGI deactivated with source intact'
+        require_line 'GuestIAR_second_sgi_deactivated=0x0000000000000c06'
+        require_line 'GuestRPR_second_sgi_deactivated=0x00000000000000ff'
+        require_line 'GuestHPPIR_second_sgi_deactivated=0x00000000000003ff'
+        require_snapshot both_sgis_deactivated 0x0000000002000405 \
+            0x0000000008000c06 0x0000000000000000 \
+            0x000000000000000f
+        require_once '[gicv2-lab] virtual SGI interface restored'
         require_snapshot cleared 0x0000000000000000 \
-            0x0000000000000000 0x000000000000000f
+            0x0000000000000000 0x0000000000000000 \
+            0x000000000000000f
         reject_line '[gicv2-lab] H3 FAIL:'
         reject_line '[gicv2-lab] H4a FAIL:'
         reject_line '[gicv2-lab] H4b FAIL:'
         reject_line '[gicv2-lab] H4c FAIL:'
         reject_line '[gicv2-lab] H4d FAIL:'
         reject_line '[gicv2-lab] H4e FAIL:'
+        reject_line '[gicv2-lab] H4f FAIL:'
         reject_line '[gicv2-lab] unexpected physical IRQ'
         exit 0
     fi
@@ -187,5 +197,5 @@ done
 
 test -f "$log" && cat "$log"
 test ! -s "$stderr_log" || cat "$stderr_log" >&2
-echo "gicv2-lab: QEMU smoke test did not observe the H4e marker" >&2
+echo "gicv2-lab: QEMU smoke test did not observe the H4f marker" >&2
 exit 1

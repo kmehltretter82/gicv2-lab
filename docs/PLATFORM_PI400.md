@@ -1,4 +1,4 @@
-# Pi 400 platform facts used by H1 through H4e
+# Pi 400 platform facts used by H1 through H4f
 
 The Pi 400 uses BCM2711 with four Cortex-A72 cores and a GIC-400 implementing
 the GICv2 virtualization extensions.
@@ -8,10 +8,10 @@ The EL2 monitor uses only these peripheral addresses with its MMU disabled:
 | Block | Address | Current use |
 | --- | ---: | --- |
 | PL011 UART0 | `0xfe201000` | serial diagnostic output |
-| GICD | `0xff841000` | configure maintenance in H3-H4b; quiesce PPIs in H4c-H4e |
-| GICC | `0xff842000` | service maintenance in H3-H4b; remain quiescent in H4c-H4e |
+| GICD | `0xff841000` | configure maintenance in H3-H4b; quiesce PPIs in H4c-H4f |
+| GICC | `0xff842000` | service maintenance in H3-H4b; remain quiescent in H4c-H4f |
 | GICH | `0xff844000` | configure virtualization state and List Registers |
-| GICV | `0xff846000` | exact 8 KiB register block exposed to EL1 in H4d-H4e |
+| GICV | `0xff846000` | exact 8 KiB register block exposed to EL1 in H4d-H4f |
 
 The GIC distributor, physical CPU interface, hypervisor interface, and virtual
 CPU interface are separate frames. H1 only reads GICH_VTR, and H2 does not
@@ -19,14 +19,15 @@ initialize the GIC. H3 initializes the physical and virtual interfaces and
 injects one software virtual interrupt through LR0. H4a and H4b isolate LR
 lifecycle and underflow-maintenance behavior. H4c disables all maintenance
 causes and PPIs while it uses LR0 and LR1 for nested priority preemption. The
-H4d and H4e also disable every maintenance cause and PPI. H4d distinguishes
+H4d through H4f also disable every maintenance cause and PPI. H4d distinguishes
 the priority drop at `GICV_EOIR` from deactivation at `GICV_DIR`; H4e uses
-that split to expose Pending again from a Pending+Active LR. The GIC
+that split to expose Pending again from a Pending+Active LR; H4f preserves
+two distinct software SGI source tags through HPPIR, IAR, EOIR, and DIR. The GIC
 virtualization maintenance output used by the earlier scenarios is PPI number
 9, architectural INTID 25.
 
 EL2 accesses all four physical frames directly with its MMU disabled. The
-H4d-H4e stage 2 allows EL1 to access only the architectural 8 KiB GICV block:
+H4d-H4f stage 2 allows EL1 to access only the architectural 8 KiB GICV block:
 the first page contains IAR, EOIR, RPR, and HPPIR, and the second contains DIR
 at offset `0x1000`. The guest cannot program GICD, GICC, GICH, or adjacent
 MMIO.
