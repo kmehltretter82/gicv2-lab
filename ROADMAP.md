@@ -32,12 +32,17 @@ Exit gate: the strict H2 smoke oracle passes 100 consecutive qemu-pi4 boots
 without an unexpected exception, reset, or hang. Passed with 100 fresh QEMU
 processes on 2026-08-22.
 
-## H3 — first virtual interrupt (next)
+## H3 — first virtual interrupt (completed)
 
 - Read the List Register count from GICH_VTR; do not assume four.
 - Initialize GICH/GICV state and inject one virtual interrupt.
 - Have the EL1 payload acknowledge and EOI it.
 - Record and acknowledge the GIC maintenance PPI.
+
+Exit gate: the strict H3 smoke oracle passed 100 consecutive qemu-pi4
+processes without an unexpected exception, register state, reset, or hang on
+2026-08-22. The tested source revision and raw trace are preserved in
+`results/2026-08-22-h3-qemu-pi4/`.
 
 ## H4 — deterministic GICv2 state machine
 
@@ -54,7 +59,8 @@ any one-sided forbidden outcome to its smallest sequence.
 
 ## H6 — first real Pi 400 boot (later)
 
-This is gated on H1–H3 passing under QEMU. The first image:
+The H1–H3 QEMU prerequisite is satisfied. Physical execution remains opt-in
+and requires the user's explicit request. The first image:
 
 1. uses a recoverable boot medium and serial capture;
 2. makes no runtime storage, network, USB, PCIe, OTP, or firmware writes;

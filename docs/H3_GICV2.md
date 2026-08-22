@@ -70,3 +70,11 @@ Specification, version 2](https://developer.arm.com/documentation/ihi0048/latest
 The [Armv8-A virtualization
 guide](https://developer.arm.com/-/media/Arm%20Developer%20Community/PDF/Learn%20the%20Architecture/Armv8-A%20virtualization.pdf?revision=a765a7df-1a00-434d-b241-357bfda2dd31)
 provides the EL2/GIC virtualization overview.
+
+## Recorded result
+
+The strict oracle passed 100 consecutive fresh qemu-pi4 processes on
+2026-08-22 with no forbidden outcome. The exact tested lab revision, artifact
+and QEMU binary hashes, toolchain, command line, host environment, and final
+raw serial trace are recorded in
+`results/2026-08-22-h3-qemu-pi4/manifest.md`.
