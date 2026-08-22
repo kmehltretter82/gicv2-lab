@@ -10,24 +10,29 @@ and forbidden outcomes are clear. Booting Linux is not the first objective.
   stacks, and trace buffer.
 - Make physical Pi runs opt-in and recoverable.
 
-## H1 — EL2 monitor under QEMU (current)
+## H1 — EL2 monitor under QEMU (completed)
 
 - Reset at EL2, set a stack, clear BSS, and install VBAR_EL2.
 - Initialize PL011 and print CPU, timer, and GIC capability registers.
 - Take a deliberate EL2 synchronous exception and report its syndrome.
-- Emit H1 PASS and halt.
+- Emit an H1 PASS checkpoint after returning from the deliberate exception.
 
 Exit gate: 100 normalized cold-boot traces under qemu-pi4 complete without an
-unexplained reset or hang.
+unexplained reset or hang. This is satisfied by the stricter H2 repetition
+gate, which also runs the complete H1 checkpoint on every boot.
 
-## H2 — one tiny EL1 guest
+## H2 — one tiny EL1 guest (completed)
 
 - Construct minimal stage-2 tables.
 - Enter a one-vCPU AArch64 EL1 payload with ERET.
 - Implement HVC report, pass, fail, and exit calls.
 - Demonstrate an expected stage-2 fault.
 
-## H3 — first virtual interrupt
+Exit gate: the strict H2 smoke oracle passes 100 consecutive qemu-pi4 boots
+without an unexpected exception, reset, or hang. Passed with 100 fresh QEMU
+processes on 2026-08-22.
+
+## H3 — first virtual interrupt (next)
 
 - Read the List Register count from GICH_VTR; do not assume four.
 - Initialize GICH/GICV state and inject one virtual interrupt.

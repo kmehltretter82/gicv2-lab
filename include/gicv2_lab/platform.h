@@ -1,3 +1,5 @@
+/* SPDX-License-Identifier: GPL-2.0-or-later */
+
 #ifndef GICV2_LAB_PLATFORM_H
 #define GICV2_LAB_PLATFORM_H
 
@@ -119,6 +121,11 @@ static inline uint64_t read_spsr_el2(void)
 
     __asm__ volatile("mrs %0, SPSR_EL2" : "=r"(value));
     return value;
+}
+
+static inline void write_elr_el2(uint64_t value)
+{
+    __asm__ volatile("msr ELR_EL2, %0" : : "r"(value));
 }
 
 static inline void cpu_relax(void)

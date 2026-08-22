@@ -34,6 +34,22 @@ SECTIONS
         __bss_end = .;
     }
 
+    __monitor_end = .;
+    ASSERT(__monitor_end < 0x00200000,
+           "EL2 monitor overlaps the guest region")
+
+    . = 0x00200000;
+
+    .guest : ALIGN(4096)
+    {
+        __guest_start = .;
+        KEEP(*(.guest.text))
+        __guest_end = .;
+    }
+
+    ASSERT(__guest_end <= 0x003ff000,
+           "EL1 guest overlaps its stack")
+
     /DISCARD/ :
     {
         *(.comment)

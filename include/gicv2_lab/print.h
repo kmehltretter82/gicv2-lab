@@ -1,3 +1,5 @@
+/* SPDX-License-Identifier: GPL-2.0-or-later */
+
 #ifndef GICV2_LAB_PRINT_H
 #define GICV2_LAB_PRINT_H
 

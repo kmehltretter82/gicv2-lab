@@ -13,14 +13,17 @@ interrupt transition observable, replayable, and comparable across:
 
 ## Status
 
-H1 is the current milestone. It deliberately stays QEMU-only:
+H2 is complete under qemu-pi4. It deliberately stays QEMU-only and now has:
 
-- reset at non-secure EL2;
-- PL011 serial output;
-- an EL2 exception-vector table;
-- a capability dump, including GICH_VTR;
-- one deliberate synchronous exception; and
-- a deterministic H1 PASS serial marker.
+- reset at non-secure EL2, PL011 output, and a complete EL2 vector table;
+- a CPU, timer, and GIC capability dump, including GICH_VTR;
+- minimal 4 KiB-granule stage-2 tables for one 2 MiB guest region;
+- entry into a tiny AArch64 EL1 guest with stage-1 translation disabled;
+- a small HVC report/pass/fail/exit ABI; and
+- a deliberate stage-2 translation fault that EL2 validates and resumes.
+
+The strict exit gate passed 100 consecutive fresh QEMU boots. H3, the first
+virtual-interrupt scenario, is next.
 
 The first real Pi 400 boot is scheduled only after H1 through H3 pass under
 QEMU. See ROADMAP.md.
@@ -52,10 +55,20 @@ Override QEMU to test another build:
     make LLVM_BIN=/opt/homebrew/opt/llvm/bin \
       QEMU=/path/to/qemu-system-aarch64 smoke
 
+Run the H2 exit-gate loop (100 consecutive boots by default) with:
+
+    make LLVM_BIN=/opt/homebrew/opt/llvm/bin smoke-repeat
+
+Set `SMOKE_RUNS=N` to select a different count.
+
 The test loads the ELF directly at 0x80000 and uses
 -cpu cortex-a72,has_el3=off. That prevents QEMU's optional synthetic EL3 from
 obscuring the non-secure EL2 environment the Pi 400 exposes to this lab. It
+checks the H2 stage-2 descriptor, exception trace, and final PASS marker. It
 never writes a physical boot medium.
+
+The H2 architectural contract and fixed memory map are documented in
+docs/H2_STAGE2.md. The guest call interface is in docs/HVC_ABI.md.
 
 ## Repository boundaries
 
