@@ -36,7 +36,11 @@ guest_start:
     msr vbar_el1, x2
     isb
 
-    adr x2, guest_irq_count
+    adr x2, guest_irq_depth
+    str wzr, [x2]
+    adr x2, guest_low_done
+    str wzr, [x2]
+    adr x2, guest_high_done
     str wzr, [x2]
 
     mrs x1, CurrentEL
@@ -60,28 +64,13 @@ guest_start:
     mov x0, #HVC_IRQ_READY
     hvc #0
 
-    movz x2, #PI400_GICV_BASE_LO
-    movk x2, #PI400_GICV_BASE_HI, lsl #16
-    ldr w1, [x2, #GICV_HPPIR]
-    mov x0, #HVC_WFI_READY
-    hvc #0
-
     msr daifclr, #2
     isb
 
-    .global guest_wfi_instruction
-guest_wfi_instruction:
-    wfi
-
-    .global guest_after_wfi_instruction
-guest_after_wfi_instruction:
-    adr x2, guest_irq_count
-    ldr w1, [x2]
-    cmp w1, #1
-    b.ne guest_irq_bad
-
-    mov x0, #HVC_WFI_RESUMED
-    hvc #0
+    adr x2, guest_low_done
+1:
+    ldr w3, [x2]
+    cbz w3, 1b
 
     msr daifset, #2
     isb
@@ -142,27 +131,83 @@ guest_vectors:
     GUEST_VECTOR 15, guest_unexpected
 
 guest_irq_entry:
-    adr x2, guest_irq_count
+    adr x2, guest_irq_depth
     ldr w3, [x2]
-    cbnz w3, guest_irq_bad
+    cbz w3, guest_low_irq
+    cmp w3, #1
+    b.eq guest_high_irq
+    b guest_irq_bad
+
+guest_low_irq:
+    movz x2, #PI400_GICV_BASE_LO
+    movk x2, #PI400_GICV_BASE_HI, lsl #16
+    ldr w1, [x2, #GICV_IAR]
+    cmp w1, #GICV2_LOW_INTID
+    b.ne guest_irq_bad
+
+    REPORT_IRQ_STATE HVC_CONTEXT_PAUSE
+
+    adr x2, guest_irq_depth
+    mov w3, #1
+    str w3, [x2]
+    dsb sy
+    msr daifclr, #2
+    isb
+
+    adr x2, guest_high_done
+1:
+    ldr w3, [x2]
+    cbz w3, 1b
+
+    msr daifset, #2
+    isb
+
+    movz x2, #PI400_GICV_BASE_LO
+    movk x2, #PI400_GICV_BASE_HI, lsl #16
+    REPORT_IRQ_STATE HVC_LOW_RESUMED
+
+    str w1, [x2, #GICV_EOIR]
+    dsb sy
+    REPORT_IRQ_STATE HVC_LOW_EOI
+
+    str w1, [x2, #GICV_DIR]
+    dsb sy
+    REPORT_IRQ_STATE HVC_LOW_DEACTIVATE
+
+    adr x2, guest_irq_depth
+    str wzr, [x2]
+    adr x2, guest_low_done
+    mov w3, #1
+    str w3, [x2]
+    dsb sy
+    b guest_irq_return
+
+guest_high_irq:
+    adr x2, guest_irq_depth
+    mov w3, #2
+    str w3, [x2]
+    dsb sy
 
     movz x2, #PI400_GICV_BASE_LO
     movk x2, #PI400_GICV_BASE_HI, lsl #16
     ldr w1, [x2, #GICV_IAR]
-    cmp w1, #GICV2_WAKE_INTID
+    cmp w1, #GICV2_HIGH_INTID
     b.ne guest_irq_bad
 
-    REPORT_IRQ_STATE HVC_WAKE_ACTIVE
+    REPORT_IRQ_STATE HVC_HIGH_ACTIVE
 
     str w1, [x2, #GICV_EOIR]
     dsb sy
-    REPORT_IRQ_STATE HVC_WAKE_EOI
+    REPORT_IRQ_STATE HVC_HIGH_EOI
 
     str w1, [x2, #GICV_DIR]
     dsb sy
-    REPORT_IRQ_STATE HVC_WAKE_DEACTIVATE
+    REPORT_IRQ_STATE HVC_HIGH_DEACTIVATE
 
-    adr x2, guest_irq_count
+    adr x2, guest_high_done
+    mov w3, #1
+    str w3, [x2]
+    adr x2, guest_irq_depth
     mov w3, #1
     str w3, [x2]
     dsb sy
@@ -193,8 +238,20 @@ guest_halt:
 
 .section .guest.data, "aw"
 .align 2
-.global guest_irq_count
-.type guest_irq_count, %object
-guest_irq_count:
+.global guest_irq_depth
+.type guest_irq_depth, %object
+guest_irq_depth:
     .word 0
-.size guest_irq_count, . - guest_irq_count
+.size guest_irq_depth, . - guest_irq_depth
+
+.global guest_low_done
+.type guest_low_done, %object
+guest_low_done:
+    .word 0
+.size guest_low_done, . - guest_low_done
+
+.global guest_high_done
+.type guest_high_done, %object
+guest_high_done:
+    .word 0
+.size guest_high_done, . - guest_high_done

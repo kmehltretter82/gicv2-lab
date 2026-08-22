@@ -1,6 +1,6 @@
-# H2-H4h guest call ABI
+# H2-H4i guest call ABI
 
-H2 through H4h use a deliberately private call ABI. It is not SMCCC and is
+H2 through H4i use a deliberately private call ABI. It is not SMCCC and is
 not intended for Linux guests.
 
 The AArch64 guest executes `HVC #0` with the operation in `x0` and its single
@@ -13,13 +13,15 @@ protocol operations rather than general hypervisor services.
 | `0x100` | REPORT | raw `CurrentEL`; H2 requires `4` (EL1) | mark the guest report seen and return |
 | `0x101` | PASS | magic `0x600d` | require the report and expected fault, then return |
 | `0x102` | FAIL | scenario-defined | print a failure and halt |
-| `0x103` | EXIT | zero | require the complete H4h sequence, print H4h PASS, and halt |
-| `0x104` | IRQ_READY | GICV `CTLR` in bits 31:0, `PMR` in bits 39:32, `BPR` in bits 42:40, all other bits zero | require `CTLR=0x201` and an empty virtual interface |
-| `0x105` | WFI_READY | raw HPPIR | require spurious INTID 1023, then arm the exact WFI trap with `HCR_EL2.TWI` |
-| `0x106` | WAKE_ACTIVE | interrupt-state tuple | require timer injection and validate virtual INTID 48 Active |
-| `0x107` | WAKE_EOI | interrupt-state tuple | validate INTID 48's split priority drop without deactivation |
-| `0x108` | WAKE_DEACTIVATE | interrupt-state tuple | validate DIR and clear the Invalid LR |
-| `0x109` | WFI_RESUMED | guest IRQ count, exactly one | require the timer and complete virtual-IRQ lifecycle before accepting post-WFI execution |
+| `0x103` | EXIT | zero | require the complete H4i sequence, print H4i PASS, and halt |
+| `0x104` | IRQ_READY | GICV `CTLR` in bits 31:0, `PMR` in bits 39:32, `BPR` in bits 42:40, all other bits zero | require `CTLR=0x201` and an empty virtual interface, then inject lower INTID 50 |
+| `0x105` | CONTEXT_PAUSE | interrupt-state tuple | require INTID 50 Active, then save, quiesce, and restore the active-plus-pending context |
+| `0x106` | HIGH_ACTIVE | interrupt-state tuple | validate nested higher INTID 51 and both LRs Active |
+| `0x107` | HIGH_EOI | interrupt-state tuple | validate INTID 51's split priority drop |
+| `0x108` | HIGH_DEACTIVATE | interrupt-state tuple | validate INTID 51's DIR transition |
+| `0x109` | LOW_RESUMED | interrupt-state tuple | require the lower INTID 50 handler to resume |
+| `0x10a` | LOW_EOI | interrupt-state tuple | validate INTID 50's split priority drop |
+| `0x10b` | LOW_DEACTIVATE | interrupt-state tuple | validate INTID 50's DIR transition and clear every LR |
 
 For H4e, an interrupt-state tuple places the raw GICV IAR in bits 31:0,
 GICV RPR in bits 39:32, and the low ten bits of GICV HPPIR in bits 49:40. All
@@ -69,8 +71,8 @@ deactivation and that the resulting Pending entry was eligible afterward.
 
 All H4e maintenance enables remain clear. A physical IRQ is forbidden.
 
-H4f replaces the H4e operations from `0x105` onward with the source-tagged
-SGI calls in the current table. An SGI interrupt-state tuple places the raw
+H4f replaced the H4e operations from `0x105` onward with its then-current
+source-tagged SGI calls. An SGI interrupt-state tuple places the raw
 GICV IAR, including CPUID bits [12:10], in bits 31:0; RPR in bits 39:32; and
 the low 13 raw HPPIR bits, including CPUID, in bits 52:40. All other bits are
 zero. The first tuple requires IAR `0x0405`; while the second SGI is pending,
@@ -90,8 +92,8 @@ bits 31:0, RPR in bits 39:32, and 13-bit HPPIR in bits 52:40.
 
 All H4g maintenance enables remain clear. A physical IRQ is forbidden.
 
-H4h assigns the current names shown in the table to operations `0x105`-
-`0x109`. The WFI_READY call is made with IRQs still masked; after it returns,
+H4h assigned its then-current WFI and wake names to operations `0x105`-
+`0x109`. The WFI_READY call was made with IRQs still masked; after it returned,
 the guest unmasks IRQs and executes the exact trapped WFI. The three wake
 state calls are made from the one EL1 IRQ handler and retain the raw IAR value
 through EOIR and DIR. WFI_RESUMED is made only by the instruction stream after
@@ -103,6 +105,24 @@ and the low 13 HPPIR bits in bits 52:40. WAKE_ACTIVE requires IAR 48, RPR
 `0xff`, and HPPIR 1023. Maintenance is disabled; physical INTID 26 is the
 single allowed EL2 timer interrupt, and every other physical IRQ is
 forbidden.
+
+H4i assigns the current names shown in the table to operations `0x105`-
+`0x10b`. CONTEXT_PAUSE occurs from the lower handler after IAR returns 50 and
+while IRQs remain masked. EL2 adds pending INTID 51, saves HCR, VMCR, APR, and
+all four LRs, disables HCR first, installs a quiescent context, restores the
+saved payload while disabled, and enables the saved HCR last. After that call
+returns, the lower handler records depth one and unmasks IRQs so INTID 51 can
+preempt it. HIGH_ACTIVE, HIGH_EOI, and HIGH_DEACTIVATE run in the nested
+handler. LOW_RESUMED, LOW_EOI, and LOW_DEACTIVATE run after that nested
+handler returns.
+
+The H4i interrupt-state tuple places raw IAR in bits 31:0, RPR in bits 39:32,
+and the low 13 HPPIR bits in bits 52:40. All other bits are zero. Lower active
+and resumed calls require IAR 50, RPR `0x80`, and HPPIR 1023. Higher active
+requires IAR 51 and RPR `0x20`; its EOI and deactivation calls retain IAR 51
+with RPR `0x80`. The lower EOI and deactivation calls retain IAR 50 with RPR
+`0xff`. Every H4i HPPIR value is 1023. Maintenance and all PPIs are disabled,
+so every physical IRQ is forbidden.
 
 The monitor rejects duplicate calls, invalid arguments, unknown operations,
 and an early exit. An HVC resumes at the architecturally supplied return

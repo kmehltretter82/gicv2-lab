@@ -1,4 +1,4 @@
-# Pi 400 platform facts used by H1 through H4h
+# Pi 400 platform facts used by H1 through H4i
 
 The Pi 400 uses BCM2711 with four Cortex-A72 cores and a GIC-400 implementing
 the GICv2 virtualization extensions.
@@ -8,10 +8,10 @@ The EL2 monitor uses only these peripheral addresses with its MMU disabled:
 | Block | Address | Current use |
 | --- | ---: | --- |
 | PL011 UART0 | `0xfe201000` | serial diagnostic output |
-| GICD | `0xff841000` | configure maintenance in H3-H4b; quiesce PPIs in H4c-H4g; enable timer PPI 26 in H4h |
-| GICC | `0xff842000` | service maintenance in H3-H4b and timer PPI 26 in H4h |
+| GICD | `0xff841000` | configure maintenance in H3-H4b; quiesce PPIs in H4c-H4g and H4i; enable timer PPI 26 in H4h |
+| GICC | `0xff842000` | service maintenance in H3-H4b and timer PPI 26 in H4h; remain quiescent in H4i |
 | GICH | `0xff844000` | configure virtualization state and List Registers |
-| GICV | `0xff846000` | exact 8 KiB register block exposed to EL1 in H4d-H4h |
+| GICV | `0xff846000` | exact 8 KiB register block exposed to EL1 in H4d-H4i |
 
 The GIC distributor, physical CPU interface, hypervisor interface, and virtual
 CPU interface are separate frames. H1 only reads GICH_VTR, and H2 does not
@@ -29,8 +29,13 @@ architectural INTID 26, and uses `CNTHP_EL2` to drive the wake. The GIC
 virtualization maintenance output used by the earlier scenarios is PPI
 number 9, architectural INTID 25.
 
+H4i again disables every PPI and maintenance cause. It uses GICH only to save,
+disable, quiesce, and restore the single vCPU's HCR, VMCR, APR, and four LRs.
+No physical interrupt participates in the context switch or the subsequent
+nested virtual delivery.
+
 EL2 accesses all four physical frames directly with its MMU disabled. The
-H4d-H4h stage 2 allows EL1 to access only the architectural 8 KiB GICV block:
+H4d-H4i stage 2 allows EL1 to access only the architectural 8 KiB GICV block:
 the first page contains IAR, EOIR, RPR, and HPPIR, and the second contains DIR
 at offset `0x1000`. The guest cannot program GICD, GICC, GICH, or adjacent
 MMIO.

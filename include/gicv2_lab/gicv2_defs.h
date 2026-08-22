@@ -48,13 +48,10 @@
 #define GICV_HPPIR 0x018
 #define GICV_DIR   0x1000
 
-#define GICV2_HYP_TIMER_INTID       26
-#define GICV2_WAKE_INTID            48
-#define GICV2_WAKE_PRIORITY         0x40
-#define GICV2_HYP_TIMER_DIVISOR     20
-#define GICV2_CNTHP_CTL_ENABLE      0x1
-#define GICV2_CNTHP_CTL_IMASK       0x2
-#define GICV2_CNTHP_CTL_ISTATUS     0x4
+#define GICV2_LOW_INTID            50
+#define GICV2_HIGH_INTID           51
+#define GICV2_LOW_PRIORITY         0x80
+#define GICV2_HIGH_PRIORITY        0x20
 #define GICV2_GICV_CTLR_EXPECTED  0x201
 #define GICV2_GICV_PMR_EXPECTED  0xf8
 #define GICV2_GICV_BPR_EXPECTED  0x02

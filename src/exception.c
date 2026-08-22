@@ -24,9 +24,6 @@
 #define ESR_EC_HVC64      UINT64_C(0x16)
 #define ESR_EC_DABT_LOWER UINT64_C(0x24)
 #define ESR_EC_BRK64      UINT64_C(0x3c)
-#define ESR_EC_WFX_TRAP   UINT64_C(0x01)
-#define ESR_WFX_TI_MASK   UINT64_C(0x3)
-#define ESR_WFX_TI_WFI    UINT64_C(0)
 
 #define VECTOR_CURRENT_SPX_SYNC UINT64_C(4)
 #define VECTOR_CURRENT_SPX_IRQ  UINT64_C(5)
@@ -34,12 +31,6 @@
 #define VECTOR_LOWER_A64_IRQ    UINT64_C(9)
 #define GUEST_CURRENTEL_VALUE   UINT64_C(4)
 #define S2_LEVEL2_TRANSLATION_FAULT UINT64_C(6)
-#define SPSR_MODE_MASK UINT64_C(0xf)
-#define SPSR_EL1H      UINT64_C(5)
-#define SPSR_IRQ_MASK  (UINT64_C(1) << 7)
-
-#define HCR_EL2_BASE UINT64_C(0x80000011)
-#define HCR_EL2_TWI  (UINT64_C(1) << 13)
 
 #define IRQ_READY_PMR_SHIFT 32
 #define IRQ_READY_BPR_SHIFT 40
@@ -69,21 +60,28 @@
     lab_kv_hex64("GICH_LR3_" suffix, (snapshot)->lr[3]); \
 } while (0)
 
+#define DUMP_CONTEXT(context, suffix) do { \
+    lab_kv_hex64("SavedContext_HCR_" suffix, (context)->hcr); \
+    lab_kv_hex64("SavedContext_VMCR_" suffix, (context)->vmcr); \
+    lab_kv_hex64("SavedContext_APR_" suffix, (context)->apr); \
+    lab_kv_hex64("SavedContext_LR0_" suffix, (context)->lr[0]); \
+    lab_kv_hex64("SavedContext_LR1_" suffix, (context)->lr[1]); \
+    lab_kv_hex64("SavedContext_LR2_" suffix, (context)->lr[2]); \
+    lab_kv_hex64("SavedContext_LR3_" suffix, (context)->lr[3]); \
+} while (0)
+
 static bool guest_report_seen;
 static bool stage2_fault_seen;
 static bool h2_pass_seen;
 static bool irq_ready_seen;
-static bool wfi_ready_seen;
-static bool wfi_trap_seen;
-static bool timer_irq_seen;
-static bool wake_active_seen;
-static bool wake_drop_seen;
-static bool wake_deactivated_seen;
-static bool wfi_resumed_seen;
+static bool context_restored_seen;
+static bool high_active_seen;
+static bool high_drop_seen;
+static bool high_deactivated_seen;
+static bool low_resumed_seen;
+static bool low_drop_seen;
+static bool low_deactivated_seen;
 static bool el2_brk_seen;
-
-extern char guest_wfi_instruction[];
-extern char guest_after_wfi_instruction[];
 
 _Static_assert(sizeof(struct exception_frame) == 256,
                "exception frame must match vectors.S");
@@ -101,7 +99,7 @@ static void dump_exception(const struct exception_frame *frame, uint64_t esr)
 static uint64_t fail_exception(const struct exception_frame *frame,
                                uint64_t esr, const char *reason)
 {
-    lab_puts("[gicv2-lab] H4h FAIL: ");
+    lab_puts("[gicv2-lab] H4i FAIL: ");
     lab_puts(reason);
     lab_puts("\n");
     dump_exception(frame, esr);
@@ -177,12 +175,11 @@ static uint64_t handle_hvc(struct exception_frame *frame, uint64_t esr)
         return fail_exception(frame, esr, "guest reported failure");
 
     case HVC_IRQ_READY: {
-        struct gicv2_lr_snapshot empty;
+        struct gicv2_lr_snapshot pending;
 
         if (!h2_pass_seen || irq_ready_seen ||
             !irq_ready_argument_valid(argument) ||
-            read_hcr_el2() != HCR_EL2_BASE ||
-            !gicv2_capture_empty(&empty)) {
+            !gicv2_inject_low(&pending)) {
             return fail_exception(frame, esr, "invalid IRQ-ready report");
         }
         irq_ready_seen = true;
@@ -192,149 +189,235 @@ static uint64_t handle_hvc(struct exception_frame *frame, uint64_t esr)
                      (argument >> IRQ_READY_PMR_SHIFT) & 0xff);
         lab_kv_hex64("GuestGICV_BPR",
                      (argument >> IRQ_READY_BPR_SHIFT) & 7);
-        lab_puts("[gicv2-lab] virtual interface empty before WFI\n");
-        DUMP_SNAPSHOT(&empty, "before_wfi");
+        lab_puts("[gicv2-lab] low-priority virtual IRQ pending\n");
+        DUMP_SNAPSHOT(&pending, "low_pending");
         frame->x[0] = 0;
         return EXCEPTION_RESUME;
     }
 
-    case HVC_WFI_READY: {
-        struct gicv2_lr_snapshot empty;
-        uint64_t hcr_before = read_hcr_el2();
+    case HVC_CONTEXT_PAUSE: {
+        struct gicv2_context_switch context_switch;
 
-        lab_kv_hex64("GuestHPPIR_before_wfi", argument);
-        if (!irq_ready_seen || wfi_ready_seen || wfi_trap_seen ||
-            timer_irq_seen || argument !=
-                GICV2_GICV_HPPIR_SPURIOUS_EXPECTED ||
-            hcr_before != HCR_EL2_BASE ||
-            !gicv2_capture_empty(&empty)) {
+        if (!irq_ready_seen || context_restored_seen ||
+            !irq_state_argument_valid(
+                argument, GICV2_LOW_INTID, GICV2_LOW_PRIORITY,
+                GICV2_GICV_HPPIR_SPURIOUS_EXPECTED)) {
             return fail_exception(frame, esr,
-                                  "invalid WFI-ready report");
+                                  "invalid context-pause report");
         }
 
-        write_hcr_el2(HCR_EL2_BASE | HCR_EL2_TWI);
-        if (read_hcr_el2() != (HCR_EL2_BASE | HCR_EL2_TWI)) {
-            return fail_exception(frame, esr, "failed to arm WFI trap");
+        if (!gicv2_pause_save_restore(&context_switch)) {
+            lab_kv_dec("ContextSwitch_completed_steps",
+                       context_switch.completed_steps);
+            if (context_switch.completed_steps == 3) {
+                DUMP_SNAPSHOT(&context_switch.quiescent,
+                              "context_quiescent_failed");
+            }
+            return fail_exception(frame, esr,
+                                  "invalid virtual-interface context switch");
         }
+        lab_puts("[gicv2-lab] low-priority virtual IRQ active\n");
+        dump_irq_state("GuestIAR_low_active", "GuestRPR_low_active",
+                       "GuestHPPIR_low_active", argument);
+        lab_kv_hex64("GuestIRQState_low_active", argument);
+        DUMP_SNAPSHOT(&context_switch.low_active, "low_active");
+        lab_puts("[gicv2-lab] active-pending context saved\n");
+        DUMP_SNAPSHOT(&context_switch.saved, "context_saved");
+        DUMP_CONTEXT(&context_switch.context, "context_saved");
+        lab_puts("[gicv2-lab] virtual interface disabled first\n");
+        DUMP_SNAPSHOT(&context_switch.disabled, "context_disabled");
+        lab_puts("[gicv2-lab] quiescent context installed\n");
+        DUMP_SNAPSHOT(&context_switch.quiescent, "context_quiescent");
+        lab_puts("[gicv2-lab] saved payload restored while disabled\n");
+        DUMP_SNAPSHOT(&context_switch.restored_disabled,
+                      "context_restored_disabled");
+        lab_puts("[gicv2-lab] saved context restored with HCR last\n");
+        DUMP_SNAPSHOT(&context_switch.restored, "context_restored");
 
-        wfi_ready_seen = true;
-        lab_puts("[gicv2-lab] guest WFI trap armed\n");
-        lab_kv_hex64("HCR_EL2_before_wfi", hcr_before);
-        lab_kv_hex64("HCR_EL2_wfi_trap_armed", read_hcr_el2());
-        DUMP_SNAPSHOT(&empty, "wfi_trap_armed");
+        context_restored_seen = true;
         frame->x[0] = 0;
         return EXCEPTION_RESUME;
     }
 
-    case HVC_WAKE_ACTIVE: {
+    case HVC_HIGH_ACTIVE: {
         struct gicv2_lr_snapshot active;
         bool valid;
 
-        if (!wfi_trap_seen || !timer_irq_seen || wake_active_seen ||
-            wake_drop_seen || wake_deactivated_seen || wfi_resumed_seen ||
+        if (!context_restored_seen || high_active_seen || high_drop_seen ||
+            high_deactivated_seen || low_resumed_seen ||
             !irq_state_argument_valid(
-                argument, GICV2_WAKE_INTID, GICV2_WAKE_PRIORITY,
+                argument, GICV2_HIGH_INTID, GICV2_HIGH_PRIORITY,
                 GICV2_GICV_HPPIR_SPURIOUS_EXPECTED)) {
-            return fail_exception(frame, esr, "invalid wake active report");
+            return fail_exception(frame, esr, "invalid high active report");
         }
 
-        valid = gicv2_capture_wake_active(&active);
-        lab_puts("[gicv2-lab] timer-injected virtual IRQ active\n");
-        dump_irq_state("GuestIAR_wake_active", "GuestRPR_wake_active",
-                       "GuestHPPIR_wake_active", argument);
-        lab_kv_hex64("GuestIRQState_wake_active", argument);
-        DUMP_SNAPSHOT(&active, "wake_active");
+        valid = gicv2_capture_both_active(&active);
+        lab_puts("[gicv2-lab] restored high-priority IRQ active\n");
+        dump_irq_state("GuestIAR_high_active", "GuestRPR_high_active",
+                       "GuestHPPIR_high_active", argument);
+        lab_kv_hex64("GuestIRQState_high_active", argument);
+        DUMP_SNAPSHOT(&active, "both_active");
         if (!valid) {
-            return fail_exception(frame, esr, "invalid wake active state");
+            return fail_exception(frame, esr, "invalid both-active state");
         }
 
-        wake_active_seen = true;
+        high_active_seen = true;
         frame->x[0] = 0;
         return EXCEPTION_RESUME;
     }
 
-    case HVC_WAKE_EOI: {
+    case HVC_HIGH_EOI: {
         struct gicv2_lr_snapshot priority_drop;
         bool valid;
 
-        if (!wake_active_seen || wake_drop_seen || wake_deactivated_seen ||
-            wfi_resumed_seen ||
+        if (!high_active_seen || high_drop_seen || high_deactivated_seen ||
+            low_resumed_seen ||
             !irq_state_argument_valid(
-                argument, GICV2_WAKE_INTID,
-                GICV2_GICV_RPR_IDLE_EXPECTED,
+                argument, GICV2_HIGH_INTID, GICV2_LOW_PRIORITY,
                 GICV2_GICV_HPPIR_SPURIOUS_EXPECTED)) {
-            return fail_exception(frame, esr, "invalid wake EOI report");
+            return fail_exception(frame, esr, "invalid high EOI report");
         }
 
-        valid = gicv2_capture_wake_drop(&priority_drop);
-        lab_puts("[gicv2-lab] wake IRQ priority dropped\n");
-        dump_irq_state("GuestIAR_wake_drop", "GuestRPR_wake_drop",
-                       "GuestHPPIR_wake_drop", argument);
-        lab_kv_hex64("GuestIRQState_wake_drop", argument);
-        DUMP_SNAPSHOT(&priority_drop, "wake_drop");
+        valid = gicv2_capture_high_drop(&priority_drop);
+        lab_puts("[gicv2-lab] high-priority IRQ priority dropped\n");
+        dump_irq_state("GuestIAR_high_drop", "GuestRPR_high_drop",
+                       "GuestHPPIR_high_drop", argument);
+        lab_kv_hex64("GuestIRQState_high_drop", argument);
+        DUMP_SNAPSHOT(&priority_drop, "high_drop");
         if (!valid) {
-            return fail_exception(frame, esr, "invalid wake drop state");
+            return fail_exception(frame, esr, "invalid high drop state");
         }
 
-        wake_drop_seen = true;
+        high_drop_seen = true;
         frame->x[0] = 0;
         return EXCEPTION_RESUME;
     }
 
-    case HVC_WAKE_DEACTIVATE: {
+    case HVC_HIGH_DEACTIVATE: {
+        struct gicv2_lr_snapshot deactivated;
+        bool valid;
+
+        if (!high_drop_seen || high_deactivated_seen || low_resumed_seen ||
+            !irq_state_argument_valid(
+                argument, GICV2_HIGH_INTID, GICV2_LOW_PRIORITY,
+                GICV2_GICV_HPPIR_SPURIOUS_EXPECTED)) {
+            return fail_exception(frame, esr,
+                                  "invalid high deactivation report");
+        }
+
+        valid = gicv2_capture_high_deactivated(&deactivated);
+        lab_puts("[gicv2-lab] high-priority IRQ deactivated\n");
+        dump_irq_state("GuestIAR_high_deactivated",
+                       "GuestRPR_high_deactivated",
+                       "GuestHPPIR_high_deactivated", argument);
+        lab_kv_hex64("GuestIRQState_high_deactivated", argument);
+        DUMP_SNAPSHOT(&deactivated, "high_deactivated");
+        if (!valid) {
+            return fail_exception(frame, esr,
+                                  "invalid high deactivation state");
+        }
+
+        high_deactivated_seen = true;
+        frame->x[0] = 0;
+        return EXCEPTION_RESUME;
+    }
+
+    case HVC_LOW_RESUMED: {
+        struct gicv2_lr_snapshot resumed;
+        bool valid;
+
+        if (!high_deactivated_seen || low_resumed_seen || low_drop_seen ||
+            low_deactivated_seen ||
+            !irq_state_argument_valid(
+                argument, GICV2_LOW_INTID, GICV2_LOW_PRIORITY,
+                GICV2_GICV_HPPIR_SPURIOUS_EXPECTED)) {
+            return fail_exception(frame, esr,
+                                  "invalid low resume report");
+        }
+
+        valid = gicv2_capture_low_resumed(&resumed);
+        lab_puts("[gicv2-lab] low-priority handler resumed\n");
+        dump_irq_state("GuestIAR_low_resumed", "GuestRPR_low_resumed",
+                       "GuestHPPIR_low_resumed", argument);
+        lab_kv_hex64("GuestIRQState_low_resumed", argument);
+        DUMP_SNAPSHOT(&resumed, "low_resumed");
+        if (!valid) {
+            return fail_exception(frame, esr, "invalid low resumed state");
+        }
+
+        low_resumed_seen = true;
+        frame->x[0] = 0;
+        return EXCEPTION_RESUME;
+    }
+
+    case HVC_LOW_EOI: {
+        struct gicv2_lr_snapshot priority_drop;
+        bool valid;
+
+        if (!low_resumed_seen || low_drop_seen || low_deactivated_seen ||
+            !irq_state_argument_valid(
+                argument, GICV2_LOW_INTID,
+                GICV2_GICV_RPR_IDLE_EXPECTED,
+                GICV2_GICV_HPPIR_SPURIOUS_EXPECTED)) {
+            return fail_exception(frame, esr, "invalid low EOI report");
+        }
+
+        valid = gicv2_capture_low_drop(&priority_drop);
+        lab_puts("[gicv2-lab] low-priority IRQ priority dropped\n");
+        dump_irq_state("GuestIAR_low_drop", "GuestRPR_low_drop",
+                       "GuestHPPIR_low_drop", argument);
+        lab_kv_hex64("GuestIRQState_low_drop", argument);
+        DUMP_SNAPSHOT(&priority_drop, "low_drop");
+        if (!valid) {
+            return fail_exception(frame, esr, "invalid low drop state");
+        }
+
+        low_drop_seen = true;
+        frame->x[0] = 0;
+        return EXCEPTION_RESUME;
+    }
+
+    case HVC_LOW_DEACTIVATE: {
         struct gicv2_lr_transition completion;
         bool valid;
 
-        if (!wake_drop_seen || wake_deactivated_seen || wfi_resumed_seen ||
+        if (!low_drop_seen || low_deactivated_seen ||
             !irq_state_argument_valid(
-                argument, GICV2_WAKE_INTID,
+                argument, GICV2_LOW_INTID,
                 GICV2_GICV_RPR_IDLE_EXPECTED,
                 GICV2_GICV_HPPIR_SPURIOUS_EXPECTED)) {
             return fail_exception(frame, esr,
-                                  "invalid wake deactivation report");
+                                  "invalid low deactivation report");
         }
 
-        valid = gicv2_finish_wake(&completion);
-        lab_puts("[gicv2-lab] wake IRQ deactivated\n");
-        dump_irq_state("GuestIAR_wake_deactivated",
-                       "GuestRPR_wake_deactivated",
-                       "GuestHPPIR_wake_deactivated", argument);
-        lab_kv_hex64("GuestIRQState_wake_deactivated", argument);
-        DUMP_SNAPSHOT(&completion.before, "wake_deactivated");
-        lab_puts("[gicv2-lab] wake LR cleared\n");
+        valid = gicv2_finish_context_test(&completion);
+        lab_puts("[gicv2-lab] low-priority IRQ deactivated\n");
+        dump_irq_state("GuestIAR_low_deactivated",
+                       "GuestRPR_low_deactivated",
+                       "GuestHPPIR_low_deactivated", argument);
+        lab_kv_hex64("GuestIRQState_low_deactivated", argument);
+        DUMP_SNAPSHOT(&completion.before, "all_deactivated");
+        lab_puts("[gicv2-lab] restored context LRs cleared\n");
         DUMP_SNAPSHOT(&completion.after, "cleared");
         if (!valid) {
             return fail_exception(frame, esr,
-                                  "invalid wake deactivation state");
+                                  "invalid final deactivation state");
         }
 
-        wake_deactivated_seen = true;
+        low_deactivated_seen = true;
         frame->x[0] = 0;
         return EXCEPTION_RESUME;
     }
 
-    case HVC_WFI_RESUMED:
-        if (!wake_deactivated_seen || wfi_resumed_seen || argument != 1 ||
-            !gicv2_hyp_timer_fired() || read_hcr_el2() != HCR_EL2_BASE) {
-            return fail_exception(frame, esr,
-                                  "invalid post-WFI resume report");
-        }
-        wfi_resumed_seen = true;
-        lab_puts("[gicv2-lab] guest resumed after timer-woken WFI\n");
-        lab_kv_dec("GuestIRQCount_after_wfi", (uint32_t)argument);
-        frame->x[0] = 0;
-        return EXCEPTION_RESUME;
-
     case HVC_EXIT:
         if (!guest_report_seen || !stage2_fault_seen || !h2_pass_seen ||
-            !irq_ready_seen || !wfi_ready_seen || !wfi_trap_seen ||
-            !timer_irq_seen || !wake_active_seen || !wake_drop_seen ||
-            !wake_deactivated_seen || !wfi_resumed_seen ||
-            !gicv2_hyp_timer_fired() || read_hcr_el2() != HCR_EL2_BASE ||
-            argument != 0) {
+            !irq_ready_seen || !context_restored_seen ||
+            !high_active_seen || !high_drop_seen ||
+            !high_deactivated_seen || !low_resumed_seen ||
+            !low_drop_seen || !low_deactivated_seen || argument != 0) {
             return fail_exception(frame, esr, "guest exited too early");
         }
-        lab_puts("[gicv2-lab] H4h PASS\n");
+        lab_puts("[gicv2-lab] H4i PASS\n");
         return EXCEPTION_HALT;
 
     default:
@@ -344,38 +427,13 @@ static uint64_t handle_hvc(struct exception_frame *frame, uint64_t esr)
 
 static uint64_t handle_physical_irq(struct exception_frame *frame)
 {
-    struct gicv2_lr_snapshot pending = { 0 };
-    uint64_t elapsed_ticks = 0;
-    uint32_t control = 0;
-    uint32_t iar = 1023;
-    bool valid;
+    uint32_t iar = gicv2_acknowledge_physical_irq();
 
-    valid = gicv2_service_hyp_timer(&iar, &control, &elapsed_ticks,
-                                    &pending);
-    lab_puts("[gicv2-lab] physical IRQ observed\n");
+    lab_puts("[gicv2-lab] unexpected physical IRQ\n");
     lab_kv_dec("physical_irq_vector_slot", (uint32_t)frame->vector_slot);
-    lab_kv_dec("PhysicalIAR_hyp_timer", iar & UINT32_C(0x3ff));
-    lab_kv_hex64("CNTHP_CTL_expired", control);
-    lab_kv_hex64("CNTHP_elapsed_ticks", elapsed_ticks);
-    lab_kv_hex64("HCR_EL2_timer_irq", read_hcr_el2());
-    lab_kv_hex64("ELR_EL2_timer_irq", read_elr_el2());
-    lab_kv_hex64("SPSR_EL2_timer_irq", read_spsr_el2());
-
-    if (!wfi_trap_seen || timer_irq_seen ||
-        frame->vector_slot != VECTOR_LOWER_A64_IRQ ||
-        read_hcr_el2() != HCR_EL2_BASE ||
-        read_elr_el2() !=
-            (uint64_t)(uintptr_t)guest_after_wfi_instruction ||
-        (read_spsr_el2() & SPSR_MODE_MASK) != SPSR_EL1H ||
-        (read_spsr_el2() & SPSR_IRQ_MASK) != 0 || !valid) {
-        lab_puts("[gicv2-lab] H4h FAIL: unexpected physical IRQ\n");
-        return EXCEPTION_HALT;
-    }
-
-    timer_irq_seen = true;
-    lab_puts("[gicv2-lab] expected hypervisor timer IRQ\n");
-    DUMP_SNAPSHOT(&pending, "timer_injected_pending");
-    return EXCEPTION_RESUME;
+    lab_kv_dec("PhysicalIAR_unexpected", iar & UINT32_C(0x3ff));
+    lab_puts("[gicv2-lab] H4i FAIL: physical IRQ is forbidden\n");
+    return EXCEPTION_HALT;
 }
 
 uint64_t exception_dispatch(struct exception_frame *frame)
@@ -402,41 +460,6 @@ uint64_t exception_dispatch(struct exception_frame *frame)
         lab_puts("[gicv2-lab] expected EL2 BRK\n");
         dump_exception(frame, esr);
         write_elr_el2(elr + 4);
-        return EXCEPTION_RESUME;
-    }
-
-    if (frame->vector_slot == VECTOR_LOWER_A64_SYNC &&
-        ec == ESR_EC_WFX_TRAP) {
-        uint64_t delay_ticks;
-        uint64_t start_count;
-        uint64_t spsr = read_spsr_el2();
-        uint32_t control;
-
-        if (!wfi_ready_seen || wfi_trap_seen || timer_irq_seen ||
-            (iss & ESR_WFX_TI_MASK) != ESR_WFX_TI_WFI ||
-            elr != (uint64_t)(uintptr_t)guest_wfi_instruction ||
-            read_hcr_el2() != (HCR_EL2_BASE | HCR_EL2_TWI) ||
-            (spsr & SPSR_MODE_MASK) != SPSR_EL1H ||
-            (spsr & SPSR_IRQ_MASK) != 0) {
-            return fail_exception(frame, esr, "invalid trapped WFI");
-        }
-
-        lab_puts("[gicv2-lab] expected trapped guest WFI\n");
-        dump_exception(frame, esr);
-        lab_kv_hex64("HCR_EL2_wfi_trap", read_hcr_el2());
-
-        write_hcr_el2(HCR_EL2_BASE);
-        if (read_hcr_el2() != HCR_EL2_BASE ||
-            !gicv2_arm_hyp_timer(&delay_ticks, &start_count, &control)) {
-            return fail_exception(frame, esr,
-                                  "failed to arm WFI wake timer");
-        }
-
-        wfi_trap_seen = true;
-        lab_kv_hex64("HCR_EL2_wfi_reexecute", read_hcr_el2());
-        lab_kv_hex64("CNTHP_delay_ticks", delay_ticks);
-        lab_kv_hex64("CNTHP_start_count", start_count);
-        lab_kv_hex64("CNTHP_CTL_armed", control);
         return EXCEPTION_RESUME;
     }
 
