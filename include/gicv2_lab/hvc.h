@@ -7,11 +7,12 @@
 #define HVC_PASS       0x101
 #define HVC_FAIL       0x102
 #define HVC_EXIT       0x103
-#define HVC_IRQ_READY       0x104
-#define HVC_REFILL_PENDING  0x105
-#define HVC_REFILL_ACTIVE   0x106
-#define HVC_REFILL_EOI      0x107
-#define HVC_REFILL_COMPLETE 0x108
+#define HVC_IRQ_READY        0x104
+#define HVC_WFI_READY        0x105
+#define HVC_WAKE_ACTIVE      0x106
+#define HVC_WAKE_EOI         0x107
+#define HVC_WAKE_DEACTIVATE  0x108
+#define HVC_WFI_RESUMED      0x109
 
 #define HVC_PASS_MAGIC 0x600d
 

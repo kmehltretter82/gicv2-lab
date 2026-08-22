@@ -27,7 +27,7 @@ void lab_main(void)
     uint32_t lr_count;
 
     uart_init();
-    lab_puts("\n[gicv2-lab] H4g EL2 monitor\n");
+    lab_puts("\n[gicv2-lab] H4h EL2 monitor\n");
 
     current_el = read_currentel() >> 2;
     lab_kv_dec("CurrentEL", (uint32_t)current_el);
@@ -47,7 +47,7 @@ void lab_main(void)
     lab_kv_dec("GICH_PRIBITS", ((gich_vtr >> 29) & 7) + 1);
 
     if (current_el != 2) {
-        lab_puts("[gicv2-lab] H4g FAIL: expected EL2\n");
+        lab_puts("[gicv2-lab] H4h FAIL: expected EL2\n");
         halt_forever();
     }
 
@@ -66,7 +66,7 @@ void lab_main(void)
     lab_kv_hex64("HCR_EL2_enabled", read_hcr_el2());
 
     if (!gicv2_init(gich_vtr, &initial)) {
-        lab_puts("[gicv2-lab] H4g FAIL: GICv2 initialization\n");
+        lab_puts("[gicv2-lab] H4h FAIL: GICv2 initialization\n");
         halt_forever();
     }
 
@@ -79,6 +79,13 @@ void lab_main(void)
                  mmio_read32(PI400_GICC_BASE + GICC_CTLR));
     lab_kv_hex64("GICC_PMR_enabled",
                  mmio_read32(PI400_GICC_BASE + GICC_PMR));
+    lab_kv_hex64("GICD_ISENABLER0_enabled",
+                 mmio_read32(PI400_GICD_BASE + GICD_ISENABLER0));
+    lab_kv_hex64("GICD_ICFGR1_enabled",
+                 mmio_read32(PI400_GICD_BASE + GICD_ICFGR1));
+    lab_kv_hex64("GICD_IPRIORITYR24_enabled",
+                 mmio_read32(PI400_GICD_BASE + GICD_IPRIORITYR + 24));
+    lab_kv_hex64("CNTHP_CTL_initial", read_cnthp_ctl_el2());
     lab_kv_hex64("GICH_HCR_enabled", initial.hcr);
     lab_kv_hex64("GICH_VMCR_enabled", initial.vmcr);
     lab_kv_hex64("GICH_MISR_initial", initial.misr);

@@ -1,4 +1,4 @@
-# Pi 400 platform facts used by H1 through H4g
+# Pi 400 platform facts used by H1 through H4h
 
 The Pi 400 uses BCM2711 with four Cortex-A72 cores and a GIC-400 implementing
 the GICv2 virtualization extensions.
@@ -8,10 +8,10 @@ The EL2 monitor uses only these peripheral addresses with its MMU disabled:
 | Block | Address | Current use |
 | --- | ---: | --- |
 | PL011 UART0 | `0xfe201000` | serial diagnostic output |
-| GICD | `0xff841000` | configure maintenance in H3-H4b; quiesce PPIs in H4c-H4g |
-| GICC | `0xff842000` | service maintenance in H3-H4b; remain quiescent in H4c-H4g |
+| GICD | `0xff841000` | configure maintenance in H3-H4b; quiesce PPIs in H4c-H4g; enable timer PPI 26 in H4h |
+| GICC | `0xff842000` | service maintenance in H3-H4b and timer PPI 26 in H4h |
 | GICH | `0xff844000` | configure virtualization state and List Registers |
-| GICV | `0xff846000` | exact 8 KiB register block exposed to EL1 in H4d-H4g |
+| GICV | `0xff846000` | exact 8 KiB register block exposed to EL1 in H4d-H4h |
 
 The GIC distributor, physical CPU interface, hypervisor interface, and virtual
 CPU interface are separate frames. H1 only reads GICH_VTR, and H2 does not
@@ -24,11 +24,13 @@ the priority drop at `GICV_EOIR` from deactivation at `GICV_DIR`; H4e uses
 that split to expose Pending again from a Pending+Active LR; H4f preserves
 two distinct software SGI source tags through HPPIR, IAR, EOIR, and DIR. H4g
 fills all four qemu-pi4 LRs and refills one empty slot from an EL2 software
-queue. The GIC virtualization maintenance output used by the earlier
-scenarios is PPI number 9, architectural INTID 25.
+queue. H4h enables only non-secure EL2 physical timer PPI number 10,
+architectural INTID 26, and uses `CNTHP_EL2` to drive the wake. The GIC
+virtualization maintenance output used by the earlier scenarios is PPI
+number 9, architectural INTID 25.
 
 EL2 accesses all four physical frames directly with its MMU disabled. The
-H4d-H4g stage 2 allows EL1 to access only the architectural 8 KiB GICV block:
+H4d-H4h stage 2 allows EL1 to access only the architectural 8 KiB GICV block:
 the first page contains IAR, EOIR, RPR, and HPPIR, and the second contains DIR
 at offset `0x1000`. The guest cannot program GICD, GICC, GICH, or adjacent
 MMIO.

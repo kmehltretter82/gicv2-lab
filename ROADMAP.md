@@ -147,7 +147,7 @@ event, physical IRQ, or extra/missing delivery on 2026-08-22. The exact
 revision, linked-image audit, and raw trace are preserved in
 `results/2026-08-22-h4g-qemu-pi4/`.
 
-### H4h — WFI wakeup
+### H4h — WFI wakeup (implementation frozen; exit gate pending)
 
 - Trap the guest's first WFI with HCR.TWI to prove the exact wait instruction
   and checkpoint, then re-execute it untrapped.

@@ -13,7 +13,8 @@ interrupt transition observable, replayable, and comparable across:
 
 ## Status
 
-H4g is complete under qemu-pi4. It deliberately stays QEMU-only and now has:
+H4h is implemented under qemu-pi4 and its 100-process exit gate is pending.
+It deliberately stays QEMU-only and now has:
 
 - the H1 EL2 monitor and H2 one-vCPU EL1 guest with a validated, resumable
   stage-2 translation fault;
@@ -39,7 +40,9 @@ H4g is complete under qemu-pi4. It deliberately stays QEMU-only and now has:
   raw HPPIR, IAR, split EOI, and deactivation values; and
 - full four-LR exhaustion, one fifth interrupt held in an EL2 software queue,
   and a single validated empty-slot refill followed by five ordered
-  completions.
+  completions; and
+- an exact `HCR_EL2.TWI` trap and same-PC re-execution of guest WFI, followed
+  by one `CNTHP_EL2` PPI and one timer-injected virtual wake interrupt.
 
 The strict H4g exit gate passed 100 consecutive fresh qemu-pi4 processes on
 2026-08-22. Its exact revision, hashes, environment, and final raw trace are
@@ -49,8 +52,8 @@ its separate pre-fix evidence remain recorded under the H4f result directory.
 
 The QEMU prerequisite for the first real Pi 400 boot is now satisfied, but no
 physical boot has been performed. Hardware execution remains a separate,
-explicitly approved H6 step. WFI wakeup is the next QEMU-only state-machine
-milestone. See ROADMAP.md.
+explicitly approved H6 step. Paused virtual-interface save/restore is the
+final planned QEMU-only H4 milestone. See ROADMAP.md.
 
 ## Build
 
@@ -79,7 +82,7 @@ Override QEMU to test another build:
     make LLVM_BIN=/opt/homebrew/opt/llvm/bin \
       QEMU=/path/to/qemu-system-aarch64 smoke
 
-Run the H4g exit-gate loop (100 consecutive boots by default) with:
+Run the H4h exit-gate loop (100 consecutive boots by default) with:
 
     make LLVM_BIN=/opt/homebrew/opt/llvm/bin smoke-repeat
 
@@ -89,8 +92,8 @@ The test loads the ELF directly at 0x80000 and uses
 -cpu cortex-a72,has_el3=off. That prevents QEMU's optional synthetic EL3 from
 obscuring the non-secure EL2 environment the Pi 400 exposes to this lab. It
 checks the H1 and H2 descriptors and exceptions, the virtual-interrupt path,
-every H4g LR/APR/MISR/EISR/ELRSR snapshot, the guest-visible IAR/RPR/HPPIR
-values, the queue/refill boundary, all five ordered deliveries, and the final
+every H4h LR/APR/MISR/EISR/ELRSR snapshot, the exact WFI trap and re-execution,
+the physical timer PPI, the guest-visible IAR/RPR/HPPIR values, and the final
 PASS marker. It never writes a physical boot medium.
 
 The H2 architectural contract and fixed memory map are documented in
@@ -100,7 +103,8 @@ docs/H4B_UNDERFLOW.md, priority preemption is in
 docs/H4C_PRIORITY_PREEMPTION.md, split EOI is in docs/H4D_SPLIT_EOI.md, and
 Active+Pending redelivery is in docs/H4E_ACTIVE_PENDING.md. Multi-source SGIs
 are in docs/H4F_MULTI_SOURCE_SGI.md, LR exhaustion/refill is in
-docs/H4G_LR_REFILL.md, and the guest call interface is in docs/HVC_ABI.md.
+docs/H4G_LR_REFILL.md, WFI wake is in docs/H4H_WFI_WAKE.md, and the guest call
+interface is in docs/HVC_ABI.md.
 
 ## Repository boundaries
 

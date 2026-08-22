@@ -24,14 +24,16 @@ struct gicv2_lr_transition {
 };
 
 bool gicv2_init(uint32_t gich_vtr, struct gicv2_lr_snapshot *initial);
-bool gicv2_inject_full_lr_set(struct gicv2_lr_snapshot *pending);
-bool gicv2_capture_refill_active(uint32_t delivery,
-                                 struct gicv2_lr_snapshot *active);
-bool gicv2_capture_refill_drop(uint32_t delivery,
-                               struct gicv2_lr_snapshot *priority_drop);
-bool gicv2_complete_refill_delivery(
-    uint32_t delivery, struct gicv2_lr_transition *transition);
-uint32_t gicv2_software_queue_entry(void);
+bool gicv2_capture_empty(struct gicv2_lr_snapshot *empty);
+bool gicv2_arm_hyp_timer(uint64_t *delay_ticks, uint64_t *start_count,
+                         uint32_t *control);
+bool gicv2_service_hyp_timer(uint32_t *iar, uint32_t *control,
+                             uint64_t *elapsed_ticks,
+                             struct gicv2_lr_snapshot *pending);
+bool gicv2_hyp_timer_fired(void);
+bool gicv2_capture_wake_active(struct gicv2_lr_snapshot *active);
+bool gicv2_capture_wake_drop(struct gicv2_lr_snapshot *priority_drop);
+bool gicv2_finish_wake(struct gicv2_lr_transition *transition);
 uint32_t gicv2_acknowledge_physical_irq(void);
 
 #endif

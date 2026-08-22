@@ -63,17 +63,25 @@ guest_start:
     movz x2, #PI400_GICV_BASE_LO
     movk x2, #PI400_GICV_BASE_HI, lsl #16
     ldr w1, [x2, #GICV_HPPIR]
-    mov x0, #HVC_REFILL_PENDING
+    mov x0, #HVC_WFI_READY
     hvc #0
 
     msr daifclr, #2
     isb
 
+    .global guest_wfi_instruction
+guest_wfi_instruction:
+    wfi
+
+    .global guest_after_wfi_instruction
+guest_after_wfi_instruction:
     adr x2, guest_irq_count
-1:
-    ldr w3, [x2]
-    cmp w3, #GICV2_REFILL_DELIVERIES
-    b.ne 1b
+    ldr w1, [x2]
+    cmp w1, #1
+    b.ne guest_irq_bad
+
+    mov x0, #HVC_WFI_RESUMED
+    hvc #0
 
     msr daifset, #2
     isb
@@ -136,29 +144,26 @@ guest_vectors:
 guest_irq_entry:
     adr x2, guest_irq_count
     ldr w3, [x2]
-    cmp w3, #GICV2_REFILL_DELIVERIES
-    b.hs guest_irq_bad
+    cbnz w3, guest_irq_bad
 
     movz x2, #PI400_GICV_BASE_LO
     movk x2, #PI400_GICV_BASE_HI, lsl #16
     ldr w1, [x2, #GICV_IAR]
-    add w0, w3, #GICV2_REFILL_FIRST_INTID
-    cmp w1, w0
+    cmp w1, #GICV2_WAKE_INTID
     b.ne guest_irq_bad
 
-    REPORT_IRQ_STATE HVC_REFILL_ACTIVE
+    REPORT_IRQ_STATE HVC_WAKE_ACTIVE
 
     str w1, [x2, #GICV_EOIR]
     dsb sy
-    REPORT_IRQ_STATE HVC_REFILL_EOI
+    REPORT_IRQ_STATE HVC_WAKE_EOI
 
     str w1, [x2, #GICV_DIR]
     dsb sy
-    REPORT_IRQ_STATE HVC_REFILL_COMPLETE
+    REPORT_IRQ_STATE HVC_WAKE_DEACTIVATE
 
     adr x2, guest_irq_count
-    ldr w3, [x2]
-    add w3, w3, #1
+    mov w3, #1
     str w3, [x2]
     dsb sy
 

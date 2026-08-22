@@ -45,53 +45,41 @@
     (UINT32_C(1) << ((uint32_t)(priority) >> 3))
 
 static uint32_t implemented_lrs;
-static bool spill_queued;
-static uint32_t spill_entry;
+static bool hyp_timer_armed;
+static bool hyp_timer_expired;
+static uint64_t hyp_timer_start;
+static uint64_t hyp_timer_delay;
 
-static const uint32_t lr_base[GICV2_REFILL_DELIVERIES] = {
-    GICH_LR_BASE(40, 0x20),
-    GICH_LR_BASE(41, 0x40),
-    GICH_LR_BASE(42, 0x60),
-    GICH_LR_BASE(43, 0x80),
-    GICH_LR_BASE(44, 0xa0),
-};
+#define HYP_TIMER_PPI_MASK \
+    (UINT32_C(1) << GICV2_HYP_TIMER_INTID)
+#define HYP_TIMER_PRIORITY UINT32_C(0x20)
+#define HYP_TIMER_PRIORITY_SHIFT \
+    ((GICV2_HYP_TIMER_INTID & UINT32_C(3)) * 8)
+#define HYP_TIMER_CONFIG_SHIFT \
+    ((GICV2_HYP_TIMER_INTID - 16) * 2)
+#define HYP_TIMER_EDGE_BIT \
+    (UINT32_C(2) << HYP_TIMER_CONFIG_SHIFT)
 
-static const uint32_t lr_pending[GICV2_REFILL_DELIVERIES] = {
-    GICH_LR_PENDING_ENTRY(40, 0x20),
-    GICH_LR_PENDING_ENTRY(41, 0x40),
-    GICH_LR_PENDING_ENTRY(42, 0x60),
-    GICH_LR_PENDING_ENTRY(43, 0x80),
-    GICH_LR_PENDING_ENTRY(44, 0xa0),
-};
-
-static const uint32_t lr_active[GICV2_REFILL_DELIVERIES] = {
-    GICH_LR_ACTIVE_ENTRY(40, 0x20),
-    GICH_LR_ACTIVE_ENTRY(41, 0x40),
-    GICH_LR_ACTIVE_ENTRY(42, 0x60),
-    GICH_LR_ACTIVE_ENTRY(43, 0x80),
-    GICH_LR_ACTIVE_ENTRY(44, 0xa0),
-};
-
-static const uint32_t active_apr[GICV2_REFILL_DELIVERIES] = {
-    GICH_APR_ACTIVE(0x20),
-    GICH_APR_ACTIVE(0x40),
-    GICH_APR_ACTIVE(0x60),
-    GICH_APR_ACTIVE(0x80),
-    GICH_APR_ACTIVE(0xa0),
-};
+#define GICH_LR_WAKE_BASE \
+    GICH_LR_BASE(GICV2_WAKE_INTID, GICV2_WAKE_PRIORITY)
+#define GICH_LR_WAKE_PENDING \
+    GICH_LR_PENDING_ENTRY(GICV2_WAKE_INTID, GICV2_WAKE_PRIORITY)
+#define GICH_LR_WAKE_ACTIVE \
+    GICH_LR_ACTIVE_ENTRY(GICV2_WAKE_INTID, GICV2_WAKE_PRIORITY)
+#define GICH_APR_WAKE_ACTIVE GICH_APR_ACTIVE(GICV2_WAKE_PRIORITY)
 
 _Static_assert(GICH_VMCR_INITIAL == UINT32_C(0xf85c0201),
-               "H4g VMCR encoding changed");
-_Static_assert(GICH_LR_PENDING_ENTRY(40, 0x20) == UINT32_C(0x12000028),
-               "H4g first pending encoding changed");
-_Static_assert(GICH_LR_PENDING_ENTRY(43, 0x80) == UINT32_C(0x1800002b),
-               "H4g fourth pending encoding changed");
-_Static_assert(GICH_LR_PENDING_ENTRY(44, 0xa0) == UINT32_C(0x1a00002c),
-               "H4g spill encoding changed");
-_Static_assert(GICH_LR_ACTIVE_ENTRY(44, 0xa0) == UINT32_C(0x2a00002c),
-               "H4g spill active encoding changed");
-_Static_assert(GICH_APR_ACTIVE(0xa0) == UINT32_C(0x00100000),
-               "H4g spill APR encoding changed");
+               "H4h VMCR encoding changed");
+_Static_assert(GICH_LR_WAKE_PENDING == UINT32_C(0x14000030),
+               "H4h pending wake encoding changed");
+_Static_assert(GICH_LR_WAKE_ACTIVE == UINT32_C(0x24000030),
+               "H4h active wake encoding changed");
+_Static_assert(GICH_LR_WAKE_BASE == UINT32_C(0x04000030),
+               "H4h invalid wake encoding changed");
+_Static_assert(GICH_APR_WAKE_ACTIVE == UINT32_C(0x00000100),
+               "H4h wake APR encoding changed");
+_Static_assert(HYP_TIMER_PPI_MASK == UINT32_C(0x04000000),
+               "H4h timer PPI mask changed");
 
 static void gic_barrier(void)
 {
@@ -137,11 +125,28 @@ static uint32_t read_elrsr1(void)
 
 static bool init_physical_interface(void)
 {
+    uint32_t config;
+    uint32_t priority;
+
+    write_cnthp_ctl_el2(0);
     mmio_write32(PI400_GICC_BASE + GICC_CTLR, 0);
     mmio_write32(PI400_GICD_BASE + GICD_CTLR, 0);
     mmio_write32(PI400_GICD_BASE + GICD_ICENABLER0, GICD_PPI_MASK);
     mmio_write32(PI400_GICD_BASE + GICD_ICPENDR0, GICD_PPI_MASK);
     mmio_write32(PI400_GICD_BASE + GICD_ICACTIVER0, GICD_PPI_MASK);
+
+    priority = mmio_read32(PI400_GICD_BASE + GICD_IPRIORITYR +
+                           (GICV2_HYP_TIMER_INTID & ~UINT32_C(3)));
+    priority &= ~(UINT32_C(0xff) << HYP_TIMER_PRIORITY_SHIFT);
+    priority |= HYP_TIMER_PRIORITY << HYP_TIMER_PRIORITY_SHIFT;
+    mmio_write32(PI400_GICD_BASE + GICD_IPRIORITYR +
+                 (GICV2_HYP_TIMER_INTID & ~UINT32_C(3)), priority);
+
+    config = mmio_read32(PI400_GICD_BASE + GICD_ICFGR1);
+    config &= ~HYP_TIMER_EDGE_BIT;
+    mmio_write32(PI400_GICD_BASE + GICD_ICFGR1, config);
+    mmio_write32(PI400_GICD_BASE + GICD_ISENABLER0,
+                 HYP_TIMER_PPI_MASK);
 
     mmio_write32(PI400_GICC_BASE + GICC_PMR, GIC_PRIORITY_MASK);
     mmio_write32(PI400_GICC_BASE + GICC_BPR, GIC_BINARY_POINT);
@@ -155,7 +160,13 @@ static bool init_physical_interface(void)
                GIC_INTERFACE_ENABLE &&
            mmio_read32(PI400_GICC_BASE + GICC_PMR) != 0 &&
            (mmio_read32(PI400_GICD_BASE + GICD_ISENABLER0) &
-            GICD_PPI_MASK) == 0;
+            GICD_PPI_MASK) == HYP_TIMER_PPI_MASK &&
+           ((mmio_read32(PI400_GICD_BASE + GICD_IPRIORITYR +
+                         (GICV2_HYP_TIMER_INTID & ~UINT32_C(3))) >>
+             HYP_TIMER_PRIORITY_SHIFT) & UINT32_C(0xff)) ==
+               HYP_TIMER_PRIORITY &&
+           (read_cnthp_ctl_el2() &
+            (GICV2_CNTHP_CTL_ENABLE | GICV2_CNTHP_CTL_IMASK)) == 0;
 }
 
 static void capture_lrs(struct gicv2_lr_snapshot *snapshot)
@@ -206,102 +217,50 @@ static bool empty_snapshot_valid(const struct gicv2_lr_snapshot *snapshot)
     return snapshot_valid(snapshot, empty, 0, 0);
 }
 
-static bool full_pending_snapshot_valid(
-    const struct gicv2_lr_snapshot *snapshot)
+static bool wake_snapshot_valid(const struct gicv2_lr_snapshot *snapshot,
+                                uint32_t lr0, uint32_t apr,
+                                uint32_t valid_lr_mask)
 {
-    return snapshot_valid(snapshot, lr_pending, 0, UINT32_C(0xf));
-}
+    const uint32_t expected[GICV2_SNAPSHOT_LRS] = { lr0, 0, 0, 0 };
 
-static void expected_delivery_lrs(uint32_t delivery, uint32_t current,
-                                  uint32_t expected[GICV2_SNAPSHOT_LRS])
-{
-    uint32_t slot;
-    uint32_t index;
-
-    expected[0] = delivery == 0 ? lr_pending[0] : lr_pending[4];
-    for (index = 1; index < GICV2_SNAPSHOT_LRS; index++) {
-        expected[index] = index < delivery ? lr_base[index] :
-                                             lr_pending[index];
-    }
-
-    slot = delivery == 4 ? 0 : delivery;
-    expected[slot] = current;
-}
-
-static uint32_t delivery_valid_mask(uint32_t delivery)
-{
-    if (delivery == 0) {
-        return UINT32_C(0xf);
-    }
-    return UINT32_C(1) |
-           (UINT32_C(0xf) & ~((UINT32_C(1) << delivery) - 1));
-}
-
-static bool delivery_snapshot_valid(
-    const struct gicv2_lr_snapshot *snapshot, uint32_t delivery,
-    uint32_t current, uint32_t apr, uint32_t valid_lr_mask)
-{
-    uint32_t expected[GICV2_SNAPSHOT_LRS];
-
-    if (delivery >= GICV2_REFILL_DELIVERIES) {
-        return false;
-    }
-    expected_delivery_lrs(delivery, current, expected);
     return snapshot_valid(snapshot, expected, apr, valid_lr_mask);
 }
 
-static bool active_snapshot_valid(
-    const struct gicv2_lr_snapshot *snapshot, uint32_t delivery)
-{
-    if (delivery >= GICV2_REFILL_DELIVERIES) {
-        return false;
-    }
-    return delivery_snapshot_valid(snapshot, delivery, lr_active[delivery],
-                                   active_apr[delivery],
-                                   delivery_valid_mask(delivery));
-}
-
-static bool drop_snapshot_valid(
-    const struct gicv2_lr_snapshot *snapshot, uint32_t delivery)
-{
-    if (delivery >= GICV2_REFILL_DELIVERIES) {
-        return false;
-    }
-    return delivery_snapshot_valid(snapshot, delivery, lr_active[delivery],
-                                   0, delivery_valid_mask(delivery));
-}
-
-static bool deactivated_snapshot_valid(
-    const struct gicv2_lr_snapshot *snapshot, uint32_t delivery)
-{
-    uint32_t slot;
-    uint32_t valid_mask;
-
-    if (delivery >= GICV2_REFILL_DELIVERIES) {
-        return false;
-    }
-    slot = delivery == 4 ? 0 : delivery;
-    valid_mask = delivery_valid_mask(delivery) & ~(UINT32_C(1) << slot);
-    return delivery_snapshot_valid(snapshot, delivery, lr_base[delivery], 0,
-                                   valid_mask);
-}
-
-static bool refilled_snapshot_valid(
+static bool wake_pending_snapshot_valid(
     const struct gicv2_lr_snapshot *snapshot)
 {
-    uint32_t expected[GICV2_SNAPSHOT_LRS] = {
-        lr_pending[4], lr_pending[1], lr_pending[2], lr_pending[3]
-    };
+    return wake_snapshot_valid(snapshot, GICH_LR_WAKE_PENDING, 0,
+                               UINT32_C(1));
+}
 
-    return snapshot_valid(snapshot, expected, 0, UINT32_C(0xf));
+static bool wake_active_snapshot_valid(
+    const struct gicv2_lr_snapshot *snapshot)
+{
+    return wake_snapshot_valid(snapshot, GICH_LR_WAKE_ACTIVE,
+                               GICH_APR_WAKE_ACTIVE, UINT32_C(1));
+}
+
+static bool wake_drop_snapshot_valid(
+    const struct gicv2_lr_snapshot *snapshot)
+{
+    return wake_snapshot_valid(snapshot, GICH_LR_WAKE_ACTIVE, 0,
+                               UINT32_C(1));
+}
+
+static bool wake_deactivated_snapshot_valid(
+    const struct gicv2_lr_snapshot *snapshot)
+{
+    return wake_snapshot_valid(snapshot, GICH_LR_WAKE_BASE, 0, 0);
 }
 
 static void init_virtual_interface(void)
 {
     uint32_t index;
 
-    spill_queued = false;
-    spill_entry = 0;
+    hyp_timer_armed = false;
+    hyp_timer_expired = false;
+    hyp_timer_start = 0;
+    hyp_timer_delay = 0;
     mmio_write32(PI400_GICH_BASE + GICH_HCR, 0);
     for (index = 0; index < implemented_lrs; index++) {
         mmio_write32(PI400_GICH_BASE + GICH_LR0 + index * 4, 0);
@@ -336,84 +295,121 @@ bool gicv2_init(uint32_t gich_vtr, struct gicv2_lr_snapshot *initial)
     return empty_snapshot_valid(initial);
 }
 
-bool gicv2_inject_full_lr_set(struct gicv2_lr_snapshot *pending)
+bool gicv2_capture_empty(struct gicv2_lr_snapshot *empty)
 {
-    struct gicv2_lr_snapshot before;
-    uint32_t index;
+    capture_lrs(empty);
+    return empty_snapshot_valid(empty);
+}
 
-    capture_lrs(&before);
-    if (!empty_snapshot_valid(&before) || spill_queued) {
-        *pending = before;
+bool gicv2_arm_hyp_timer(uint64_t *delay_ticks, uint64_t *start_count,
+                         uint32_t *control)
+{
+    struct gicv2_lr_snapshot empty;
+    uint64_t frequency = read_cntfrq_el0();
+    uint64_t delay = frequency / GICV2_HYP_TIMER_DIVISOR;
+
+    if (hyp_timer_armed || hyp_timer_expired || delay == 0 ||
+        delay > INT32_MAX || !gicv2_capture_empty(&empty)) {
         return false;
     }
 
-    spill_entry = lr_pending[4];
-    spill_queued = true;
-    for (index = 0; index < GICV2_SNAPSHOT_LRS; index++) {
-        mmio_write32(PI400_GICH_BASE + GICH_LR0 + index * 4,
-                     lr_pending[index]);
-    }
+    write_cnthp_ctl_el2(0);
+    hyp_timer_start = read_cntpct_el0();
+    hyp_timer_delay = delay;
+    hyp_timer_armed = true;
+    write_cnthp_tval_el2(delay);
+    write_cnthp_ctl_el2(GICV2_CNTHP_CTL_ENABLE);
     gic_barrier();
-    capture_lrs(pending);
-    return full_pending_snapshot_valid(pending) &&
-           spill_entry == lr_pending[4];
+
+    *delay_ticks = hyp_timer_delay;
+    *start_count = hyp_timer_start;
+    *control = (uint32_t)read_cnthp_ctl_el2();
+    if (*control != GICV2_CNTHP_CTL_ENABLE) {
+        write_cnthp_ctl_el2(0);
+        hyp_timer_armed = false;
+        return false;
+    }
+    return true;
 }
 
-bool gicv2_capture_refill_active(uint32_t delivery,
-                                 struct gicv2_lr_snapshot *active)
+bool gicv2_service_hyp_timer(uint32_t *iar, uint32_t *control,
+                             uint64_t *elapsed_ticks,
+                             struct gicv2_lr_snapshot *pending)
+{
+    struct gicv2_lr_snapshot empty;
+    uint64_t now;
+    bool valid;
+
+    *iar = mmio_read32(PI400_GICC_BASE + GICC_IAR);
+    *control = (uint32_t)read_cnthp_ctl_el2();
+    now = read_cntpct_el0();
+    *elapsed_ticks = now - hyp_timer_start;
+
+    valid = hyp_timer_armed && !hyp_timer_expired &&
+            (*iar & UINT32_C(0x3ff)) == GICV2_HYP_TIMER_INTID &&
+            (*control & (GICV2_CNTHP_CTL_ENABLE |
+                         GICV2_CNTHP_CTL_IMASK |
+                         GICV2_CNTHP_CTL_ISTATUS)) ==
+                (GICV2_CNTHP_CTL_ENABLE | GICV2_CNTHP_CTL_ISTATUS) &&
+            *elapsed_ticks >= hyp_timer_delay &&
+            gicv2_capture_empty(&empty);
+
+    write_cnthp_ctl_el2(0);
+    if (valid) {
+        mmio_write32(PI400_GICH_BASE + GICH_LR0,
+                     GICH_LR_WAKE_PENDING);
+        gic_barrier();
+    }
+
+    if ((*iar & UINT32_C(0x3ff)) < 1020) {
+        mmio_write32(PI400_GICC_BASE + GICC_EOIR, *iar);
+        gic_barrier();
+    }
+
+    if (!valid) {
+        return false;
+    }
+
+    capture_lrs(pending);
+    if (!wake_pending_snapshot_valid(pending)) {
+        return false;
+    }
+
+    hyp_timer_armed = false;
+    hyp_timer_expired = true;
+    return true;
+}
+
+bool gicv2_hyp_timer_fired(void)
+{
+    return hyp_timer_expired && !hyp_timer_armed;
+}
+
+bool gicv2_capture_wake_active(struct gicv2_lr_snapshot *active)
 {
     capture_lrs(active);
-    return active_snapshot_valid(active, delivery);
+    return hyp_timer_expired && wake_active_snapshot_valid(active);
 }
 
-bool gicv2_capture_refill_drop(uint32_t delivery,
-                               struct gicv2_lr_snapshot *priority_drop)
+bool gicv2_capture_wake_drop(struct gicv2_lr_snapshot *priority_drop)
 {
     capture_lrs(priority_drop);
-    return drop_snapshot_valid(priority_drop, delivery);
+    return hyp_timer_expired && wake_drop_snapshot_valid(priority_drop);
 }
 
-bool gicv2_complete_refill_delivery(
-    uint32_t delivery, struct gicv2_lr_transition *transition)
+bool gicv2_finish_wake(struct gicv2_lr_transition *transition)
 {
-    uint32_t index;
-
     capture_lrs(&transition->before);
     transition->after = transition->before;
-    if (!deactivated_snapshot_valid(&transition->before, delivery)) {
+    if (!hyp_timer_expired ||
+        !wake_deactivated_snapshot_valid(&transition->before)) {
         return false;
     }
 
-    if (delivery == 0) {
-        if (!spill_queued || spill_entry != lr_pending[4]) {
-            return false;
-        }
-        mmio_write32(PI400_GICH_BASE + GICH_LR0, spill_entry);
-        spill_entry = 0;
-        spill_queued = false;
-        gic_barrier();
-        capture_lrs(&transition->after);
-        return refilled_snapshot_valid(&transition->after);
-    }
-
-    if (delivery + 1 != GICV2_REFILL_DELIVERIES) {
-        return !spill_queued && spill_entry == 0;
-    }
-
-    if (spill_queued || spill_entry != 0) {
-        return false;
-    }
-    for (index = 0; index < GICV2_SNAPSHOT_LRS; index++) {
-        mmio_write32(PI400_GICH_BASE + GICH_LR0 + index * 4, 0);
-    }
+    mmio_write32(PI400_GICH_BASE + GICH_LR0, 0);
     gic_barrier();
     capture_lrs(&transition->after);
     return empty_snapshot_valid(&transition->after);
-}
-
-uint32_t gicv2_software_queue_entry(void)
-{
-    return spill_queued ? spill_entry : 0;
 }
 
 uint32_t gicv2_acknowledge_physical_irq(void)

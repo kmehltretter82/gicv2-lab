@@ -7,7 +7,7 @@ image=${1:?usage: smoke-qemu.sh IMAGE}
 qemu=${QEMU:?set QEMU to qemu-system-aarch64}
 log=build/smoke-qemu.log
 stderr_log=build/smoke-qemu.stderr
-marker='[gicv2-lab] H4g PASS'
+marker='[gicv2-lab] H4h PASS'
 deadline=$(( $(date +%s) + 10 ))
 poll_interval=${SMOKE_POLL_INTERVAL:-0.1}
 pid=
@@ -109,7 +109,7 @@ while test "$(date +%s)" -lt "$deadline"; do
         if test "${SMOKE_QUIET:-0}" != 1; then
             cat "$log"
         fi
-        require_once '[gicv2-lab] H4g EL2 monitor'
+        require_once '[gicv2-lab] H4h EL2 monitor'
         require_once "$marker"
         require_line 'CurrentEL=2'
         require_line 'GICH_LRS=4'
@@ -122,6 +122,10 @@ while test "$(date +%s)" -lt "$deadline"; do
         require_line 'VTCR_EL2_enabled=0x0000000080003560'
         require_line 'HCR_EL2_enabled=0x0000000080000011'
         require_line 'GICC_PMR_enabled=0x00000000000000ff'
+        require_line 'GICD_ISENABLER0_enabled=0x000000000400ffff'
+        require_line 'GICD_ICFGR1_enabled=0x0000000000000000'
+        require_line 'GICD_IPRIORITYR24_enabled=0x0000000000200000'
+        require_line 'CNTHP_CTL_initial=0x0000000000000000'
         require_line 'GICH_HCR_enabled=0x0000000000000001'
         require_line 'GICH_VMCR_enabled=0x00000000f85c0201'
         require_line 'GICH_MISR_initial=0x0000000000000000'
@@ -144,130 +148,76 @@ while test "$(date +%s)" -lt "$deadline"; do
         require_line 'GuestGICV_CTLR=0x0000000000000201'
         require_line 'GuestGICV_PMR=0x00000000000000f8'
         require_line 'GuestGICV_BPR=0x0000000000000002'
-        require_once '[gicv2-lab] all four List Registers occupied'
-        require_snapshot all_pending 0x0000000012000028 \
-            0x0000000014000029 0x000000001600002a \
-            0x000000001800002b 0x0000000000000000 \
-            0x0000000000000000
-        require_once '[gicv2-lab] fifth virtual interrupt queued in EL2'
-        require_line 'EL2SoftwareQueue_entry=0x000000001a00002c'
-        require_line 'GuestHPPIR_all_pending_observed=0x0000000000000028'
-        require_once '[gicv2-lab] highest-priority resident LR visible'
-        require_line 'GuestHPPIR_all_pending=0x0000000000000028'
-
-        require_count 5 '[gicv2-lab] refill delivery active'
-        require_count 5 '[gicv2-lab] refill delivery priority dropped'
-        require_count 5 '[gicv2-lab] refill delivery deactivated'
-        require_count 3 'RefillDelivery=0'
-        require_count 3 'RefillDelivery=1'
-        require_count 3 'RefillDelivery=2'
-        require_count 3 'RefillDelivery=3'
-        require_count 3 'RefillDelivery=4'
-        require_count 5 'RefillPhase=0'
-        require_count 5 'RefillPhase=1'
-        require_count 5 'RefillPhase=2'
-        require_count 3 'GuestIAR_refill=0x0000000000000028'
-        require_count 3 'GuestIAR_refill=0x0000000000000029'
-        require_count 3 'GuestIAR_refill=0x000000000000002a'
-        require_count 3 'GuestIAR_refill=0x000000000000002b'
-        require_count 3 'GuestIAR_refill=0x000000000000002c'
-        require_count 10 'GuestRPR_refill=0x00000000000000ff'
-        require_count 3 'GuestHPPIR_refill=0x0000000000000029'
-        require_count 3 'GuestHPPIR_refill=0x000000000000002a'
-        require_count 3 'GuestHPPIR_refill=0x000000000000002b'
-        require_count 3 'GuestHPPIR_refill=0x000000000000002c'
-        require_count 3 'GuestHPPIR_refill=0x00000000000003ff'
-
-        require_line 'GuestIRQState_delivery0_active=0x0000292000000028'
-        require_snapshot delivery0_active 0x0000000022000028 \
-            0x0000000014000029 0x000000001600002a \
-            0x000000001800002b 0x0000000000000010 \
-            0x0000000000000000
-        require_line 'GuestIRQState_delivery0_drop=0x000029ff00000028'
-        require_snapshot delivery0_drop 0x0000000022000028 \
-            0x0000000014000029 0x000000001600002a \
-            0x000000001800002b 0x0000000000000000 \
-            0x0000000000000000
-        require_line 'GuestIRQState_delivery0_deactivated=0x000029ff00000028'
-        require_snapshot delivery0_deactivated 0x0000000002000028 \
-            0x0000000014000029 0x000000001600002a \
-            0x000000001800002b 0x0000000000000000 \
-            0x0000000000000001
-        require_once '[gicv2-lab] freed LR0 refilled from EL2 queue'
-        require_line 'EL2SoftwareQueue_after_refill=0x0000000000000000'
-        require_snapshot refilled 0x000000001a00002c \
-            0x0000000014000029 0x000000001600002a \
-            0x000000001800002b 0x0000000000000000 \
-            0x0000000000000000
-
-        require_line 'GuestIRQState_delivery1_active=0x00002a4000000029'
-        require_snapshot delivery1_active 0x000000001a00002c \
-            0x0000000024000029 0x000000001600002a \
-            0x000000001800002b 0x0000000000000100 \
-            0x0000000000000000
-        require_line 'GuestIRQState_delivery1_drop=0x00002aff00000029'
-        require_snapshot delivery1_drop 0x000000001a00002c \
-            0x0000000024000029 0x000000001600002a \
-            0x000000001800002b 0x0000000000000000 \
-            0x0000000000000000
-        require_line 'GuestIRQState_delivery1_deactivated=0x00002aff00000029'
-        require_snapshot delivery1_deactivated 0x000000001a00002c \
-            0x0000000004000029 0x000000001600002a \
-            0x000000001800002b 0x0000000000000000 \
-            0x0000000000000002
-
-        require_line 'GuestIRQState_delivery2_active=0x00002b600000002a'
-        require_snapshot delivery2_active 0x000000001a00002c \
-            0x0000000004000029 0x000000002600002a \
-            0x000000001800002b 0x0000000000001000 \
-            0x0000000000000002
-        require_line 'GuestIRQState_delivery2_drop=0x00002bff0000002a'
-        require_snapshot delivery2_drop 0x000000001a00002c \
-            0x0000000004000029 0x000000002600002a \
-            0x000000001800002b 0x0000000000000000 \
-            0x0000000000000002
-        require_line 'GuestIRQState_delivery2_deactivated=0x00002bff0000002a'
-        require_snapshot delivery2_deactivated 0x000000001a00002c \
-            0x0000000004000029 0x000000000600002a \
-            0x000000001800002b 0x0000000000000000 \
-            0x0000000000000006
-
-        require_line 'GuestIRQState_delivery3_active=0x00002c800000002b'
-        require_snapshot delivery3_active 0x000000001a00002c \
-            0x0000000004000029 0x000000000600002a \
-            0x000000002800002b 0x0000000000010000 \
-            0x0000000000000006
-        require_line 'GuestIRQState_delivery3_drop=0x00002cff0000002b'
-        require_snapshot delivery3_drop 0x000000001a00002c \
-            0x0000000004000029 0x000000000600002a \
-            0x000000002800002b 0x0000000000000000 \
-            0x0000000000000006
-        require_line 'GuestIRQState_delivery3_deactivated=0x00002cff0000002b'
-        require_snapshot delivery3_deactivated 0x000000001a00002c \
-            0x0000000004000029 0x000000000600002a \
-            0x000000000800002b 0x0000000000000000 \
-            0x000000000000000e
-
-        require_line 'GuestIRQState_delivery4_active=0x0003ffa00000002c'
-        require_snapshot delivery4_active 0x000000002a00002c \
-            0x0000000004000029 0x000000000600002a \
-            0x000000000800002b 0x0000000000100000 \
-            0x000000000000000e
-        require_line 'GuestIRQState_delivery4_drop=0x0003ffff0000002c'
-        require_snapshot delivery4_drop 0x000000002a00002c \
-            0x0000000004000029 0x000000000600002a \
-            0x000000000800002b 0x0000000000000000 \
-            0x000000000000000e
-        require_line 'GuestIRQState_delivery4_deactivated=0x0003ffff0000002c'
-        require_snapshot delivery4_deactivated 0x000000000a00002c \
-            0x0000000004000029 0x000000000600002a \
-            0x000000000800002b 0x0000000000000000 \
-            0x000000000000000f
-        require_once '[gicv2-lab] exhausted LR set restored'
-        require_snapshot cleared 0x0000000000000000 \
+        require_once '[gicv2-lab] virtual interface empty before WFI'
+        require_snapshot before_wfi \
             0x0000000000000000 0x0000000000000000 \
             0x0000000000000000 0x0000000000000000 \
-            0x000000000000000f
+            0x0000000000000000 0x000000000000000f
+        require_line 'GuestHPPIR_before_wfi=0x00000000000003ff'
+        require_once '[gicv2-lab] guest WFI trap armed'
+        require_line 'HCR_EL2_before_wfi=0x0000000080000011'
+        require_line 'HCR_EL2_wfi_trap_armed=0x0000000080002011'
+        require_snapshot wfi_trap_armed \
+            0x0000000000000000 0x0000000000000000 \
+            0x0000000000000000 0x0000000000000000 \
+            0x0000000000000000 0x000000000000000f
+        require_once '[gicv2-lab] expected trapped guest WFI'
+        require_count 2 'vector_slot=8'
+        require_line 'ESR_EL2=0x0000000007e00000'
+        require_line 'ELR_EL2=0x0000000000200074'
+        require_line 'SPSR_EL2=0x0000000000000345'
+        require_line 'HCR_EL2_wfi_trap=0x0000000080002011'
+        require_line 'HCR_EL2_wfi_reexecute=0x0000000080000011'
+        require_line 'CNTHP_delay_ticks=0x00000000002932e0'
+        require_once 'CNTHP_start_count='
+        require_line 'CNTHP_CTL_armed=0x0000000000000001'
+        require_once '[gicv2-lab] physical IRQ observed'
+        require_line 'physical_irq_vector_slot=9'
+        require_line 'PhysicalIAR_hyp_timer=26'
+        require_line 'CNTHP_CTL_expired=0x0000000000000005'
+        require_once 'CNTHP_elapsed_ticks='
+        require_line 'HCR_EL2_timer_irq=0x0000000080000011'
+        require_line 'ELR_EL2_timer_irq=0x0000000000200078'
+        require_line 'SPSR_EL2_timer_irq=0x0000000000000345'
+        require_once '[gicv2-lab] expected hypervisor timer IRQ'
+        require_snapshot timer_injected_pending \
+            0x0000000014000030 0x0000000000000000 \
+            0x0000000000000000 0x0000000000000000 \
+            0x0000000000000000 0x000000000000000e
+        require_once '[gicv2-lab] timer-injected virtual IRQ active'
+        require_line 'GuestIAR_wake_active=0x0000000000000030'
+        require_line 'GuestRPR_wake_active=0x0000000000000040'
+        require_line 'GuestHPPIR_wake_active=0x00000000000003ff'
+        require_line 'GuestIRQState_wake_active=0x0003ff4000000030'
+        require_snapshot wake_active \
+            0x0000000024000030 0x0000000000000000 \
+            0x0000000000000000 0x0000000000000000 \
+            0x0000000000000100 0x000000000000000e
+        require_once '[gicv2-lab] wake IRQ priority dropped'
+        require_line 'GuestIAR_wake_drop=0x0000000000000030'
+        require_line 'GuestRPR_wake_drop=0x00000000000000ff'
+        require_line 'GuestHPPIR_wake_drop=0x00000000000003ff'
+        require_line 'GuestIRQState_wake_drop=0x0003ffff00000030'
+        require_snapshot wake_drop \
+            0x0000000024000030 0x0000000000000000 \
+            0x0000000000000000 0x0000000000000000 \
+            0x0000000000000000 0x000000000000000e
+        require_once '[gicv2-lab] wake IRQ deactivated'
+        require_line 'GuestIAR_wake_deactivated=0x0000000000000030'
+        require_line 'GuestRPR_wake_deactivated=0x00000000000000ff'
+        require_line 'GuestHPPIR_wake_deactivated=0x00000000000003ff'
+        require_line 'GuestIRQState_wake_deactivated=0x0003ffff00000030'
+        require_snapshot wake_deactivated \
+            0x0000000004000030 0x0000000000000000 \
+            0x0000000000000000 0x0000000000000000 \
+            0x0000000000000000 0x000000000000000f
+        require_once '[gicv2-lab] wake LR cleared'
+        require_snapshot cleared \
+            0x0000000000000000 0x0000000000000000 \
+            0x0000000000000000 0x0000000000000000 \
+            0x0000000000000000 0x000000000000000f
+        require_once '[gicv2-lab] guest resumed after timer-woken WFI'
+        require_line 'GuestIRQCount_after_wfi=1'
         reject_line '[gicv2-lab] H3 FAIL:'
         reject_line '[gicv2-lab] H4a FAIL:'
         reject_line '[gicv2-lab] H4b FAIL:'
@@ -276,6 +226,7 @@ while test "$(date +%s)" -lt "$deadline"; do
         reject_line '[gicv2-lab] H4e FAIL:'
         reject_line '[gicv2-lab] H4f FAIL:'
         reject_line '[gicv2-lab] H4g FAIL:'
+        reject_line '[gicv2-lab] H4h FAIL:'
         reject_line '[gicv2-lab] unexpected physical IRQ'
         exit 0
     fi
@@ -287,5 +238,5 @@ done
 
 test -f "$log" && cat "$log"
 test ! -s "$stderr_log" || cat "$stderr_log" >&2
-echo "gicv2-lab: QEMU smoke test did not observe the H4g marker" >&2
+echo "gicv2-lab: QEMU smoke test did not observe the H4h marker" >&2
 exit 1

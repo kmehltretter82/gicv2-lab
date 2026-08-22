@@ -67,6 +67,43 @@ static inline uint64_t read_hcr_el2(void)
     return value;
 }
 
+static inline void write_hcr_el2(uint64_t value)
+{
+    __asm__ volatile("msr HCR_EL2, %0\n"
+                     "isb\n"
+                     : : "r"(value) : "memory");
+}
+
+static inline uint64_t read_cntpct_el0(void)
+{
+    uint64_t value;
+
+    __asm__ volatile("mrs %0, CNTPCT_EL0" : "=r"(value));
+    return value;
+}
+
+static inline uint64_t read_cnthp_ctl_el2(void)
+{
+    uint64_t value;
+
+    __asm__ volatile("mrs %0, CNTHP_CTL_EL2" : "=r"(value));
+    return value;
+}
+
+static inline void write_cnthp_ctl_el2(uint64_t value)
+{
+    __asm__ volatile("msr CNTHP_CTL_EL2, %0\n"
+                     "isb\n"
+                     : : "r"(value) : "memory");
+}
+
+static inline void write_cnthp_tval_el2(uint64_t value)
+{
+    __asm__ volatile("msr CNTHP_TVAL_EL2, %0\n"
+                     "isb\n"
+                     : : "r"(value) : "memory");
+}
+
 static inline uint64_t read_vtcr_el2(void)
 {
     uint64_t value;
