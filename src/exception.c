@@ -21,9 +21,9 @@
 #define ESR_DABT_S1PTW (UINT64_C(1) << 7)
 #define ESR_DABT_FNV   (UINT64_C(1) << 10)
 
-#define ESR_EC_HVC64         UINT64_C(0x16)
-#define ESR_EC_DABT_LOWER    UINT64_C(0x24)
-#define ESR_EC_BRK64         UINT64_C(0x3c)
+#define ESR_EC_HVC64      UINT64_C(0x16)
+#define ESR_EC_DABT_LOWER UINT64_C(0x24)
+#define ESR_EC_BRK64      UINT64_C(0x3c)
 
 #define VECTOR_CURRENT_SPX_SYNC UINT64_C(4)
 #define VECTOR_CURRENT_SPX_IRQ  UINT64_C(5)
@@ -32,16 +32,34 @@
 #define GUEST_CURRENTEL_VALUE   UINT64_C(4)
 #define S2_LEVEL2_TRANSLATION_FAULT UINT64_C(6)
 
+#define IRQ_READY_PMR_SHIFT 32
+#define IRQ_READY_BPR_SHIFT 40
+#define IRQ_READY_ALLOWED_MASK \
+    (UINT64_C(0xffffffff) | (UINT64_C(0xff) << IRQ_READY_PMR_SHIFT) | \
+     (UINT64_C(7) << IRQ_READY_BPR_SHIFT))
+
+#define DUMP_SNAPSHOT(snapshot, suffix) do { \
+    lab_kv_hex64("GICH_HCR_" suffix, (snapshot)->hcr); \
+    lab_kv_hex64("GICH_VMCR_" suffix, (snapshot)->vmcr); \
+    lab_kv_hex64("GICH_MISR_" suffix, (snapshot)->misr); \
+    lab_kv_hex64("GICH_EISR0_" suffix, (snapshot)->eisr[0]); \
+    lab_kv_hex64("GICH_EISR1_" suffix, (snapshot)->eisr[1]); \
+    lab_kv_hex64("GICH_ELRSR0_" suffix, (snapshot)->elrsr[0]); \
+    lab_kv_hex64("GICH_ELRSR1_" suffix, (snapshot)->elrsr[1]); \
+    lab_kv_hex64("GICH_APR_" suffix, (snapshot)->apr); \
+    lab_kv_hex64("GICH_LR0_" suffix, (snapshot)->lr[0]); \
+    lab_kv_hex64("GICH_LR1_" suffix, (snapshot)->lr[1]); \
+} while (0)
+
 static bool guest_report_seen;
 static bool stage2_fault_seen;
 static bool h2_pass_seen;
 static bool irq_ready_seen;
-static bool guest_irq_active_seen;
-static bool guest_irq_eoi_seen;
-static bool maintenance_seen;
+static bool low_active_seen;
+static bool high_active_seen;
+static bool high_eoi_seen;
+static bool low_eoi_seen;
 static bool el2_brk_seen;
-
-extern volatile uint32_t guest_maintenance_seen;
 
 _Static_assert(sizeof(struct exception_frame) == 256,
                "exception frame must match vectors.S");
@@ -59,11 +77,23 @@ static void dump_exception(const struct exception_frame *frame, uint64_t esr)
 static uint64_t fail_exception(const struct exception_frame *frame,
                                uint64_t esr, const char *reason)
 {
-    lab_puts("[gicv2-lab] H4b FAIL: ");
+    lab_puts("[gicv2-lab] H4c FAIL: ");
     lab_puts(reason);
     lab_puts("\n");
     dump_exception(frame, esr);
     return EXCEPTION_HALT;
+}
+
+static bool irq_ready_argument_valid(uint64_t argument)
+{
+    uint32_t ctlr = (uint32_t)argument;
+    uint32_t pmr = (uint32_t)(argument >> IRQ_READY_PMR_SHIFT) & 0xff;
+    uint32_t bpr = (uint32_t)(argument >> IRQ_READY_BPR_SHIFT) & 7;
+
+    return (argument & ~IRQ_READY_ALLOWED_MASK) == 0 &&
+           ctlr == GICV2_GICV_CTLR_EXPECTED &&
+           pmr == GICV2_GICV_PMR_EXPECTED &&
+           bpr == GICV2_GICV_BPR_EXPECTED;
 }
 
 static uint64_t handle_hvc(struct exception_frame *frame, uint64_t esr)
@@ -98,83 +128,132 @@ static uint64_t handle_hvc(struct exception_frame *frame, uint64_t esr)
         return fail_exception(frame, esr, "guest reported failure");
 
     case HVC_IRQ_READY: {
-        struct gicv2_lr_snapshot armed;
+        struct gicv2_lr_snapshot pending;
 
         if (!h2_pass_seen || irq_ready_seen ||
-            (uint32_t)argument != GICV2_GICV_CTLR_EXPECTED ||
-            (uint32_t)(argument >> 32) != GICV2_GICV_PMR_EXPECTED ||
-            !gicv2_arm_underflow(&armed)) {
+            !irq_ready_argument_valid(argument) ||
+            !gicv2_inject_low(&pending)) {
             return fail_exception(frame, esr, "invalid IRQ-ready report");
         }
         irq_ready_seen = true;
         lab_puts("[gicv2-lab] EL1 virtual interface ready\n");
         lab_kv_hex64("GuestGICV_CTLR", (uint32_t)argument);
-        lab_kv_hex64("GuestGICV_PMR", (uint32_t)(argument >> 32));
-        lab_kv_hex64("GICH_HCR_pending", armed.hcr);
-        lab_kv_hex64("GICH_VMCR_pending", armed.vmcr);
-        lab_kv_hex64("GICH_MISR_pending", armed.misr);
-        lab_kv_hex64("GICH_EISR0_pending", armed.eisr[0]);
-        lab_kv_hex64("GICH_EISR1_pending", armed.eisr[1]);
-        lab_kv_hex64("GICH_ELRSR0_pending", armed.elrsr[0]);
-        lab_kv_hex64("GICH_ELRSR1_pending", armed.elrsr[1]);
-        lab_kv_hex64("GICH_APR_pending", armed.apr);
-        lab_kv_hex64("GICH_LR0_injected", armed.lr[0]);
-        lab_kv_hex64("GICH_LR1_injected", armed.lr[1]);
+        lab_kv_hex64("GuestGICV_PMR",
+                     (argument >> IRQ_READY_PMR_SHIFT) & 0xff);
+        lab_kv_hex64("GuestGICV_BPR",
+                     (argument >> IRQ_READY_BPR_SHIFT) & 7);
+        lab_puts("[gicv2-lab] low-priority virtual IRQ pending\n");
+        DUMP_SNAPSHOT(&pending, "low_pending");
         frame->x[0] = 0;
         return EXCEPTION_RESUME;
     }
 
     case HVC_IRQ_ACTIVE: {
-        struct gicv2_lr_snapshot active;
+        struct gicv2_lr_transition injection;
+        bool valid;
 
-        if (!irq_ready_seen || guest_irq_active_seen ||
-            argument != GICV2_PRIMARY_INTID) {
+        if (!irq_ready_seen || low_active_seen ||
+            argument != GICV2_LOW_INTID) {
             return fail_exception(frame, esr,
-                                  "invalid virtual IRQ active report");
+                                  "invalid low IRQ active report");
         }
 
-        gicv2_capture_lrs(&active);
-        lab_puts("[gicv2-lab] LR0 active with LR1 reserve\n");
-        lab_kv_dec("GuestIAR_active", (uint32_t)argument);
-        lab_kv_hex64("GICH_HCR_active", active.hcr);
-        lab_kv_hex64("GICH_VMCR_active", active.vmcr);
-        lab_kv_hex64("GICH_MISR_active", active.misr);
-        lab_kv_hex64("GICH_EISR0_active", active.eisr[0]);
-        lab_kv_hex64("GICH_EISR1_active", active.eisr[1]);
-        lab_kv_hex64("GICH_ELRSR0_active", active.elrsr[0]);
-        lab_kv_hex64("GICH_ELRSR1_active", active.elrsr[1]);
-        lab_kv_hex64("GICH_APR_active", active.apr);
-        lab_kv_hex64("GICH_LR0_active", active.lr[0]);
-        lab_kv_hex64("GICH_LR1_active", active.lr[1]);
-
-        if (!gicv2_active_snapshot_valid(&active)) {
+        valid = gicv2_inject_high(&injection);
+        lab_puts("[gicv2-lab] low-priority virtual IRQ active\n");
+        lab_kv_dec("GuestIAR_low_active", (uint32_t)argument);
+        DUMP_SNAPSHOT(&injection.before, "low_active");
+        lab_puts("[gicv2-lab] high-priority virtual IRQ pending\n");
+        DUMP_SNAPSHOT(&injection.after, "high_pending");
+        if (!valid) {
             return fail_exception(frame, esr,
-                                  "invalid virtual IRQ active state");
+                                  "invalid low-active/high-pending state");
         }
 
-        guest_irq_active_seen = true;
+        low_active_seen = true;
         frame->x[0] = 0;
         return EXCEPTION_RESUME;
     }
 
-    case HVC_IRQ_EOI:
-        if (!guest_irq_active_seen || guest_irq_eoi_seen ||
-            argument != GICV2_PRIMARY_INTID) {
-            return fail_exception(frame, esr, "invalid virtual IRQ EOI");
+    case HVC_IRQ_NESTED_ACTIVE: {
+        struct gicv2_lr_snapshot active;
+        bool valid;
+
+        if (!low_active_seen || high_active_seen || high_eoi_seen ||
+            argument != GICV2_HIGH_INTID) {
+            return fail_exception(frame, esr,
+                                  "invalid nested IRQ active report");
         }
-        guest_irq_eoi_seen = true;
-        lab_puts("[gicv2-lab] EL1 acknowledged and EOIed virtual IRQ\n");
-        lab_kv_dec("GuestIAR", (uint32_t)argument);
+
+        valid = gicv2_capture_both_active(&active);
+        lab_puts("[gicv2-lab] nested high-priority virtual IRQ active\n");
+        lab_kv_dec("GuestIAR_high_active", (uint32_t)argument);
+        DUMP_SNAPSHOT(&active, "both_active");
+        if (!valid) {
+            return fail_exception(frame, esr,
+                                  "invalid both-active state");
+        }
+
+        high_active_seen = true;
         frame->x[0] = 0;
         return EXCEPTION_RESUME;
+    }
+
+    case HVC_IRQ_NESTED_EOI: {
+        struct gicv2_lr_snapshot eoi;
+        bool valid;
+
+        if (!high_active_seen || high_eoi_seen ||
+            argument != GICV2_HIGH_INTID) {
+            return fail_exception(frame, esr,
+                                  "invalid nested IRQ EOI report");
+        }
+
+        valid = gicv2_capture_high_eoi(&eoi);
+        lab_puts("[gicv2-lab] high-priority virtual IRQ EOI\n");
+        lab_kv_dec("GuestIAR_high_eoi", (uint32_t)argument);
+        DUMP_SNAPSHOT(&eoi, "high_eoi");
+        if (!valid) {
+            return fail_exception(frame, esr,
+                                  "invalid high-EOI state");
+        }
+
+        high_eoi_seen = true;
+        frame->x[0] = 0;
+        return EXCEPTION_RESUME;
+    }
+
+    case HVC_IRQ_EOI: {
+        struct gicv2_lr_transition completion;
+        bool valid;
+
+        if (!high_eoi_seen || low_eoi_seen ||
+            argument != GICV2_LOW_INTID) {
+            return fail_exception(frame, esr, "invalid low IRQ EOI");
+        }
+
+        valid = gicv2_finish_priority_test(&completion);
+        lab_puts("[gicv2-lab] low-priority virtual IRQ EOI\n");
+        lab_kv_dec("GuestIAR_low_eoi", (uint32_t)argument);
+        DUMP_SNAPSHOT(&completion.before, "low_eoi");
+        lab_puts("[gicv2-lab] virtual interface restored\n");
+        DUMP_SNAPSHOT(&completion.after, "cleared");
+        if (!valid) {
+            return fail_exception(frame, esr,
+                                  "invalid low-EOI/clear state");
+        }
+
+        low_eoi_seen = true;
+        frame->x[0] = 0;
+        return EXCEPTION_RESUME;
+    }
 
     case HVC_EXIT:
         if (!guest_report_seen || !stage2_fault_seen || !h2_pass_seen ||
-            !irq_ready_seen || !guest_irq_active_seen ||
-            !guest_irq_eoi_seen || !maintenance_seen || argument != 0) {
+            !irq_ready_seen || !low_active_seen || !high_active_seen ||
+            !high_eoi_seen || !low_eoi_seen || argument != 0) {
             return fail_exception(frame, esr, "guest exited too early");
         }
-        lab_puts("[gicv2-lab] H4b PASS\n");
+        lab_puts("[gicv2-lab] H4c PASS\n");
         return EXCEPTION_HALT;
 
     default:
@@ -182,53 +261,15 @@ static uint64_t handle_hvc(struct exception_frame *frame, uint64_t esr)
     }
 }
 
-static void dump_maintenance(
-    const struct exception_frame *frame,
-    const struct gicv2_maintenance_trace *trace)
-{
-    lab_kv_dec("maintenance_vector_slot", (uint32_t)frame->vector_slot);
-    lab_kv_dec("PhysicalIAR", trace->iar & UINT32_C(0x3ff));
-    lab_kv_hex64("GICH_HCR_maintenance", trace->before.hcr);
-    lab_kv_hex64("GICH_VMCR_maintenance", trace->before.vmcr);
-    lab_kv_hex64("GICH_MISR", trace->before.misr);
-    lab_kv_hex64("GICH_EISR0", trace->before.eisr[0]);
-    lab_kv_hex64("GICH_EISR1", trace->before.eisr[1]);
-    lab_kv_hex64("GICH_ELRSR0", trace->before.elrsr[0]);
-    lab_kv_hex64("GICH_ELRSR1", trace->before.elrsr[1]);
-    lab_kv_hex64("GICH_APR", trace->before.apr);
-    lab_kv_hex64("GICH_LR0_post_eoi", trace->before.lr[0]);
-    lab_kv_hex64("GICH_LR1_remaining", trace->before.lr[1]);
-    lab_kv_hex64("GICH_HCR_cleared", trace->after.hcr);
-    lab_kv_hex64("GICH_VMCR_cleared", trace->after.vmcr);
-    lab_kv_hex64("GICH_MISR_cleared", trace->after.misr);
-    lab_kv_hex64("GICH_EISR0_cleared", trace->after.eisr[0]);
-    lab_kv_hex64("GICH_EISR1_cleared", trace->after.eisr[1]);
-    lab_kv_hex64("GICH_ELRSR0_cleared", trace->after.elrsr[0]);
-    lab_kv_hex64("GICH_ELRSR1_cleared", trace->after.elrsr[1]);
-    lab_kv_hex64("GICH_APR_cleared", trace->after.apr);
-    lab_kv_hex64("GICH_LR0_cleared", trace->after.lr[0]);
-    lab_kv_hex64("GICH_LR1_cleared", trace->after.lr[1]);
-}
-
 static uint64_t handle_physical_irq(struct exception_frame *frame)
 {
-    struct gicv2_maintenance_trace trace;
+    uint32_t iar = gicv2_acknowledge_physical_irq();
 
-    gicv2_acknowledge_underflow(&trace);
-    lab_puts("[gicv2-lab] GIC underflow maintenance interrupt\n");
-    dump_maintenance(frame, &trace);
-
-    if (!guest_irq_active_seen || maintenance_seen ||
-        !gicv2_underflow_trace_valid(&trace)) {
-        lab_puts("[gicv2-lab] H4b FAIL: invalid maintenance interrupt\n");
-        return EXCEPTION_HALT;
-    }
-
-    maintenance_seen = true;
-    guest_maintenance_seen = 1;
-    __asm__ volatile("dsb sy" : : : "memory");
-    lab_puts("[gicv2-lab] underflow maintenance PPI 25 acknowledged\n");
-    return EXCEPTION_RESUME;
+    lab_puts("[gicv2-lab] unexpected physical IRQ\n");
+    lab_kv_dec("physical_irq_vector_slot", (uint32_t)frame->vector_slot);
+    lab_kv_dec("PhysicalIAR_unexpected", iar & UINT32_C(0x3ff));
+    lab_puts("[gicv2-lab] H4c FAIL: physical IRQ is forbidden\n");
+    return EXCEPTION_HALT;
 }
 
 uint64_t exception_dispatch(struct exception_frame *frame)

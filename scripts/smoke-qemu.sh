@@ -7,7 +7,7 @@ image=${1:?usage: smoke-qemu.sh IMAGE}
 qemu=${QEMU:?set QEMU to qemu-system-aarch64}
 log=build/smoke-qemu.log
 stderr_log=build/smoke-qemu.stderr
-marker='[gicv2-lab] H4b PASS'
+marker='[gicv2-lab] H4c PASS'
 deadline=$(( $(date +%s) + 10 ))
 poll_interval=${SMOKE_POLL_INTERVAL:-0.1}
 pid=
@@ -30,6 +30,17 @@ require_line()
 
     if ! grep -Fq "$expected" "$log"; then
         echo "gicv2-lab: missing smoke-test line: $expected" >&2
+        return 1
+    fi
+}
+
+require_once()
+{
+    expected=$1
+    actual=$(grep -Fc "$expected" "$log" || true)
+
+    if test "$actual" -ne 1; then
+        echo "gicv2-lab: expected one smoke-test line, found $actual: $expected" >&2
         return 1
     fi
 }
@@ -62,17 +73,19 @@ while test "$(date +%s)" -lt "$deadline"; do
         if test "${SMOKE_QUIET:-0}" != 1; then
             cat "$log"
         fi
-        require_line '[gicv2-lab] H4b EL2 monitor'
+        require_once '[gicv2-lab] H4c EL2 monitor'
         require_line 'CurrentEL=2'
         require_line 'GICH_LRS=4'
-        require_line '[gicv2-lab] H1 PASS'
+        require_line 'GICH_PREBITS=5'
+        require_line 'GICH_PRIBITS=5'
+        require_once '[gicv2-lab] H1 PASS'
         require_line 'stage2_guest_desc=0x00000000002007fd'
         require_line 'stage2_gicv_desc=0x00400000ff8467c7'
         require_line 'VTCR_EL2_enabled=0x0000000080003560'
         require_line 'HCR_EL2_enabled=0x0000000080000011'
         require_line 'GICC_PMR_enabled=0x00000000000000ff'
         require_line 'GICH_HCR_enabled=0x0000000000000001'
-        require_line 'GICH_VMCR_enabled=0x00000000f8fc0001'
+        require_line 'GICH_VMCR_enabled=0x00000000f85c0001'
         require_line 'GICH_MISR_initial=0x0000000000000000'
         require_line 'GICH_EISR0_initial=0x0000000000000000'
         require_line 'GICH_EISR1_initial=0x0000000000000000'
@@ -87,47 +100,83 @@ while test "$(date +%s)" -lt "$deadline"; do
         require_line 'HPFAR_EL2=0x0000000000000800'
         require_line 'stage2_fsc=6'
         require_line '[gicv2-lab] EL1 guest resumed after stage-2 fault'
-        require_line '[gicv2-lab] H2 PASS'
+        require_once '[gicv2-lab] H2 PASS'
         require_line 'GuestGICV_CTLR=0x0000000000000001'
         require_line 'GuestGICV_PMR=0x00000000000000f8'
-        require_line 'GICH_HCR_pending=0x0000000000000003'
-        require_line 'GICH_VMCR_pending=0x00000000f8fc0001'
-        require_line 'GICH_MISR_pending=0x0000000000000000'
-        require_line 'GICH_EISR0_pending=0x0000000000000000'
-        require_line 'GICH_EISR1_pending=0x0000000000000000'
-        require_line 'GICH_ELRSR0_pending=0x000000000000000c'
-        require_line 'GICH_ELRSR1_pending=0x0000000000000000'
-        require_line 'GICH_APR_pending=0x0000000000000000'
-        require_line 'GICH_LR0_injected=0x000000001200002a'
-        require_line 'GICH_LR1_injected=0x000000001f80002b'
-        require_line '[gicv2-lab] LR0 active with LR1 reserve'
-        require_line 'GuestIAR_active=42'
-        require_line 'GICH_HCR_active=0x0000000000000003'
-        require_line 'GICH_VMCR_active=0x00000000f8fc0001'
-        require_line 'GICH_MISR_active=0x0000000000000000'
-        require_line 'GICH_EISR0_active=0x0000000000000000'
-        require_line 'GICH_EISR1_active=0x0000000000000000'
-        require_line 'GICH_ELRSR0_active=0x000000000000000c'
-        require_line 'GICH_ELRSR1_active=0x0000000000000000'
-        require_line 'GICH_APR_active=0x0000000000000001'
-        require_line 'GICH_LR0_active=0x000000002200002a'
-        require_line 'GICH_LR1_active=0x000000001f80002b'
-        require_line 'GuestIAR=42'
-        require_line '[gicv2-lab] GIC underflow maintenance interrupt'
-        require_line 'maintenance_vector_slot=9'
-        require_line 'PhysicalIAR=25'
-        require_line 'GICH_HCR_maintenance=0x0000000000000003'
-        require_line 'GICH_VMCR_maintenance=0x00000000f8fc0001'
-        require_line 'GICH_MISR=0x0000000000000002'
-        require_line 'GICH_EISR0=0x0000000000000000'
-        require_line 'GICH_EISR1=0x0000000000000000'
-        require_line 'GICH_ELRSR0=0x000000000000000d'
-        require_line 'GICH_ELRSR1=0x0000000000000000'
-        require_line 'GICH_APR=0x0000000000000000'
-        require_line 'GICH_LR0_post_eoi=0x000000000200002a'
-        require_line 'GICH_LR1_remaining=0x000000001f80002b'
+        require_line 'GuestGICV_BPR=0x0000000000000002'
+        require_once '[gicv2-lab] low-priority virtual IRQ pending'
+        require_line 'GICH_HCR_low_pending=0x0000000000000001'
+        require_line 'GICH_VMCR_low_pending=0x00000000f85c0001'
+        require_line 'GICH_MISR_low_pending=0x0000000000000000'
+        require_line 'GICH_EISR0_low_pending=0x0000000000000000'
+        require_line 'GICH_EISR1_low_pending=0x0000000000000000'
+        require_line 'GICH_ELRSR0_low_pending=0x000000000000000e'
+        require_line 'GICH_ELRSR1_low_pending=0x0000000000000000'
+        require_line 'GICH_APR_low_pending=0x0000000000000000'
+        require_line 'GICH_LR0_low_pending=0x000000001800002a'
+        require_line 'GICH_LR1_low_pending=0x0000000000000000'
+        require_once '[gicv2-lab] low-priority virtual IRQ active'
+        require_line 'GuestIAR_low_active=42'
+        require_line 'GICH_HCR_low_active=0x0000000000000001'
+        require_line 'GICH_VMCR_low_active=0x00000000f85c0001'
+        require_line 'GICH_MISR_low_active=0x0000000000000000'
+        require_line 'GICH_EISR0_low_active=0x0000000000000000'
+        require_line 'GICH_EISR1_low_active=0x0000000000000000'
+        require_line 'GICH_ELRSR0_low_active=0x000000000000000e'
+        require_line 'GICH_ELRSR1_low_active=0x0000000000000000'
+        require_line 'GICH_APR_low_active=0x0000000000010000'
+        require_line 'GICH_LR0_low_active=0x000000002800002a'
+        require_line 'GICH_LR1_low_active=0x0000000000000000'
+        require_once '[gicv2-lab] high-priority virtual IRQ pending'
+        require_line 'GICH_HCR_high_pending=0x0000000000000001'
+        require_line 'GICH_VMCR_high_pending=0x00000000f85c0001'
+        require_line 'GICH_MISR_high_pending=0x0000000000000000'
+        require_line 'GICH_EISR0_high_pending=0x0000000000000000'
+        require_line 'GICH_EISR1_high_pending=0x0000000000000000'
+        require_line 'GICH_ELRSR0_high_pending=0x000000000000000c'
+        require_line 'GICH_ELRSR1_high_pending=0x0000000000000000'
+        require_line 'GICH_APR_high_pending=0x0000000000010000'
+        require_line 'GICH_LR0_high_pending=0x000000002800002a'
+        require_line 'GICH_LR1_high_pending=0x000000001200002b'
+        require_once '[gicv2-lab] nested high-priority virtual IRQ active'
+        require_line 'GuestIAR_high_active=43'
+        require_line 'GICH_HCR_both_active=0x0000000000000001'
+        require_line 'GICH_VMCR_both_active=0x00000000f85c0001'
+        require_line 'GICH_MISR_both_active=0x0000000000000000'
+        require_line 'GICH_EISR0_both_active=0x0000000000000000'
+        require_line 'GICH_EISR1_both_active=0x0000000000000000'
+        require_line 'GICH_ELRSR0_both_active=0x000000000000000c'
+        require_line 'GICH_ELRSR1_both_active=0x0000000000000000'
+        require_line 'GICH_APR_both_active=0x0000000000010010'
+        require_line 'GICH_LR0_both_active=0x000000002800002a'
+        require_line 'GICH_LR1_both_active=0x000000002200002b'
+        require_once '[gicv2-lab] high-priority virtual IRQ EOI'
+        require_line 'GuestIAR_high_eoi=43'
+        require_line 'GICH_HCR_high_eoi=0x0000000000000001'
+        require_line 'GICH_VMCR_high_eoi=0x00000000f85c0001'
+        require_line 'GICH_MISR_high_eoi=0x0000000000000000'
+        require_line 'GICH_EISR0_high_eoi=0x0000000000000000'
+        require_line 'GICH_EISR1_high_eoi=0x0000000000000000'
+        require_line 'GICH_ELRSR0_high_eoi=0x000000000000000e'
+        require_line 'GICH_ELRSR1_high_eoi=0x0000000000000000'
+        require_line 'GICH_APR_high_eoi=0x0000000000010000'
+        require_line 'GICH_LR0_high_eoi=0x000000002800002a'
+        require_line 'GICH_LR1_high_eoi=0x000000000200002b'
+        require_once '[gicv2-lab] low-priority virtual IRQ EOI'
+        require_line 'GuestIAR_low_eoi=42'
+        require_line 'GICH_HCR_low_eoi=0x0000000000000001'
+        require_line 'GICH_VMCR_low_eoi=0x00000000f85c0001'
+        require_line 'GICH_MISR_low_eoi=0x0000000000000000'
+        require_line 'GICH_EISR0_low_eoi=0x0000000000000000'
+        require_line 'GICH_EISR1_low_eoi=0x0000000000000000'
+        require_line 'GICH_ELRSR0_low_eoi=0x000000000000000f'
+        require_line 'GICH_ELRSR1_low_eoi=0x0000000000000000'
+        require_line 'GICH_APR_low_eoi=0x0000000000000000'
+        require_line 'GICH_LR0_low_eoi=0x000000000800002a'
+        require_line 'GICH_LR1_low_eoi=0x000000000200002b'
+        require_once '[gicv2-lab] virtual interface restored'
         require_line 'GICH_HCR_cleared=0x0000000000000001'
-        require_line 'GICH_VMCR_cleared=0x00000000f8fc0001'
+        require_line 'GICH_VMCR_cleared=0x00000000f85c0001'
         require_line 'GICH_MISR_cleared=0x0000000000000000'
         require_line 'GICH_EISR0_cleared=0x0000000000000000'
         require_line 'GICH_EISR1_cleared=0x0000000000000000'
@@ -136,10 +185,11 @@ while test "$(date +%s)" -lt "$deadline"; do
         require_line 'GICH_APR_cleared=0x0000000000000000'
         require_line 'GICH_LR0_cleared=0x0000000000000000'
         require_line 'GICH_LR1_cleared=0x0000000000000000'
-        require_line '[gicv2-lab] underflow maintenance PPI 25 acknowledged'
         reject_line '[gicv2-lab] H3 FAIL:'
         reject_line '[gicv2-lab] H4a FAIL:'
         reject_line '[gicv2-lab] H4b FAIL:'
+        reject_line '[gicv2-lab] H4c FAIL:'
+        reject_line '[gicv2-lab] unexpected physical IRQ'
         exit 0
     fi
     if ! kill -0 "$pid" 2>/dev/null; then
@@ -150,5 +200,5 @@ done
 
 test -f "$log" && cat "$log"
 test ! -s "$stderr_log" || cat "$stderr_log" >&2
-echo "gicv2-lab: QEMU smoke test did not observe the H4b marker" >&2
+echo "gicv2-lab: QEMU smoke test did not observe the H4c marker" >&2
 exit 1

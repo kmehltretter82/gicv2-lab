@@ -18,19 +18,17 @@ struct gicv2_lr_snapshot {
     uint32_t lr[GICV2_SNAPSHOT_LRS];
 };
 
-struct gicv2_maintenance_trace {
-    uint32_t iar;
+struct gicv2_lr_transition {
     struct gicv2_lr_snapshot before;
     struct gicv2_lr_snapshot after;
 };
 
-bool gicv2_init(uint32_t lr_count, struct gicv2_lr_snapshot *initial);
-bool gicv2_arm_underflow(struct gicv2_lr_snapshot *armed);
-void gicv2_capture_lrs(struct gicv2_lr_snapshot *snapshot);
-bool gicv2_active_snapshot_valid(const struct gicv2_lr_snapshot *snapshot);
-void gicv2_acknowledge_underflow(
-    struct gicv2_maintenance_trace *trace);
-bool gicv2_underflow_trace_valid(
-    const struct gicv2_maintenance_trace *trace);
+bool gicv2_init(uint32_t gich_vtr, struct gicv2_lr_snapshot *initial);
+bool gicv2_inject_low(struct gicv2_lr_snapshot *pending);
+bool gicv2_inject_high(struct gicv2_lr_transition *transition);
+bool gicv2_capture_both_active(struct gicv2_lr_snapshot *active);
+bool gicv2_capture_high_eoi(struct gicv2_lr_snapshot *eoi);
+bool gicv2_finish_priority_test(struct gicv2_lr_transition *transition);
+uint32_t gicv2_acknowledge_physical_irq(void);
 
 #endif

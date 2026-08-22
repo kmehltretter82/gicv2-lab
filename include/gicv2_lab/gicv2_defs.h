@@ -41,13 +41,16 @@
 
 #define GICV_CTLR 0x000
 #define GICV_PMR  0x004
+#define GICV_BPR  0x008
 #define GICV_IAR  0x00c
 #define GICV_EOIR 0x010
 
-#define GICV2_MAINTENANCE_INTID 25
-#define GICV2_PRIMARY_INTID     42
-#define GICV2_RESERVE_INTID     43
+#define GICV2_LOW_INTID          42
+#define GICV2_HIGH_INTID         43
+#define GICV2_LOW_PRIORITY       0x80
+#define GICV2_HIGH_PRIORITY      0x20
 #define GICV2_GICV_CTLR_EXPECTED 0x01
 #define GICV2_GICV_PMR_EXPECTED  0xf8
+#define GICV2_GICV_BPR_EXPECTED  0x02
 
 #endif

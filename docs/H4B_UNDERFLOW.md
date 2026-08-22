@@ -56,7 +56,8 @@ before EXIT.
 An early maintenance PPI while two LRs are valid, a second guest interrupt,
 any EOI/EISR cause, a wrong IAR, a changed VMCR, any other LR/APR/MISR/ELRSR
 value, a duplicate event, unexpected exception, reset, hang, or early exit is
-forbidden. The strict oracle is `scripts/smoke-qemu.sh`.
+forbidden. At the recorded H4b source revision, the strict oracle was
+`scripts/smoke-qemu.sh`; later milestones reuse that filename.
 
 The architectural rule and register encodings are defined by the [Arm Generic
 Interrupt Controller Architecture Specification, version

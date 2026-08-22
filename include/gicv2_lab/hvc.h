@@ -10,6 +10,8 @@
 #define HVC_IRQ_READY  0x104
 #define HVC_IRQ_EOI    0x105
 #define HVC_IRQ_ACTIVE 0x106
+#define HVC_IRQ_NESTED_ACTIVE 0x107
+#define HVC_IRQ_NESTED_EOI    0x108
 
 #define HVC_PASS_MAGIC 0x600d
 
