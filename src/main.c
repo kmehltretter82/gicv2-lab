@@ -21,12 +21,13 @@ static void halt_forever(void)
 
 void lab_main(void)
 {
+    struct gicv2_lr_snapshot initial;
     uint64_t current_el;
     uint32_t gich_vtr;
     uint32_t lr_count;
 
     uart_init();
-    lab_puts("\n[gicv2-lab] H3 EL2 monitor\n");
+    lab_puts("\n[gicv2-lab] H4a EL2 monitor\n");
 
     current_el = read_currentel() >> 2;
     lab_kv_dec("CurrentEL", (uint32_t)current_el);
@@ -44,7 +45,7 @@ void lab_main(void)
     lab_kv_dec("GICH_LRS", lr_count);
 
     if (current_el != 2) {
-        lab_puts("[gicv2-lab] H3 FAIL: expected EL2\n");
+        lab_puts("[gicv2-lab] H4a FAIL: expected EL2\n");
         halt_forever();
     }
 
@@ -60,8 +61,8 @@ void lab_main(void)
     lab_kv_hex64("VTTBR_EL2_enabled", read_vttbr_el2());
     lab_kv_hex64("HCR_EL2_enabled", read_hcr_el2());
 
-    if (!gicv2_init(lr_count)) {
-        lab_puts("[gicv2-lab] H3 FAIL: GICv2 initialization\n");
+    if (!gicv2_init(lr_count, &initial)) {
+        lab_puts("[gicv2-lab] H4a FAIL: GICv2 initialization\n");
         halt_forever();
     }
 
@@ -74,12 +75,15 @@ void lab_main(void)
                  mmio_read32(PI400_GICC_BASE + GICC_CTLR));
     lab_kv_hex64("GICC_PMR_enabled",
                  mmio_read32(PI400_GICC_BASE + GICC_PMR));
-    lab_kv_hex64("GICH_HCR_enabled",
-                 mmio_read32(PI400_GICH_BASE + GICH_HCR));
-    lab_kv_hex64("GICH_VMCR_enabled",
-                 mmio_read32(PI400_GICH_BASE + GICH_VMCR));
-    lab_kv_hex64("GICH_ELRSR0_initial",
-                 mmio_read32(PI400_GICH_BASE + GICH_ELRSR0));
+    lab_kv_hex64("GICH_HCR_enabled", initial.hcr);
+    lab_kv_hex64("GICH_VMCR_enabled", initial.vmcr);
+    lab_kv_hex64("GICH_MISR_initial", initial.misr);
+    lab_kv_hex64("GICH_EISR0_initial", initial.eisr[0]);
+    lab_kv_hex64("GICH_EISR1_initial", initial.eisr[1]);
+    lab_kv_hex64("GICH_ELRSR0_initial", initial.elrsr[0]);
+    lab_kv_hex64("GICH_ELRSR1_initial", initial.elrsr[1]);
+    lab_kv_hex64("GICH_APR_initial", initial.apr);
+    lab_kv_hex64("GICH_LR0_initial", initial.lr0);
 
     lab_puts("[gicv2-lab] entering EL1 guest\n");
     enter_guest((uint64_t)(uintptr_t)guest_start, GUEST_STACK_TOP);

@@ -7,7 +7,7 @@ image=${1:?usage: smoke-qemu.sh IMAGE}
 qemu=${QEMU:?set QEMU to qemu-system-aarch64}
 log=build/smoke-qemu.log
 stderr_log=build/smoke-qemu.stderr
-marker='[gicv2-lab] H3 PASS'
+marker='[gicv2-lab] H4a PASS'
 deadline=$(( $(date +%s) + 10 ))
 poll_interval=${SMOKE_POLL_INTERVAL:-0.1}
 pid=
@@ -62,6 +62,7 @@ while test "$(date +%s)" -lt "$deadline"; do
         if test "${SMOKE_QUIET:-0}" != 1; then
             cat "$log"
         fi
+        require_line '[gicv2-lab] H4a EL2 monitor'
         require_line 'CurrentEL=2'
         require_line 'GICH_LRS=4'
         require_line '[gicv2-lab] H1 PASS'
@@ -72,7 +73,13 @@ while test "$(date +%s)" -lt "$deadline"; do
         require_line 'GICC_PMR_enabled=0x00000000000000ff'
         require_line 'GICH_HCR_enabled=0x0000000000000001'
         require_line 'GICH_VMCR_enabled=0x00000000f8fc0001'
+        require_line 'GICH_MISR_initial=0x0000000000000000'
+        require_line 'GICH_EISR0_initial=0x0000000000000000'
+        require_line 'GICH_EISR1_initial=0x0000000000000000'
         require_line 'GICH_ELRSR0_initial=0x000000000000000f'
+        require_line 'GICH_ELRSR1_initial=0x0000000000000000'
+        require_line 'GICH_APR_initial=0x0000000000000000'
+        require_line 'GICH_LR0_initial=0x0000000000000000'
         require_line 'GuestCurrentEL=1'
         require_line '[gicv2-lab] expected stage-2 translation fault'
         require_line 'FAR_EL2=0x0000000000080000'
@@ -82,10 +89,31 @@ while test "$(date +%s)" -lt "$deadline"; do
         require_line '[gicv2-lab] H2 PASS'
         require_line 'GuestGICV_CTLR=0x0000000000000001'
         require_line 'GuestGICV_PMR=0x00000000000000f8'
+        require_line 'GICH_HCR_pending=0x0000000000000001'
+        require_line 'GICH_VMCR_pending=0x00000000f8fc0001'
+        require_line 'GICH_MISR_pending=0x0000000000000000'
+        require_line 'GICH_EISR0_pending=0x0000000000000000'
+        require_line 'GICH_EISR1_pending=0x0000000000000000'
+        require_line 'GICH_ELRSR0_pending=0x000000000000000e'
+        require_line 'GICH_ELRSR1_pending=0x0000000000000000'
+        require_line 'GICH_APR_pending=0x0000000000000000'
         require_line 'GICH_LR0_injected=0x000000001208002a'
+        require_line '[gicv2-lab] LR0 active checkpoint'
+        require_line 'GuestIAR_active=42'
+        require_line 'GICH_HCR_active=0x0000000000000001'
+        require_line 'GICH_VMCR_active=0x00000000f8fc0001'
+        require_line 'GICH_MISR_active=0x0000000000000000'
+        require_line 'GICH_EISR0_active=0x0000000000000000'
+        require_line 'GICH_EISR1_active=0x0000000000000000'
+        require_line 'GICH_ELRSR0_active=0x000000000000000e'
+        require_line 'GICH_ELRSR1_active=0x0000000000000000'
+        require_line 'GICH_APR_active=0x0000000000000001'
+        require_line 'GICH_LR0_active=0x000000002208002a'
         require_line 'GuestIAR=42'
         require_line 'maintenance_vector_slot=9'
         require_line 'PhysicalIAR=25'
+        require_line 'GICH_HCR_maintenance=0x0000000000000001'
+        require_line 'GICH_VMCR_maintenance=0x00000000f8fc0001'
         require_line 'GICH_MISR=0x0000000000000001'
         require_line 'GICH_EISR0=0x0000000000000001'
         require_line 'GICH_EISR1=0x0000000000000000'
@@ -93,14 +121,18 @@ while test "$(date +%s)" -lt "$deadline"; do
         require_line 'GICH_ELRSR1=0x0000000000000000'
         require_line 'GICH_APR=0x0000000000000000'
         require_line 'GICH_LR0_post_eoi=0x000000000208002a'
+        require_line 'GICH_HCR_cleared=0x0000000000000001'
+        require_line 'GICH_VMCR_cleared=0x00000000f8fc0001'
         require_line 'GICH_MISR_cleared=0x0000000000000000'
         require_line 'GICH_EISR0_cleared=0x0000000000000000'
         require_line 'GICH_EISR1_cleared=0x0000000000000000'
         require_line 'GICH_ELRSR0_cleared=0x000000000000000f'
         require_line 'GICH_ELRSR1_cleared=0x0000000000000000'
+        require_line 'GICH_APR_cleared=0x0000000000000000'
         require_line 'GICH_LR0_cleared=0x0000000000000000'
         require_line '[gicv2-lab] maintenance PPI 25 acknowledged'
         reject_line '[gicv2-lab] H3 FAIL:'
+        reject_line '[gicv2-lab] H4a FAIL:'
         exit 0
     fi
     if ! kill -0 "$pid" 2>/dev/null; then
@@ -111,5 +143,5 @@ done
 
 test -f "$log" && cat "$log"
 test ! -s "$stderr_log" || cat "$stderr_log" >&2
-echo "gicv2-lab: QEMU smoke test did not observe the H3 marker" >&2
+echo "gicv2-lab: QEMU smoke test did not observe the H4a marker" >&2
 exit 1

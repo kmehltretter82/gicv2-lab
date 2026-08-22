@@ -71,6 +71,11 @@ The [Armv8-A virtualization
 guide](https://developer.arm.com/-/media/Arm%20Developer%20Community/PDF/Learn%20the%20Architecture/Armv8-A%20virtualization.pdf?revision=a765a7df-1a00-434d-b241-357bfda2dd31)
 provides the EL2/GIC virtualization overview.
 
+H4a extends this scenario with a synchronous checkpoint between the
+`GICV_IAR` read and `GICV_EOIR` write. Its additional LR and APR requirements
+are documented in `H4A_LR_LIFECYCLE.md`; they do not alter the recorded H3
+result below.
+
 ## Recorded result
 
 The strict oracle passed 100 consecutive fresh qemu-pi4 processes on

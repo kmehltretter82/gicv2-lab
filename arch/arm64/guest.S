@@ -123,6 +123,10 @@ guest_irq_entry:
     cmp w3, #H3_VIRTUAL_INTID
     b.ne guest_irq_bad
 
+    dsb sy
+    mov x0, #HVC_IRQ_ACTIVE
+    hvc #0
+
     str w1, [x2, #GICV_EOIR]
     dsb sy
 

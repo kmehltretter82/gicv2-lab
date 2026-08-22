@@ -36,6 +36,7 @@ static bool guest_report_seen;
 static bool stage2_fault_seen;
 static bool h2_pass_seen;
 static bool irq_ready_seen;
+static bool guest_irq_active_seen;
 static bool guest_irq_eoi_seen;
 static bool maintenance_seen;
 static bool el2_brk_seen;
@@ -58,7 +59,7 @@ static void dump_exception(const struct exception_frame *frame, uint64_t esr)
 static uint64_t fail_exception(const struct exception_frame *frame,
                                uint64_t esr, const char *reason)
 {
-    lab_puts("[gicv2-lab] H3 FAIL: ");
+    lab_puts("[gicv2-lab] H4a FAIL: ");
     lab_puts(reason);
     lab_puts("\n");
     dump_exception(frame, esr);
@@ -69,7 +70,6 @@ static uint64_t handle_hvc(struct exception_frame *frame, uint64_t esr)
 {
     uint64_t operation = frame->x[0];
     uint64_t argument = frame->x[1];
-    uint32_t lr_value;
 
     switch (operation) {
     case HVC_REPORT:
@@ -97,23 +97,66 @@ static uint64_t handle_hvc(struct exception_frame *frame, uint64_t esr)
         lab_kv_hex64("guest_failure_argument", argument);
         return fail_exception(frame, esr, "guest reported failure");
 
-    case HVC_IRQ_READY:
+    case HVC_IRQ_READY: {
+        struct gicv2_lr_snapshot pending;
+
         if (!h2_pass_seen || irq_ready_seen ||
             (uint32_t)argument != H3_GICV_CTLR_EXPECTED ||
             (uint32_t)(argument >> 32) != H3_GICV_PMR_EXPECTED ||
-            !gicv2_inject_test_irq(&lr_value)) {
+            !gicv2_inject_test_irq(&pending)) {
             return fail_exception(frame, esr, "invalid IRQ-ready report");
         }
         irq_ready_seen = true;
         lab_puts("[gicv2-lab] EL1 virtual interface ready\n");
         lab_kv_hex64("GuestGICV_CTLR", (uint32_t)argument);
         lab_kv_hex64("GuestGICV_PMR", (uint32_t)(argument >> 32));
-        lab_kv_hex64("GICH_LR0_injected", lr_value);
+        lab_kv_hex64("GICH_HCR_pending", pending.hcr);
+        lab_kv_hex64("GICH_VMCR_pending", pending.vmcr);
+        lab_kv_hex64("GICH_MISR_pending", pending.misr);
+        lab_kv_hex64("GICH_EISR0_pending", pending.eisr[0]);
+        lab_kv_hex64("GICH_EISR1_pending", pending.eisr[1]);
+        lab_kv_hex64("GICH_ELRSR0_pending", pending.elrsr[0]);
+        lab_kv_hex64("GICH_ELRSR1_pending", pending.elrsr[1]);
+        lab_kv_hex64("GICH_APR_pending", pending.apr);
+        lab_kv_hex64("GICH_LR0_injected", pending.lr0);
         frame->x[0] = 0;
         return EXCEPTION_RESUME;
+    }
+
+    case HVC_IRQ_ACTIVE: {
+        struct gicv2_lr_snapshot active;
+
+        if (!irq_ready_seen || guest_irq_active_seen ||
+            argument != H3_VIRTUAL_INTID) {
+            return fail_exception(frame, esr,
+                                  "invalid virtual IRQ active report");
+        }
+
+        gicv2_capture_lr0(&active);
+        lab_puts("[gicv2-lab] LR0 active checkpoint\n");
+        lab_kv_dec("GuestIAR_active", (uint32_t)argument);
+        lab_kv_hex64("GICH_HCR_active", active.hcr);
+        lab_kv_hex64("GICH_VMCR_active", active.vmcr);
+        lab_kv_hex64("GICH_MISR_active", active.misr);
+        lab_kv_hex64("GICH_EISR0_active", active.eisr[0]);
+        lab_kv_hex64("GICH_EISR1_active", active.eisr[1]);
+        lab_kv_hex64("GICH_ELRSR0_active", active.elrsr[0]);
+        lab_kv_hex64("GICH_ELRSR1_active", active.elrsr[1]);
+        lab_kv_hex64("GICH_APR_active", active.apr);
+        lab_kv_hex64("GICH_LR0_active", active.lr0);
+
+        if (!gicv2_active_snapshot_valid(&active)) {
+            return fail_exception(frame, esr,
+                                  "invalid virtual IRQ active state");
+        }
+
+        guest_irq_active_seen = true;
+        frame->x[0] = 0;
+        return EXCEPTION_RESUME;
+    }
 
     case HVC_IRQ_EOI:
-        if (!irq_ready_seen || guest_irq_eoi_seen ||
+        if (!guest_irq_active_seen || guest_irq_eoi_seen ||
             argument != H3_VIRTUAL_INTID) {
             return fail_exception(frame, esr, "invalid virtual IRQ EOI");
         }
@@ -125,11 +168,11 @@ static uint64_t handle_hvc(struct exception_frame *frame, uint64_t esr)
 
     case HVC_EXIT:
         if (!guest_report_seen || !stage2_fault_seen || !h2_pass_seen ||
-            !irq_ready_seen || !guest_irq_eoi_seen || !maintenance_seen ||
-            argument != 0) {
+            !irq_ready_seen || !guest_irq_active_seen ||
+            !guest_irq_eoi_seen || !maintenance_seen || argument != 0) {
             return fail_exception(frame, esr, "guest exited too early");
         }
-        lab_puts("[gicv2-lab] H3 PASS\n");
+        lab_puts("[gicv2-lab] H4a PASS\n");
         return EXCEPTION_HALT;
 
     default:
@@ -143,20 +186,24 @@ static void dump_maintenance(
 {
     lab_kv_dec("maintenance_vector_slot", (uint32_t)frame->vector_slot);
     lab_kv_dec("PhysicalIAR", trace->iar & UINT32_C(0x3ff));
-    lab_kv_hex64("GICH_HCR_maintenance", trace->hcr);
-    lab_kv_hex64("GICH_MISR", trace->misr);
-    lab_kv_hex64("GICH_EISR0", trace->eisr[0]);
-    lab_kv_hex64("GICH_EISR1", trace->eisr[1]);
-    lab_kv_hex64("GICH_ELRSR0", trace->elrsr[0]);
-    lab_kv_hex64("GICH_ELRSR1", trace->elrsr[1]);
-    lab_kv_hex64("GICH_APR", trace->apr);
-    lab_kv_hex64("GICH_LR0_post_eoi", trace->lr0);
-    lab_kv_hex64("GICH_MISR_cleared", trace->misr_after);
-    lab_kv_hex64("GICH_EISR0_cleared", trace->eisr_after[0]);
-    lab_kv_hex64("GICH_EISR1_cleared", trace->eisr_after[1]);
-    lab_kv_hex64("GICH_ELRSR0_cleared", trace->elrsr_after[0]);
-    lab_kv_hex64("GICH_ELRSR1_cleared", trace->elrsr_after[1]);
-    lab_kv_hex64("GICH_LR0_cleared", trace->lr0_after);
+    lab_kv_hex64("GICH_HCR_maintenance", trace->before.hcr);
+    lab_kv_hex64("GICH_VMCR_maintenance", trace->before.vmcr);
+    lab_kv_hex64("GICH_MISR", trace->before.misr);
+    lab_kv_hex64("GICH_EISR0", trace->before.eisr[0]);
+    lab_kv_hex64("GICH_EISR1", trace->before.eisr[1]);
+    lab_kv_hex64("GICH_ELRSR0", trace->before.elrsr[0]);
+    lab_kv_hex64("GICH_ELRSR1", trace->before.elrsr[1]);
+    lab_kv_hex64("GICH_APR", trace->before.apr);
+    lab_kv_hex64("GICH_LR0_post_eoi", trace->before.lr0);
+    lab_kv_hex64("GICH_HCR_cleared", trace->after.hcr);
+    lab_kv_hex64("GICH_VMCR_cleared", trace->after.vmcr);
+    lab_kv_hex64("GICH_MISR_cleared", trace->after.misr);
+    lab_kv_hex64("GICH_EISR0_cleared", trace->after.eisr[0]);
+    lab_kv_hex64("GICH_EISR1_cleared", trace->after.eisr[1]);
+    lab_kv_hex64("GICH_ELRSR0_cleared", trace->after.elrsr[0]);
+    lab_kv_hex64("GICH_ELRSR1_cleared", trace->after.elrsr[1]);
+    lab_kv_hex64("GICH_APR_cleared", trace->after.apr);
+    lab_kv_hex64("GICH_LR0_cleared", trace->after.lr0);
 }
 
 static uint64_t handle_physical_irq(struct exception_frame *frame)
@@ -167,9 +214,9 @@ static uint64_t handle_physical_irq(struct exception_frame *frame)
     lab_puts("[gicv2-lab] GIC maintenance interrupt\n");
     dump_maintenance(frame, &trace);
 
-    if (!irq_ready_seen || maintenance_seen ||
+    if (!guest_irq_active_seen || maintenance_seen ||
         !gicv2_maintenance_trace_valid(&trace)) {
-        lab_puts("[gicv2-lab] H3 FAIL: invalid maintenance interrupt\n");
+        lab_puts("[gicv2-lab] H4a FAIL: invalid maintenance interrupt\n");
         return EXCEPTION_HALT;
     }
 
