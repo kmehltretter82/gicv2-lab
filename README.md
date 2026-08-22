@@ -57,6 +57,11 @@ All planned QEMU-only H4 milestones are complete. No physical boot has been
 performed. Hardware execution remains a separate, explicitly approved H6
 step. See ROADMAP.md.
 
+H5 now has a QEMU-only host-tool baseline: it captures raw serial output,
+pins the ELF and scenario hashes, normalizes selected architectural state,
+compares fresh runs, and reduces a mismatch to its first trace prefix. It
+does not boot hardware. See docs/H5_DIFFERENTIAL_RUNNER.md.
+
 ## Build
 
 The project uses LLVM's freestanding AArch64 tools. On this Mac:
@@ -109,6 +114,27 @@ docs/H4G_LR_REFILL.md, WFI wake is in docs/H4H_WFI_WAKE.md, paused
 virtual-interface context save/restore is in
 docs/H4I_CONTEXT_SAVE_RESTORE.md, and the guest call interface is in
 docs/HVC_ABI.md.
+
+## H5 differential runner
+
+The host-tool unit tests require only Python 3's standard library:
+
+    make h5-test
+
+Capture one fresh, preserved QEMU result into a new directory:
+
+    make LLVM_BIN=/opt/homebrew/opt/llvm/bin h5-qemu H5_OUT=build/h5/qemu-a
+
+Run a fresh-process semantic repeat gate with `H5_RUNS` captures:
+
+    make LLVM_BIN=/opt/homebrew/opt/llvm/bin h5-repeat \
+      H5_RUNS=20 H5_REPEAT_OUT=build/h5/repeat-20
+
+The generated directory contains lossless serial output, QEMU stderr, the
+exact invocation and hashes, normalized trace, and comparisons. The runner
+does not perform a Pi 400 or KVM action; those traces can only be imported
+after the separately approved H6/H7 work. See docs/H5_DIFFERENTIAL_RUNNER.md
+for replay, cross-backend comparison, allowed-outcome rules, and reduction.
 
 ## Repository boundaries
 

@@ -177,11 +177,27 @@ maintenance event, physical IRQ, unexpected exception, reset, hang, or early
 exit on 2026-08-22. The exact revision, linked-image audit, and raw trace are
 preserved in `results/2026-08-22-h4i-qemu-pi4/`.
 
-## H5 — differential runner
+## H5 — differential runner (QEMU host-tool baseline in progress)
 
 Run the same payload and scenario input on QEMU, real hardware, and KVM.
 Compare only architecturally meaningful fields. Preserve raw traces and reduce
 any one-sided forbidden outcome to its smallest sequence.
+
+The first H5 slice is intentionally QEMU-only and introduces:
+
+- a versioned H4i scenario contract and canonical serial-trace format;
+- lossless raw serial/stderr capture plus scenario, ELF, QEMU, and command
+  provenance;
+- a hard same-ELF-hash gate before a differential comparison;
+- explicit equality and architecturally justified allowed-outcome comparison
+  rules, rather than treating a Pi 400 implementation choice as the oracle;
+- manifest-based fresh QEMU replay and N-process repeat comparison; and
+- a first-difference trace-prefix reducer.
+
+This baseline does not boot physical hardware or invoke KVM. H6/H7 output
+will be imported passively into the same trace contract after those steps are
+explicitly approved. The current reducer shortens diagnostic trace evidence;
+data-driven operation-level delta reduction remains a later H5 extension.
 
 ## H6 — first real Pi 400 boot (later)
 

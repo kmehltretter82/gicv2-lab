@@ -6,3 +6,4 @@
 *.map
 *.dis
 .DS_Store
+__pycache__/

@@ -6,9 +6,14 @@ LLVM_BIN ?=
 CLANG := $(if $(LLVM_BIN),$(LLVM_BIN)/)clang
 OBJCOPY := $(if $(LLVM_BIN),$(LLVM_BIN)/)llvm-objcopy
 OBJDUMP := $(if $(LLVM_BIN),$(LLVM_BIN)/)llvm-objdump
+PYTHON ?= python3
 
 QEMU ?= ../qemu-rpi4/qemu-pi4/build-pi4-native-fdt/qemu-system-aarch64
 SMOKE_RUNS ?= 100
+H5_SCENARIO ?= scenarios/h4i-context-save-restore-v1.json
+H5_OUT ?= $(BUILD)/h5-qemu
+H5_REPEAT_OUT ?= $(BUILD)/h5-repeat
+H5_RUNS ?= 10
 
 CPPFLAGS := -Iinclude
 COMMON_FLAGS := --target=aarch64-none-elf -mcpu=cortex-a72 \
@@ -27,7 +32,7 @@ ASM_SOURCES := arch/arm64/guest.S arch/arm64/start.S arch/arm64/vectors.S
 OBJECTS := $(C_SOURCES:%.c=$(BUILD)/%.o) \
 	$(ASM_SOURCES:%.S=$(BUILD)/%.o)
 
-.PHONY: all clean smoke smoke-repeat disassembly
+.PHONY: all clean smoke smoke-repeat disassembly h5-test h5-qemu h5-repeat
 
 all: $(TARGET).elf $(TARGET).bin disassembly
 
@@ -60,6 +65,19 @@ smoke-repeat: all
 		run=$$((run + 1)); \
 	done; \
 	echo "gicv2-lab: $(SMOKE_RUNS) consecutive H4i smoke runs passed"
+
+h5-test:
+	PYTHONDONTWRITEBYTECODE=1 $(PYTHON) tests/test_h5_runner.py
+
+h5-qemu: all
+	PYTHONDONTWRITEBYTECODE=1 $(PYTHON) tools/h5_runner.py capture-qemu \
+		--scenario "$(H5_SCENARIO)" --image "$(TARGET).elf" --qemu "$(QEMU)" \
+		--out "$(H5_OUT)"
+
+h5-repeat: all
+	PYTHONDONTWRITEBYTECODE=1 $(PYTHON) tools/h5_runner.py repeat-qemu \
+		--scenario "$(H5_SCENARIO)" --image "$(TARGET).elf" --qemu "$(QEMU)" \
+		--out "$(H5_REPEAT_OUT)" --runs "$(H5_RUNS)"
 
 clean:
 	rm -rf $(BUILD)
