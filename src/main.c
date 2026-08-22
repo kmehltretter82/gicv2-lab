@@ -27,7 +27,7 @@ void lab_main(void)
     uint32_t lr_count;
 
     uart_init();
-    lab_puts("\n[gicv2-lab] H4f EL2 monitor\n");
+    lab_puts("\n[gicv2-lab] H4g EL2 monitor\n");
 
     current_el = read_currentel() >> 2;
     lab_kv_dec("CurrentEL", (uint32_t)current_el);
@@ -47,7 +47,7 @@ void lab_main(void)
     lab_kv_dec("GICH_PRIBITS", ((gich_vtr >> 29) & 7) + 1);
 
     if (current_el != 2) {
-        lab_puts("[gicv2-lab] H4f FAIL: expected EL2\n");
+        lab_puts("[gicv2-lab] H4g FAIL: expected EL2\n");
         halt_forever();
     }
 
@@ -66,7 +66,7 @@ void lab_main(void)
     lab_kv_hex64("HCR_EL2_enabled", read_hcr_el2());
 
     if (!gicv2_init(gich_vtr, &initial)) {
-        lab_puts("[gicv2-lab] H4f FAIL: GICv2 initialization\n");
+        lab_puts("[gicv2-lab] H4g FAIL: GICv2 initialization\n");
         halt_forever();
     }
 
@@ -89,6 +89,8 @@ void lab_main(void)
     lab_kv_hex64("GICH_APR_initial", initial.apr);
     lab_kv_hex64("GICH_LR0_initial", initial.lr[0]);
     lab_kv_hex64("GICH_LR1_initial", initial.lr[1]);
+    lab_kv_hex64("GICH_LR2_initial", initial.lr[2]);
+    lab_kv_hex64("GICH_LR3_initial", initial.lr[3]);
 
     lab_puts("[gicv2-lab] entering EL1 guest\n");
     enter_guest((uint64_t)(uintptr_t)guest_start, GUEST_STACK_TOP);

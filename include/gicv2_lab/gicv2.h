@@ -6,7 +6,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-#define GICV2_SNAPSHOT_LRS 2
+#define GICV2_SNAPSHOT_LRS 4
 
 struct gicv2_lr_snapshot {
     uint32_t hcr;
@@ -24,14 +24,14 @@ struct gicv2_lr_transition {
 };
 
 bool gicv2_init(uint32_t gich_vtr, struct gicv2_lr_snapshot *initial);
-bool gicv2_inject_sgis(struct gicv2_lr_snapshot *pending);
-bool gicv2_capture_first_sgi_active(struct gicv2_lr_snapshot *active);
-bool gicv2_capture_first_sgi_drop(struct gicv2_lr_snapshot *priority_drop);
-bool gicv2_capture_first_sgi_deactivated(
-    struct gicv2_lr_snapshot *deactivated);
-bool gicv2_capture_second_sgi_active(struct gicv2_lr_snapshot *active);
-bool gicv2_capture_second_sgi_drop(struct gicv2_lr_snapshot *priority_drop);
-bool gicv2_finish_sgis(struct gicv2_lr_transition *transition);
+bool gicv2_inject_full_lr_set(struct gicv2_lr_snapshot *pending);
+bool gicv2_capture_refill_active(uint32_t delivery,
+                                 struct gicv2_lr_snapshot *active);
+bool gicv2_capture_refill_drop(uint32_t delivery,
+                               struct gicv2_lr_snapshot *priority_drop);
+bool gicv2_complete_refill_delivery(
+    uint32_t delivery, struct gicv2_lr_transition *transition);
+uint32_t gicv2_software_queue_entry(void);
 uint32_t gicv2_acknowledge_physical_irq(void);
 
 #endif

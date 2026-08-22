@@ -63,7 +63,7 @@ guest_start:
     movz x2, #PI400_GICV_BASE_LO
     movk x2, #PI400_GICV_BASE_HI, lsl #16
     ldr w1, [x2, #GICV_HPPIR]
-    mov x0, #HVC_SGI_PENDING
+    mov x0, #HVC_REFILL_PENDING
     hvc #0
 
     msr daifclr, #2
@@ -72,7 +72,7 @@ guest_start:
     adr x2, guest_irq_count
 1:
     ldr w3, [x2]
-    cmp w3, #2
+    cmp w3, #GICV2_REFILL_DELIVERIES
     b.ne 1b
 
     msr daifset, #2
@@ -136,53 +136,29 @@ guest_vectors:
 guest_irq_entry:
     adr x2, guest_irq_count
     ldr w3, [x2]
-    cbz w3, guest_first_irq
-    cmp w3, #1
-    b.eq guest_second_irq
-    b guest_irq_bad
+    cmp w3, #GICV2_REFILL_DELIVERIES
+    b.hs guest_irq_bad
 
-guest_first_irq:
     movz x2, #PI400_GICV_BASE_LO
     movk x2, #PI400_GICV_BASE_HI, lsl #16
     ldr w1, [x2, #GICV_IAR]
-    cmp w1, #GICV2_FIRST_SGI_IAR
+    add w0, w3, #GICV2_REFILL_FIRST_INTID
+    cmp w1, w0
     b.ne guest_irq_bad
 
-    REPORT_IRQ_STATE HVC_SGI_FIRST_ACTIVE
+    REPORT_IRQ_STATE HVC_REFILL_ACTIVE
 
     str w1, [x2, #GICV_EOIR]
     dsb sy
-    REPORT_IRQ_STATE HVC_SGI_FIRST_EOI
+    REPORT_IRQ_STATE HVC_REFILL_EOI
 
     str w1, [x2, #GICV_DIR]
     dsb sy
-    REPORT_IRQ_STATE HVC_SGI_FIRST_DEACTIVATE
+    REPORT_IRQ_STATE HVC_REFILL_COMPLETE
 
     adr x2, guest_irq_count
-    mov w3, #1
-    str w3, [x2]
-    dsb sy
-    b guest_irq_return
-
-guest_second_irq:
-    movz x2, #PI400_GICV_BASE_LO
-    movk x2, #PI400_GICV_BASE_HI, lsl #16
-    ldr w1, [x2, #GICV_IAR]
-    cmp w1, #GICV2_SECOND_SGI_IAR
-    b.ne guest_irq_bad
-
-    REPORT_IRQ_STATE HVC_SGI_SECOND_ACTIVE
-
-    str w1, [x2, #GICV_EOIR]
-    dsb sy
-    REPORT_IRQ_STATE HVC_SGI_SECOND_EOI
-
-    str w1, [x2, #GICV_DIR]
-    dsb sy
-    REPORT_IRQ_STATE HVC_SGI_SECOND_DEACTIVATE
-
-    adr x2, guest_irq_count
-    mov w3, #2
+    ldr w3, [x2]
+    add w3, w3, #1
     str w3, [x2]
     dsb sy
 

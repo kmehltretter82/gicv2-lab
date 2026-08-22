@@ -56,6 +56,8 @@
     lab_kv_hex64("GICH_APR_" suffix, (snapshot)->apr); \
     lab_kv_hex64("GICH_LR0_" suffix, (snapshot)->lr[0]); \
     lab_kv_hex64("GICH_LR1_" suffix, (snapshot)->lr[1]); \
+    lab_kv_hex64("GICH_LR2_" suffix, (snapshot)->lr[2]); \
+    lab_kv_hex64("GICH_LR3_" suffix, (snapshot)->lr[3]); \
 } while (0)
 
 static bool guest_report_seen;
@@ -63,12 +65,9 @@ static bool stage2_fault_seen;
 static bool h2_pass_seen;
 static bool irq_ready_seen;
 static bool pending_hppir_seen;
-static bool first_active_seen;
-static bool first_priority_drop_seen;
-static bool first_deactivated_seen;
-static bool second_active_seen;
-static bool second_priority_drop_seen;
-static bool second_deactivated_seen;
+static uint32_t active_reports;
+static uint32_t eoi_reports;
+static uint32_t completion_reports;
 static bool el2_brk_seen;
 
 _Static_assert(sizeof(struct exception_frame) == 256,
@@ -87,7 +86,7 @@ static void dump_exception(const struct exception_frame *frame, uint64_t esr)
 static uint64_t fail_exception(const struct exception_frame *frame,
                                uint64_t esr, const char *reason)
 {
-    lab_puts("[gicv2-lab] H4f FAIL: ");
+    lab_puts("[gicv2-lab] H4g FAIL: ");
     lab_puts(reason);
     lab_puts("\n");
     dump_exception(frame, esr);
@@ -131,6 +130,64 @@ static void dump_irq_state(const char *iar_key, const char *rpr_key,
                  IRQ_STATE_HPPIR_MASK);
 }
 
+#define DUMP_REFILL_CASE(checkpoint_value, suffix) \
+    case checkpoint_value: \
+        lab_kv_hex64("GuestIRQState_" suffix, argument); \
+        DUMP_SNAPSHOT(snapshot, suffix); \
+        break
+
+static void dump_refill_state(const struct gicv2_lr_snapshot *snapshot,
+                              uint32_t delivery, uint32_t phase,
+                              uint64_t argument)
+{
+    uint32_t checkpoint = delivery * 3 + phase;
+
+    lab_kv_dec("RefillDelivery", delivery);
+    lab_kv_dec("RefillPhase", phase);
+    dump_irq_state("GuestIAR_refill", "GuestRPR_refill",
+                   "GuestHPPIR_refill", argument);
+
+    switch (checkpoint) {
+        DUMP_REFILL_CASE(0, "delivery0_active");
+        DUMP_REFILL_CASE(1, "delivery0_drop");
+        DUMP_REFILL_CASE(2, "delivery0_deactivated");
+        DUMP_REFILL_CASE(3, "delivery1_active");
+        DUMP_REFILL_CASE(4, "delivery1_drop");
+        DUMP_REFILL_CASE(5, "delivery1_deactivated");
+        DUMP_REFILL_CASE(6, "delivery2_active");
+        DUMP_REFILL_CASE(7, "delivery2_drop");
+        DUMP_REFILL_CASE(8, "delivery2_deactivated");
+        DUMP_REFILL_CASE(9, "delivery3_active");
+        DUMP_REFILL_CASE(10, "delivery3_drop");
+        DUMP_REFILL_CASE(11, "delivery3_deactivated");
+        DUMP_REFILL_CASE(12, "delivery4_active");
+        DUMP_REFILL_CASE(13, "delivery4_drop");
+        DUMP_REFILL_CASE(14, "delivery4_deactivated");
+    default:
+        break;
+    }
+}
+
+#undef DUMP_REFILL_CASE
+
+static uint32_t refill_expected_iar(uint32_t delivery)
+{
+    return GICV2_REFILL_FIRST_INTID + delivery;
+}
+
+static uint32_t refill_expected_rpr(uint32_t delivery)
+{
+    return (delivery + 1) * GICV2_REFILL_PRIORITY_STEP;
+}
+
+static uint32_t refill_expected_hppir(uint32_t delivery)
+{
+    if (delivery + 1 == GICV2_REFILL_DELIVERIES) {
+        return GICV2_GICV_HPPIR_SPURIOUS_EXPECTED;
+    }
+    return GICV2_REFILL_FIRST_INTID + delivery + 1;
+}
+
 static uint64_t handle_hvc(struct exception_frame *frame, uint64_t esr)
 {
     uint64_t operation = frame->x[0];
@@ -167,7 +224,9 @@ static uint64_t handle_hvc(struct exception_frame *frame, uint64_t esr)
 
         if (!h2_pass_seen || irq_ready_seen ||
             !irq_ready_argument_valid(argument) ||
-            !gicv2_inject_sgis(&pending)) {
+            !gicv2_inject_full_lr_set(&pending) ||
+            gicv2_software_queue_entry() !=
+                GICV2_REFILL_SPILL_LR_EXPECTED) {
             return fail_exception(frame, esr, "invalid IRQ-ready report");
         }
         irq_ready_seen = true;
@@ -177,216 +236,134 @@ static uint64_t handle_hvc(struct exception_frame *frame, uint64_t esr)
                      (argument >> IRQ_READY_PMR_SHIFT) & 0xff);
         lab_kv_hex64("GuestGICV_BPR",
                      (argument >> IRQ_READY_BPR_SHIFT) & 7);
-        lab_puts("[gicv2-lab] two source-tagged virtual SGIs pending\n");
-        DUMP_SNAPSHOT(&pending, "both_pending");
+        lab_puts("[gicv2-lab] all four List Registers occupied\n");
+        DUMP_SNAPSHOT(&pending, "all_pending");
+        lab_puts("[gicv2-lab] fifth virtual interrupt queued in EL2\n");
+        lab_kv_hex64("EL2SoftwareQueue_entry",
+                     gicv2_software_queue_entry());
         frame->x[0] = 0;
         return EXCEPTION_RESUME;
     }
 
-    case HVC_SGI_PENDING:
-        lab_kv_hex64("GuestHPPIR_both_pending_observed", argument);
-        if (!irq_ready_seen || pending_hppir_seen || first_active_seen ||
-            argument != GICV2_FIRST_SGI_IAR) {
+    case HVC_REFILL_PENDING:
+        lab_kv_hex64("GuestHPPIR_all_pending_observed", argument);
+        if (!irq_ready_seen || pending_hppir_seen || active_reports != 0 ||
+            eoi_reports != 0 || completion_reports != 0 ||
+            argument != GICV2_REFILL_FIRST_INTID) {
             return fail_exception(frame, esr,
-                                  "invalid initial SGI HPPIR report");
+                                  "invalid initial refill HPPIR report");
         }
         pending_hppir_seen = true;
-        lab_puts("[gicv2-lab] first source tag visible in HPPIR\n");
-        lab_kv_hex64("GuestHPPIR_both_pending", argument);
+        lab_puts("[gicv2-lab] highest-priority resident LR visible\n");
+        lab_kv_hex64("GuestHPPIR_all_pending", argument);
         frame->x[0] = 0;
         return EXCEPTION_RESUME;
 
-    case HVC_SGI_FIRST_ACTIVE: {
+    case HVC_REFILL_ACTIVE: {
         struct gicv2_lr_snapshot active;
+        uint32_t delivery = active_reports;
         bool valid;
 
-        if (!pending_hppir_seen || first_active_seen ||
-            first_priority_drop_seen || first_deactivated_seen ||
-            second_active_seen || second_priority_drop_seen ||
-            second_deactivated_seen ||
+        if (!pending_hppir_seen || delivery >= GICV2_REFILL_DELIVERIES ||
+            eoi_reports != delivery || completion_reports != delivery ||
             !irq_state_argument_valid(
-                argument, GICV2_FIRST_SGI_IAR,
-                GICV2_FIRST_SGI_PRIORITY, GICV2_SECOND_SGI_IAR)) {
+                argument, refill_expected_iar(delivery),
+                refill_expected_rpr(delivery),
+                refill_expected_hppir(delivery))) {
             return fail_exception(frame, esr,
-                                  "invalid first SGI active report");
+                                  "invalid refill active report");
         }
 
-        valid = gicv2_capture_first_sgi_active(&active);
-        lab_puts("[gicv2-lab] first source-tagged SGI active\n");
-        dump_irq_state("GuestIAR_first_sgi_active",
-                       "GuestRPR_first_sgi_active",
-                       "GuestHPPIR_first_sgi_active", argument);
-        DUMP_SNAPSHOT(&active, "first_sgi_active");
+        valid = gicv2_capture_refill_active(delivery, &active);
+        lab_puts("[gicv2-lab] refill delivery active\n");
+        dump_refill_state(&active, delivery, 0, argument);
         if (!valid) {
             return fail_exception(frame, esr,
-                                  "invalid first SGI active state");
+                                  "invalid refill active state");
         }
 
-        first_active_seen = true;
+        active_reports++;
         frame->x[0] = 0;
         return EXCEPTION_RESUME;
     }
 
-    case HVC_SGI_FIRST_EOI: {
-        struct gicv2_lr_snapshot first_priority_drop;
-        bool valid;
-
-        if (!first_active_seen || first_priority_drop_seen ||
-            first_deactivated_seen || second_active_seen ||
-            second_priority_drop_seen || second_deactivated_seen ||
-            !irq_state_argument_valid(
-                argument, GICV2_FIRST_SGI_IAR,
-                GICV2_GICV_RPR_IDLE_EXPECTED, GICV2_SECOND_SGI_IAR)) {
-            return fail_exception(frame, esr,
-                                  "invalid first SGI EOI report");
-        }
-
-        valid = gicv2_capture_first_sgi_drop(&first_priority_drop);
-        lab_puts("[gicv2-lab] first SGI priority dropped\n");
-        dump_irq_state("GuestIAR_first_sgi_drop",
-                       "GuestRPR_first_sgi_drop",
-                       "GuestHPPIR_first_sgi_drop", argument);
-        DUMP_SNAPSHOT(&first_priority_drop, "first_sgi_drop");
-        if (!valid) {
-            return fail_exception(frame, esr,
-                                  "invalid first SGI priority-drop state");
-        }
-
-        first_priority_drop_seen = true;
-        frame->x[0] = 0;
-        return EXCEPTION_RESUME;
-    }
-
-    case HVC_SGI_FIRST_DEACTIVATE: {
-        struct gicv2_lr_snapshot deactivated;
-        bool valid;
-
-        if (!first_priority_drop_seen || first_deactivated_seen ||
-            second_active_seen || second_priority_drop_seen ||
-            second_deactivated_seen ||
-            !irq_state_argument_valid(
-                argument, GICV2_FIRST_SGI_IAR,
-                GICV2_GICV_RPR_IDLE_EXPECTED, GICV2_SECOND_SGI_IAR)) {
-            return fail_exception(frame, esr,
-                                  "invalid first SGI deactivation report");
-        }
-
-        valid = gicv2_capture_first_sgi_deactivated(&deactivated);
-        lab_puts("[gicv2-lab] first SGI deactivated with source intact\n");
-        dump_irq_state("GuestIAR_first_sgi_deactivated",
-                       "GuestRPR_first_sgi_deactivated",
-                       "GuestHPPIR_first_sgi_deactivated", argument);
-        DUMP_SNAPSHOT(&deactivated, "first_sgi_deactivated");
-        if (!valid) {
-            return fail_exception(frame, esr,
-                                  "invalid first SGI deactivated state");
-        }
-
-        first_deactivated_seen = true;
-        frame->x[0] = 0;
-        return EXCEPTION_RESUME;
-    }
-
-    case HVC_SGI_SECOND_ACTIVE: {
-        struct gicv2_lr_snapshot active;
-        bool valid;
-
-        if (!first_deactivated_seen || second_active_seen ||
-            second_priority_drop_seen || second_deactivated_seen ||
-            !irq_state_argument_valid(
-                argument, GICV2_SECOND_SGI_IAR,
-                GICV2_SECOND_SGI_PRIORITY,
-                GICV2_GICV_HPPIR_SPURIOUS_EXPECTED)) {
-            return fail_exception(frame, esr,
-                                  "invalid second SGI active report");
-        }
-
-        valid = gicv2_capture_second_sgi_active(&active);
-        lab_puts("[gicv2-lab] second source-tagged SGI active\n");
-        dump_irq_state("GuestIAR_second_sgi_active",
-                       "GuestRPR_second_sgi_active",
-                       "GuestHPPIR_second_sgi_active", argument);
-        DUMP_SNAPSHOT(&active, "second_sgi_active");
-        if (!valid) {
-            return fail_exception(frame, esr,
-                                  "invalid second SGI active state");
-        }
-
-        second_active_seen = true;
-        frame->x[0] = 0;
-        return EXCEPTION_RESUME;
-    }
-
-    case HVC_SGI_SECOND_EOI: {
+    case HVC_REFILL_EOI: {
         struct gicv2_lr_snapshot priority_drop;
+        uint32_t delivery = eoi_reports;
         bool valid;
 
-        if (!second_active_seen || second_priority_drop_seen ||
-            second_deactivated_seen ||
+        if (delivery >= GICV2_REFILL_DELIVERIES ||
+            active_reports != delivery + 1 ||
+            completion_reports != delivery ||
             !irq_state_argument_valid(
-                argument, GICV2_SECOND_SGI_IAR,
+                argument, refill_expected_iar(delivery),
                 GICV2_GICV_RPR_IDLE_EXPECTED,
-                GICV2_GICV_HPPIR_SPURIOUS_EXPECTED)) {
+                refill_expected_hppir(delivery))) {
             return fail_exception(frame, esr,
-                                  "invalid second SGI EOI report");
+                                  "invalid refill EOI report");
         }
 
-        valid = gicv2_capture_second_sgi_drop(&priority_drop);
-        lab_puts("[gicv2-lab] second SGI priority dropped\n");
-        dump_irq_state("GuestIAR_second_sgi_drop",
-                       "GuestRPR_second_sgi_drop",
-                       "GuestHPPIR_second_sgi_drop", argument);
-        DUMP_SNAPSHOT(&priority_drop, "second_sgi_drop");
+        valid = gicv2_capture_refill_drop(delivery, &priority_drop);
+        lab_puts("[gicv2-lab] refill delivery priority dropped\n");
+        dump_refill_state(&priority_drop, delivery, 1, argument);
         if (!valid) {
             return fail_exception(frame, esr,
-                                  "invalid second SGI priority-drop state");
+                                  "invalid refill priority-drop state");
         }
 
-        second_priority_drop_seen = true;
+        eoi_reports++;
         frame->x[0] = 0;
         return EXCEPTION_RESUME;
     }
 
-    case HVC_SGI_SECOND_DEACTIVATE: {
+    case HVC_REFILL_COMPLETE: {
         struct gicv2_lr_transition completion;
+        uint32_t delivery = completion_reports;
         bool valid;
 
-        if (!second_priority_drop_seen || second_deactivated_seen ||
+        if (delivery >= GICV2_REFILL_DELIVERIES ||
+            active_reports != delivery + 1 ||
+            eoi_reports != delivery + 1 ||
             !irq_state_argument_valid(
-                argument, GICV2_SECOND_SGI_IAR,
+                argument, refill_expected_iar(delivery),
                 GICV2_GICV_RPR_IDLE_EXPECTED,
-                GICV2_GICV_HPPIR_SPURIOUS_EXPECTED)) {
+                refill_expected_hppir(delivery))) {
             return fail_exception(frame, esr,
-                                  "invalid second SGI deactivation report");
+                                  "invalid refill completion report");
         }
 
-        valid = gicv2_finish_sgis(&completion);
-        lab_puts("[gicv2-lab] second SGI deactivated with source intact\n");
-        dump_irq_state("GuestIAR_second_sgi_deactivated",
-                       "GuestRPR_second_sgi_deactivated",
-                       "GuestHPPIR_second_sgi_deactivated", argument);
-        DUMP_SNAPSHOT(&completion.before, "both_sgis_deactivated");
-        lab_puts("[gicv2-lab] virtual SGI interface restored\n");
-        DUMP_SNAPSHOT(&completion.after, "cleared");
+        valid = gicv2_complete_refill_delivery(delivery, &completion);
+        lab_puts("[gicv2-lab] refill delivery deactivated\n");
+        dump_refill_state(&completion.before, delivery, 2, argument);
+        if (delivery == 0) {
+            lab_puts("[gicv2-lab] freed LR0 refilled from EL2 queue\n");
+            lab_kv_hex64("EL2SoftwareQueue_after_refill",
+                         gicv2_software_queue_entry());
+            DUMP_SNAPSHOT(&completion.after, "refilled");
+        } else if (delivery + 1 == GICV2_REFILL_DELIVERIES) {
+            lab_puts("[gicv2-lab] exhausted LR set restored\n");
+            DUMP_SNAPSHOT(&completion.after, "cleared");
+        }
         if (!valid) {
             return fail_exception(frame, esr,
-                                  "invalid final SGI deactivation state");
+                                  "invalid refill completion state");
         }
 
-        second_deactivated_seen = true;
+        completion_reports++;
         frame->x[0] = 0;
         return EXCEPTION_RESUME;
     }
 
     case HVC_EXIT:
         if (!guest_report_seen || !stage2_fault_seen || !h2_pass_seen ||
-            !irq_ready_seen || !pending_hppir_seen || !first_active_seen ||
-            !first_priority_drop_seen || !first_deactivated_seen ||
-            !second_active_seen || !second_priority_drop_seen ||
-            !second_deactivated_seen || argument != 0) {
+            !irq_ready_seen || !pending_hppir_seen ||
+            active_reports != GICV2_REFILL_DELIVERIES ||
+            eoi_reports != GICV2_REFILL_DELIVERIES ||
+            completion_reports != GICV2_REFILL_DELIVERIES ||
+            gicv2_software_queue_entry() != 0 || argument != 0) {
             return fail_exception(frame, esr, "guest exited too early");
         }
-        lab_puts("[gicv2-lab] H4f PASS\n");
+        lab_puts("[gicv2-lab] H4g PASS\n");
         return EXCEPTION_HALT;
 
     default:
@@ -401,7 +378,7 @@ static uint64_t handle_physical_irq(struct exception_frame *frame)
     lab_puts("[gicv2-lab] unexpected physical IRQ\n");
     lab_kv_dec("physical_irq_vector_slot", (uint32_t)frame->vector_slot);
     lab_kv_dec("PhysicalIAR_unexpected", iar & UINT32_C(0x3ff));
-    lab_puts("[gicv2-lab] H4f FAIL: physical IRQ is forbidden\n");
+    lab_puts("[gicv2-lab] H4g FAIL: physical IRQ is forbidden\n");
     return EXCEPTION_HALT;
 }
 

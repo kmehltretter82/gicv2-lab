@@ -33,45 +33,65 @@
      GICH_VMCR_ENABLE_GRP0)
 
 #define GICH_LR_PRIORITY(value) (((uint32_t)(value) >> 3) << 23)
-#define GICH_LR_CPUID(value)    ((uint32_t)(value) << 10)
 #define GICH_LR_PENDING         (UINT32_C(1) << 28)
 #define GICH_LR_ACTIVE          (UINT32_C(2) << 28)
-#define GICH_LR_FIRST_BASE \
-    (GICH_LR_PRIORITY(GICV2_FIRST_SGI_PRIORITY) | \
-     GICH_LR_CPUID(GICV2_FIRST_SGI_CPUID) | GICV2_FIRST_SGI_INTID)
-#define GICH_LR_SECOND_BASE \
-    (GICH_LR_PRIORITY(GICV2_SECOND_SGI_PRIORITY) | \
-     GICH_LR_CPUID(GICV2_SECOND_SGI_CPUID) | GICV2_SECOND_SGI_INTID)
-#define GICH_LR_FIRST_PENDING  (GICH_LR_PENDING | GICH_LR_FIRST_BASE)
-#define GICH_LR_FIRST_ACTIVE   (GICH_LR_ACTIVE | GICH_LR_FIRST_BASE)
-#define GICH_LR_SECOND_PENDING (GICH_LR_PENDING | GICH_LR_SECOND_BASE)
-#define GICH_LR_SECOND_ACTIVE  (GICH_LR_ACTIVE | GICH_LR_SECOND_BASE)
-
-#define GICH_APR_FIRST_ACTIVE \
-    (UINT32_C(1) << (GICV2_FIRST_SGI_PRIORITY >> 3))
-#define GICH_APR_SECOND_ACTIVE \
-    (UINT32_C(1) << (GICV2_SECOND_SGI_PRIORITY >> 3))
+#define GICH_LR_BASE(intid, priority) \
+    (GICH_LR_PRIORITY(priority) | (uint32_t)(intid))
+#define GICH_LR_PENDING_ENTRY(intid, priority) \
+    (GICH_LR_PENDING | GICH_LR_BASE(intid, priority))
+#define GICH_LR_ACTIVE_ENTRY(intid, priority) \
+    (GICH_LR_ACTIVE | GICH_LR_BASE(intid, priority))
+#define GICH_APR_ACTIVE(priority) \
+    (UINT32_C(1) << ((uint32_t)(priority) >> 3))
 
 static uint32_t implemented_lrs;
+static bool spill_queued;
+static uint32_t spill_entry;
+
+static const uint32_t lr_base[GICV2_REFILL_DELIVERIES] = {
+    GICH_LR_BASE(40, 0x20),
+    GICH_LR_BASE(41, 0x40),
+    GICH_LR_BASE(42, 0x60),
+    GICH_LR_BASE(43, 0x80),
+    GICH_LR_BASE(44, 0xa0),
+};
+
+static const uint32_t lr_pending[GICV2_REFILL_DELIVERIES] = {
+    GICH_LR_PENDING_ENTRY(40, 0x20),
+    GICH_LR_PENDING_ENTRY(41, 0x40),
+    GICH_LR_PENDING_ENTRY(42, 0x60),
+    GICH_LR_PENDING_ENTRY(43, 0x80),
+    GICH_LR_PENDING_ENTRY(44, 0xa0),
+};
+
+static const uint32_t lr_active[GICV2_REFILL_DELIVERIES] = {
+    GICH_LR_ACTIVE_ENTRY(40, 0x20),
+    GICH_LR_ACTIVE_ENTRY(41, 0x40),
+    GICH_LR_ACTIVE_ENTRY(42, 0x60),
+    GICH_LR_ACTIVE_ENTRY(43, 0x80),
+    GICH_LR_ACTIVE_ENTRY(44, 0xa0),
+};
+
+static const uint32_t active_apr[GICV2_REFILL_DELIVERIES] = {
+    GICH_APR_ACTIVE(0x20),
+    GICH_APR_ACTIVE(0x40),
+    GICH_APR_ACTIVE(0x60),
+    GICH_APR_ACTIVE(0x80),
+    GICH_APR_ACTIVE(0xa0),
+};
 
 _Static_assert(GICH_VMCR_INITIAL == UINT32_C(0xf85c0201),
-               "H4f VMCR encoding changed");
-_Static_assert(GICH_LR_FIRST_PENDING == UINT32_C(0x12000405),
-               "H4f first pending SGI encoding changed");
-_Static_assert(GICH_LR_FIRST_ACTIVE == UINT32_C(0x22000405),
-               "H4f first active SGI encoding changed");
-_Static_assert(GICH_LR_SECOND_PENDING == UINT32_C(0x18000c06),
-               "H4f second pending SGI encoding changed");
-_Static_assert(GICH_LR_SECOND_ACTIVE == UINT32_C(0x28000c06),
-               "H4f second active SGI encoding changed");
-_Static_assert(GICH_APR_FIRST_ACTIVE == UINT32_C(0x00000010),
-               "H4f first APR encoding changed");
-_Static_assert(GICH_APR_SECOND_ACTIVE == UINT32_C(0x00010000),
-               "H4f second APR encoding changed");
-_Static_assert(GICV2_FIRST_SGI_IAR == UINT32_C(0x00000405),
-               "H4f first IAR encoding changed");
-_Static_assert(GICV2_SECOND_SGI_IAR == UINT32_C(0x00000c06),
-               "H4f second IAR encoding changed");
+               "H4g VMCR encoding changed");
+_Static_assert(GICH_LR_PENDING_ENTRY(40, 0x20) == UINT32_C(0x12000028),
+               "H4g first pending encoding changed");
+_Static_assert(GICH_LR_PENDING_ENTRY(43, 0x80) == UINT32_C(0x1800002b),
+               "H4g fourth pending encoding changed");
+_Static_assert(GICH_LR_PENDING_ENTRY(44, 0xa0) == UINT32_C(0x1a00002c),
+               "H4g spill encoding changed");
+_Static_assert(GICH_LR_ACTIVE_ENTRY(44, 0xa0) == UINT32_C(0x2a00002c),
+               "H4g spill active encoding changed");
+_Static_assert(GICH_APR_ACTIVE(0xa0) == UINT32_C(0x00100000),
+               "H4g spill APR encoding changed");
 
 static void gic_barrier(void)
 {
@@ -140,6 +160,8 @@ static bool init_physical_interface(void)
 
 static void capture_lrs(struct gicv2_lr_snapshot *snapshot)
 {
+    uint32_t index;
+
     snapshot->hcr = mmio_read32(PI400_GICH_BASE + GICH_HCR);
     snapshot->vmcr = mmio_read32(PI400_GICH_BASE + GICH_VMCR);
     snapshot->misr = mmio_read32(PI400_GICH_BASE + GICH_MISR);
@@ -148,14 +170,25 @@ static void capture_lrs(struct gicv2_lr_snapshot *snapshot)
     snapshot->elrsr[0] = mmio_read32(PI400_GICH_BASE + GICH_ELRSR0);
     snapshot->elrsr[1] = read_elrsr1();
     snapshot->apr = mmio_read32(PI400_GICH_BASE + GICH_APR);
-    snapshot->lr[0] = mmio_read32(PI400_GICH_BASE + GICH_LR0);
-    snapshot->lr[1] = mmio_read32(PI400_GICH_BASE + GICH_LR0 + 4);
+    for (index = 0; index < GICV2_SNAPSHOT_LRS; index++) {
+        snapshot->lr[index] =
+            mmio_read32(PI400_GICH_BASE + GICH_LR0 + index * 4);
+    }
 }
 
 static bool snapshot_valid(const struct gicv2_lr_snapshot *snapshot,
-                           uint32_t lr0, uint32_t lr1, uint32_t apr,
+                           const uint32_t expected_lrs[GICV2_SNAPSHOT_LRS],
+                           uint32_t apr,
                            uint32_t valid_lr_mask)
 {
+    uint32_t index;
+
+    for (index = 0; index < GICV2_SNAPSHOT_LRS; index++) {
+        if (snapshot->lr[index] != expected_lrs[index]) {
+            return false;
+        }
+    }
+
     return snapshot->hcr == GICH_HCR_ENABLE &&
            snapshot->vmcr == GICH_VMCR_INITIAL &&
            snapshot->misr == 0 &&
@@ -163,70 +196,112 @@ static bool snapshot_valid(const struct gicv2_lr_snapshot *snapshot,
            snapshot->elrsr[0] ==
                (empty_mask_low() & ~valid_lr_mask) &&
            snapshot->elrsr[1] == empty_mask_high() &&
-           snapshot->apr == apr && snapshot->lr[0] == lr0 &&
-           snapshot->lr[1] == lr1;
+           snapshot->apr == apr;
 }
 
 static bool empty_snapshot_valid(const struct gicv2_lr_snapshot *snapshot)
 {
-    return snapshot_valid(snapshot, 0, 0, 0, 0);
+    static const uint32_t empty[GICV2_SNAPSHOT_LRS];
+
+    return snapshot_valid(snapshot, empty, 0, 0);
 }
 
-static bool both_pending_snapshot_valid(
+static bool full_pending_snapshot_valid(
     const struct gicv2_lr_snapshot *snapshot)
 {
-    return snapshot_valid(snapshot, GICH_LR_FIRST_PENDING,
-                          GICH_LR_SECOND_PENDING, 0, UINT32_C(3));
+    return snapshot_valid(snapshot, lr_pending, 0, UINT32_C(0xf));
 }
 
-static bool first_active_snapshot_valid(
-    const struct gicv2_lr_snapshot *snapshot)
+static void expected_delivery_lrs(uint32_t delivery, uint32_t current,
+                                  uint32_t expected[GICV2_SNAPSHOT_LRS])
 {
-    return snapshot_valid(snapshot, GICH_LR_FIRST_ACTIVE,
-                          GICH_LR_SECOND_PENDING,
-                          GICH_APR_FIRST_ACTIVE, UINT32_C(3));
+    uint32_t slot;
+    uint32_t index;
+
+    expected[0] = delivery == 0 ? lr_pending[0] : lr_pending[4];
+    for (index = 1; index < GICV2_SNAPSHOT_LRS; index++) {
+        expected[index] = index < delivery ? lr_base[index] :
+                                             lr_pending[index];
+    }
+
+    slot = delivery == 4 ? 0 : delivery;
+    expected[slot] = current;
 }
 
-static bool first_drop_snapshot_valid(
-    const struct gicv2_lr_snapshot *snapshot)
+static uint32_t delivery_valid_mask(uint32_t delivery)
 {
-    return snapshot_valid(snapshot, GICH_LR_FIRST_ACTIVE,
-                          GICH_LR_SECOND_PENDING, 0, UINT32_C(3));
+    if (delivery == 0) {
+        return UINT32_C(0xf);
+    }
+    return UINT32_C(1) |
+           (UINT32_C(0xf) & ~((UINT32_C(1) << delivery) - 1));
 }
 
-static bool first_deactivated_snapshot_valid(
-    const struct gicv2_lr_snapshot *snapshot)
+static bool delivery_snapshot_valid(
+    const struct gicv2_lr_snapshot *snapshot, uint32_t delivery,
+    uint32_t current, uint32_t apr, uint32_t valid_lr_mask)
 {
-    return snapshot_valid(snapshot, GICH_LR_FIRST_BASE,
-                          GICH_LR_SECOND_PENDING, 0, UINT32_C(2));
+    uint32_t expected[GICV2_SNAPSHOT_LRS];
+
+    if (delivery >= GICV2_REFILL_DELIVERIES) {
+        return false;
+    }
+    expected_delivery_lrs(delivery, current, expected);
+    return snapshot_valid(snapshot, expected, apr, valid_lr_mask);
 }
 
-static bool second_active_snapshot_valid(
-    const struct gicv2_lr_snapshot *snapshot)
+static bool active_snapshot_valid(
+    const struct gicv2_lr_snapshot *snapshot, uint32_t delivery)
 {
-    return snapshot_valid(snapshot, GICH_LR_FIRST_BASE,
-                          GICH_LR_SECOND_ACTIVE,
-                          GICH_APR_SECOND_ACTIVE, UINT32_C(2));
+    if (delivery >= GICV2_REFILL_DELIVERIES) {
+        return false;
+    }
+    return delivery_snapshot_valid(snapshot, delivery, lr_active[delivery],
+                                   active_apr[delivery],
+                                   delivery_valid_mask(delivery));
 }
 
-static bool second_drop_snapshot_valid(
-    const struct gicv2_lr_snapshot *snapshot)
+static bool drop_snapshot_valid(
+    const struct gicv2_lr_snapshot *snapshot, uint32_t delivery)
 {
-    return snapshot_valid(snapshot, GICH_LR_FIRST_BASE,
-                          GICH_LR_SECOND_ACTIVE, 0, UINT32_C(2));
+    if (delivery >= GICV2_REFILL_DELIVERIES) {
+        return false;
+    }
+    return delivery_snapshot_valid(snapshot, delivery, lr_active[delivery],
+                                   0, delivery_valid_mask(delivery));
 }
 
-static bool both_deactivated_snapshot_valid(
+static bool deactivated_snapshot_valid(
+    const struct gicv2_lr_snapshot *snapshot, uint32_t delivery)
+{
+    uint32_t slot;
+    uint32_t valid_mask;
+
+    if (delivery >= GICV2_REFILL_DELIVERIES) {
+        return false;
+    }
+    slot = delivery == 4 ? 0 : delivery;
+    valid_mask = delivery_valid_mask(delivery) & ~(UINT32_C(1) << slot);
+    return delivery_snapshot_valid(snapshot, delivery, lr_base[delivery], 0,
+                                   valid_mask);
+}
+
+static bool refilled_snapshot_valid(
     const struct gicv2_lr_snapshot *snapshot)
 {
-    return snapshot_valid(snapshot, GICH_LR_FIRST_BASE,
-                          GICH_LR_SECOND_BASE, 0, 0);
+    uint32_t expected[GICV2_SNAPSHOT_LRS] = {
+        lr_pending[4], lr_pending[1], lr_pending[2], lr_pending[3]
+    };
+
+    return snapshot_valid(snapshot, expected, 0, UINT32_C(0xf));
 }
 
 static void init_virtual_interface(void)
 {
     uint32_t index;
 
+    spill_queued = false;
+    spill_entry = 0;
     mmio_write32(PI400_GICH_BASE + GICH_HCR, 0);
     for (index = 0; index < implemented_lrs; index++) {
         mmio_write32(PI400_GICH_BASE + GICH_LR0 + index * 4, 0);
@@ -245,7 +320,7 @@ bool gicv2_init(uint32_t gich_vtr, struct gicv2_lr_snapshot *initial)
     uint32_t pribits =
         (gich_vtr >> GICH_VTR_PRIBITS_SHIFT) & GICH_VTR_BITS_MASK;
 
-    if (lr_count < GICV2_SNAPSHOT_LRS || lr_count > 64 ||
+    if (lr_count != GICV2_SNAPSHOT_LRS ||
         prebits != GICH_VTR_FIVE_BITS ||
         pribits != GICH_VTR_FIVE_BITS) {
         return false;
@@ -261,70 +336,84 @@ bool gicv2_init(uint32_t gich_vtr, struct gicv2_lr_snapshot *initial)
     return empty_snapshot_valid(initial);
 }
 
-bool gicv2_inject_sgis(struct gicv2_lr_snapshot *pending)
+bool gicv2_inject_full_lr_set(struct gicv2_lr_snapshot *pending)
 {
     struct gicv2_lr_snapshot before;
+    uint32_t index;
 
     capture_lrs(&before);
-    if (!empty_snapshot_valid(&before)) {
+    if (!empty_snapshot_valid(&before) || spill_queued) {
         *pending = before;
         return false;
     }
 
-    mmio_write32(PI400_GICH_BASE + GICH_LR0, GICH_LR_FIRST_PENDING);
-    mmio_write32(PI400_GICH_BASE + GICH_LR0 + 4,
-                 GICH_LR_SECOND_PENDING);
+    spill_entry = lr_pending[4];
+    spill_queued = true;
+    for (index = 0; index < GICV2_SNAPSHOT_LRS; index++) {
+        mmio_write32(PI400_GICH_BASE + GICH_LR0 + index * 4,
+                     lr_pending[index]);
+    }
     gic_barrier();
     capture_lrs(pending);
-    return both_pending_snapshot_valid(pending);
+    return full_pending_snapshot_valid(pending) &&
+           spill_entry == lr_pending[4];
 }
 
-bool gicv2_capture_first_sgi_active(struct gicv2_lr_snapshot *active)
+bool gicv2_capture_refill_active(uint32_t delivery,
+                                 struct gicv2_lr_snapshot *active)
 {
     capture_lrs(active);
-    return first_active_snapshot_valid(active);
+    return active_snapshot_valid(active, delivery);
 }
 
-bool gicv2_capture_first_sgi_drop(
-    struct gicv2_lr_snapshot *priority_drop)
+bool gicv2_capture_refill_drop(uint32_t delivery,
+                               struct gicv2_lr_snapshot *priority_drop)
 {
     capture_lrs(priority_drop);
-    return first_drop_snapshot_valid(priority_drop);
+    return drop_snapshot_valid(priority_drop, delivery);
 }
 
-bool gicv2_capture_first_sgi_deactivated(
-    struct gicv2_lr_snapshot *deactivated)
+bool gicv2_complete_refill_delivery(
+    uint32_t delivery, struct gicv2_lr_transition *transition)
 {
-    capture_lrs(deactivated);
-    return first_deactivated_snapshot_valid(deactivated);
-}
+    uint32_t index;
 
-bool gicv2_capture_second_sgi_active(struct gicv2_lr_snapshot *active)
-{
-    capture_lrs(active);
-    return second_active_snapshot_valid(active);
-}
-
-bool gicv2_capture_second_sgi_drop(
-    struct gicv2_lr_snapshot *priority_drop)
-{
-    capture_lrs(priority_drop);
-    return second_drop_snapshot_valid(priority_drop);
-}
-
-bool gicv2_finish_sgis(struct gicv2_lr_transition *transition)
-{
     capture_lrs(&transition->before);
     transition->after = transition->before;
-    if (!both_deactivated_snapshot_valid(&transition->before)) {
+    if (!deactivated_snapshot_valid(&transition->before, delivery)) {
         return false;
     }
 
-    mmio_write32(PI400_GICH_BASE + GICH_LR0, 0);
-    mmio_write32(PI400_GICH_BASE + GICH_LR0 + 4, 0);
+    if (delivery == 0) {
+        if (!spill_queued || spill_entry != lr_pending[4]) {
+            return false;
+        }
+        mmio_write32(PI400_GICH_BASE + GICH_LR0, spill_entry);
+        spill_entry = 0;
+        spill_queued = false;
+        gic_barrier();
+        capture_lrs(&transition->after);
+        return refilled_snapshot_valid(&transition->after);
+    }
+
+    if (delivery + 1 != GICV2_REFILL_DELIVERIES) {
+        return !spill_queued && spill_entry == 0;
+    }
+
+    if (spill_queued || spill_entry != 0) {
+        return false;
+    }
+    for (index = 0; index < GICV2_SNAPSHOT_LRS; index++) {
+        mmio_write32(PI400_GICH_BASE + GICH_LR0 + index * 4, 0);
+    }
     gic_barrier();
     capture_lrs(&transition->after);
     return empty_snapshot_valid(&transition->after);
+}
+
+uint32_t gicv2_software_queue_entry(void)
+{
+    return spill_queued ? spill_entry : 0;
 }
 
 uint32_t gicv2_acknowledge_physical_irq(void)
