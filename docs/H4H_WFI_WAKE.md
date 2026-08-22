@@ -63,3 +63,13 @@ qemu-pi4 processes accepted by `scripts/smoke-qemu.sh`. Preserve the exact
 source revision, image and emulator hashes, toolchain, host, command line,
 linked-image audit, and lossless final trace under `results/` before marking
 H4h complete.
+
+## Recorded QEMU result
+
+The frozen implementation at `da2fa922c71acf0c7f0644e2bc21cce8db6156e4`
+passed 100 consecutive fresh qemu-pi4 processes on 2026-08-22. The exact
+image, emulator, environment, linked-image audit, and lossless final trace are
+recorded in `results/2026-08-22-h4h-qemu-pi4/manifest.md`.
+
+The observed result matched this contract. H4h produced no divergent
+behavior and no QEMU bug candidate.

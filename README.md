@@ -13,8 +13,7 @@ interrupt transition observable, replayable, and comparable across:
 
 ## Status
 
-H4h is implemented under qemu-pi4 and its 100-process exit gate is pending.
-It deliberately stays QEMU-only and now has:
+H4h is complete under qemu-pi4. It deliberately stays QEMU-only and now has:
 
 - the H1 EL2 monitor and H2 one-vCPU EL1 guest with a validated, resumable
   stage-2 translation fault;
@@ -44,11 +43,12 @@ It deliberately stays QEMU-only and now has:
 - an exact `HCR_EL2.TWI` trap and same-PC re-execution of guest WFI, followed
   by one `CNTHP_EL2` PPI and one timer-injected virtual wake interrupt.
 
-The strict H4g exit gate passed 100 consecutive fresh qemu-pi4 processes on
-2026-08-22. Its exact revision, hashes, environment, and final raw trace are
-preserved in `results/2026-08-22-h4g-qemu-pi4/`. H4g matched its frozen
-contract and produced no QEMU bug candidate. H4f's earlier fork candidate and
-its separate pre-fix evidence remain recorded under the H4f result directory.
+The strict H4h exit gate passed 100 consecutive fresh qemu-pi4 processes on
+2026-08-22. Its exact revision, hashes, environment, linked-image audit, and
+final raw trace are preserved in `results/2026-08-22-h4h-qemu-pi4/`. H4h
+matched its frozen contract and produced no QEMU bug candidate. H4f's earlier
+fork candidate and its separate pre-fix evidence remain recorded under the
+H4f result directory.
 
 The QEMU prerequisite for the first real Pi 400 boot is now satisfied, but no
 physical boot has been performed. Hardware execution remains a separate,

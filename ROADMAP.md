@@ -147,7 +147,7 @@ event, physical IRQ, or extra/missing delivery on 2026-08-22. The exact
 revision, linked-image audit, and raw trace are preserved in
 `results/2026-08-22-h4g-qemu-pi4/`.
 
-### H4h — WFI wakeup (implementation frozen; exit gate pending)
+### H4h — WFI wakeup (completed)
 
 - Trap the guest's first WFI with HCR.TWI to prove the exact wait instruction
   and checkpoint, then re-execute it untrapped.
@@ -156,8 +156,11 @@ revision, linked-image audit, and raw trace are preserved in
 - Forbid every unrelated physical interrupt, maintenance cause, duplicate
   wake, or completion without the validated WFI trap.
 
-Exit gate: 100 consecutive fresh qemu-pi4 processes accepted by a frozen
-strict oracle.
+Exit gate: the frozen strict H4h oracle passed 100 consecutive fresh qemu-pi4
+processes without a missing or skipped WFI, wrong timer return PC, unrelated
+physical IRQ, maintenance event, extra/missing wake, unexpected exception,
+reset, or hang on 2026-08-22. The exact revision, linked-image audit, and raw
+trace are preserved in `results/2026-08-22-h4h-qemu-pi4/`.
 
 ### H4i — paused virtual-interface save and restore
 
@@ -179,7 +182,7 @@ any one-sided forbidden outcome to its smallest sequence.
 
 ## H6 — first real Pi 400 boot (later)
 
-The H1–H4g QEMU prerequisite is satisfied. Physical execution remains opt-in
+The H1–H4h QEMU prerequisite is satisfied. Physical execution remains opt-in
 and requires the user's explicit request. The first image:
 
 1. uses a recoverable boot medium and serial capture;
