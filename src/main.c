@@ -1,5 +1,7 @@
 /* SPDX-License-Identifier: GPL-2.0-or-later */
 
+#include "gicv2_lab/gicv2.h"
+#include "gicv2_lab/gicv2_defs.h"
 #include "gicv2_lab/layout.h"
 #include "gicv2_lab/platform.h"
 #include "gicv2_lab/print.h"
@@ -21,9 +23,10 @@ void lab_main(void)
 {
     uint64_t current_el;
     uint32_t gich_vtr;
+    uint32_t lr_count;
 
     uart_init();
-    lab_puts("\n[gicv2-lab] H2 EL2 monitor\n");
+    lab_puts("\n[gicv2-lab] H3 EL2 monitor\n");
 
     current_el = read_currentel() >> 2;
     lab_kv_dec("CurrentEL", (uint32_t)current_el);
@@ -36,11 +39,12 @@ void lab_main(void)
     lab_kv_hex64("VTTBR_EL2", read_vttbr_el2());
 
     gich_vtr = mmio_read32(PI400_GICH_BASE + GICH_VTR);
+    lr_count = (gich_vtr & 0x3f) + 1;
     lab_kv_hex64("GICH_VTR", gich_vtr);
-    lab_kv_dec("GICH_LRS", (gich_vtr & 0x3f) + 1);
+    lab_kv_dec("GICH_LRS", lr_count);
 
     if (current_el != 2) {
-        lab_puts("[gicv2-lab] H2 FAIL: expected EL2\n");
+        lab_puts("[gicv2-lab] H3 FAIL: expected EL2\n");
         halt_forever();
     }
 
@@ -51,9 +55,31 @@ void lab_main(void)
     stage2_enable();
     lab_kv_hex64("stage2_root", stage2_root_address());
     lab_kv_hex64("stage2_guest_desc", stage2_guest_descriptor());
+    lab_kv_hex64("stage2_gicv_desc", stage2_gicv_descriptor());
     lab_kv_hex64("VTCR_EL2_enabled", read_vtcr_el2());
     lab_kv_hex64("VTTBR_EL2_enabled", read_vttbr_el2());
     lab_kv_hex64("HCR_EL2_enabled", read_hcr_el2());
+
+    if (!gicv2_init(lr_count)) {
+        lab_puts("[gicv2-lab] H3 FAIL: GICv2 initialization\n");
+        halt_forever();
+    }
+
+    lab_kv_hex64("GICD_TYPER", mmio_read32(PI400_GICD_BASE + GICD_TYPER));
+    lab_kv_hex64("GICD_IIDR", mmio_read32(PI400_GICD_BASE + GICD_IIDR));
+    lab_kv_hex64("GICC_IIDR", mmio_read32(PI400_GICC_BASE + GICC_IIDR));
+    lab_kv_hex64("GICD_CTLR_enabled",
+                 mmio_read32(PI400_GICD_BASE + GICD_CTLR));
+    lab_kv_hex64("GICC_CTLR_enabled",
+                 mmio_read32(PI400_GICC_BASE + GICC_CTLR));
+    lab_kv_hex64("GICC_PMR_enabled",
+                 mmio_read32(PI400_GICC_BASE + GICC_PMR));
+    lab_kv_hex64("GICH_HCR_enabled",
+                 mmio_read32(PI400_GICH_BASE + GICH_HCR));
+    lab_kv_hex64("GICH_VMCR_enabled",
+                 mmio_read32(PI400_GICH_BASE + GICH_VMCR));
+    lab_kv_hex64("GICH_ELRSR0_initial",
+                 mmio_read32(PI400_GICH_BASE + GICH_ELRSR0));
 
     lab_puts("[gicv2-lab] entering EL1 guest\n");
     enter_guest((uint64_t)(uintptr_t)guest_start, GUEST_STACK_TOP);

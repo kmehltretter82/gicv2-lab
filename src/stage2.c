@@ -3,6 +3,7 @@
 #include <stddef.h>
 #include <stdint.h>
 
+#include "gicv2_lab/gicv2_defs.h"
 #include "gicv2_lab/layout.h"
 #include "gicv2_lab/stage2.h"
 
@@ -12,10 +13,12 @@
 #define S2_DESC_VALID    (UINT64_C(1) << 0)
 #define S2_DESC_TABLE    (UINT64_C(1) << 1)
 #define S2_MEMATTR_NORMAL (UINT64_C(0xf) << 2)
+#define S2_MEMATTR_DEVICE_NGNRE (UINT64_C(1) << 2)
 #define S2_S2AP_READ     (UINT64_C(1) << 6)
 #define S2_S2AP_WRITE    (UINT64_C(1) << 7)
 #define S2_SH_INNER      (UINT64_C(3) << 8)
 #define S2_ACCESS_FLAG   (UINT64_C(1) << 10)
+#define S2_EXECUTE_NEVER (UINT64_C(1) << 54)
 
 #define VTCR_T0SZ_32BIT_IPA UINT64_C(32)
 #define VTCR_SL0_LEVEL1     (UINT64_C(1) << 6)
@@ -25,10 +28,13 @@
 #define VTCR_RES1           (UINT64_C(1) << 31)
 
 #define HCR_VM              (UINT64_C(1) << 0)
+#define HCR_IMO             (UINT64_C(1) << 4)
 #define HCR_RW              (UINT64_C(1) << 31)
 
 static uint64_t s2_l1[S2_TABLE_ENTRIES] __attribute__((aligned(4096)));
-static uint64_t s2_l2[S2_TABLE_ENTRIES] __attribute__((aligned(4096)));
+static uint64_t s2_guest_l2[S2_TABLE_ENTRIES] __attribute__((aligned(4096)));
+static uint64_t s2_mmio_l2[S2_TABLE_ENTRIES] __attribute__((aligned(4096)));
+static uint64_t s2_gicv_l3[S2_TABLE_ENTRIES] __attribute__((aligned(4096)));
 
 _Static_assert(GUEST_REGION_SIZE == (UINT64_C(1) << 21),
                "H2 uses one 2 MiB stage-2 block");
@@ -39,6 +45,8 @@ _Static_assert(GUEST_STACK_TOP >= GUEST_IPA_BASE &&
                "guest stack must be inside the mapped block");
 _Static_assert(MONITOR_LOAD_BASE < GUEST_IPA_BASE,
                "fault target must be outside the guest block");
+_Static_assert((PI400_GICV_BASE & UINT64_C(0xfff)) == 0,
+               "GICV base must be 4 KiB aligned");
 
 static void zero_table(uint64_t *table)
 {
@@ -52,21 +60,40 @@ static void zero_table(uint64_t *table)
 void stage2_enable(void)
 {
     uint64_t guest_attributes;
+    uint64_t gicv_attributes;
     uint64_t root_address = (uint64_t)(uintptr_t)s2_l1;
-    uint64_t l2_address = (uint64_t)(uintptr_t)s2_l2;
+    uint64_t guest_l2_address = (uint64_t)(uintptr_t)s2_guest_l2;
+    uint64_t mmio_l2_address = (uint64_t)(uintptr_t)s2_mmio_l2;
+    uint64_t gicv_l3_address = (uint64_t)(uintptr_t)s2_gicv_l3;
     uint64_t vtcr;
     uint64_t hcr;
 
     zero_table(s2_l1);
-    zero_table(s2_l2);
+    zero_table(s2_guest_l2);
+    zero_table(s2_mmio_l2);
+    zero_table(s2_gicv_l3);
 
-    s2_l1[0] = (l2_address & S2_ADDRESS_MASK) |
+    s2_l1[0] = (guest_l2_address & S2_ADDRESS_MASK) |
                S2_DESC_TABLE | S2_DESC_VALID;
+    s2_l1[((uint64_t)PI400_GICV_BASE >> 30) & UINT64_C(0x1ff)] =
+        (mmio_l2_address & S2_ADDRESS_MASK) |
+        S2_DESC_TABLE | S2_DESC_VALID;
 
     guest_attributes = S2_MEMATTR_NORMAL | S2_S2AP_READ | S2_S2AP_WRITE |
                        S2_SH_INNER | S2_ACCESS_FLAG;
-    s2_l2[GUEST_IPA_BASE >> 21] =
+    s2_guest_l2[GUEST_IPA_BASE >> 21] =
         GUEST_IPA_BASE | guest_attributes | S2_DESC_VALID;
+
+    s2_mmio_l2[((uint64_t)PI400_GICV_BASE >> 21) & UINT64_C(0x1ff)] =
+        (gicv_l3_address & S2_ADDRESS_MASK) |
+        S2_DESC_TABLE | S2_DESC_VALID;
+
+    gicv_attributes = S2_MEMATTR_DEVICE_NGNRE | S2_S2AP_READ |
+                      S2_S2AP_WRITE | S2_SH_INNER | S2_ACCESS_FLAG |
+                      S2_EXECUTE_NEVER;
+    s2_gicv_l3[((uint64_t)PI400_GICV_BASE >> 12) & UINT64_C(0x1ff)] =
+        PI400_GICV_BASE | gicv_attributes |
+        S2_DESC_TABLE | S2_DESC_VALID;
 
     vtcr = VTCR_RES1 | VTCR_SH0_INNER | VTCR_ORGN0_WBWA |
            VTCR_IRGN0_WBWA | VTCR_SL0_LEVEL1 | VTCR_T0SZ_32BIT_IPA;
@@ -83,7 +110,7 @@ void stage2_enable(void)
         : "r"(vtcr), "r"(root_address)
         : "memory");
 
-    hcr = HCR_RW | HCR_VM;
+    hcr = HCR_RW | HCR_IMO | HCR_VM;
     __asm__ volatile(
         "msr HCR_EL2, %0\n"
         "isb\n"
@@ -99,5 +126,11 @@ uint64_t stage2_root_address(void)
 
 uint64_t stage2_guest_descriptor(void)
 {
-    return s2_l2[GUEST_IPA_BASE >> 21];
+    return s2_guest_l2[GUEST_IPA_BASE >> 21];
+}
+
+uint64_t stage2_gicv_descriptor(void)
+{
+    return s2_gicv_l3[((uint64_t)PI400_GICV_BASE >> 12) &
+                      UINT64_C(0x1ff)];
 }

@@ -5,9 +5,9 @@
 
 #include <stdint.h>
 
+#include "gicv2_lab/gicv2_defs.h"
+
 #define PI400_PL011_BASE UINT64_C(0xfe201000)
-#define PI400_GICH_BASE  UINT64_C(0xff844000)
-#define GICH_VTR         UINT64_C(0x0004)
 
 static inline uint32_t mmio_read32(uint64_t address)
 {

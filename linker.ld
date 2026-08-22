@@ -44,6 +44,9 @@ SECTIONS
     {
         __guest_start = .;
         KEEP(*(.guest.text))
+        . = ALIGN(2048);
+        KEEP(*(.guest.vectors))
+        *(.guest.data)
         __guest_end = .;
     }
 

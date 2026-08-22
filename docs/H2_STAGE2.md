@@ -32,12 +32,21 @@ IMPLEMENTATION DEFINED choice.
 
 ## Fixed memory map
 
-| Address range | Owner | Stage-2 view |
+H3 preserves the H2 guest mapping and fault target, and adds the minimum MMIO
+mapping needed for the virtual interrupt scenario. The current tables expose
+no other peripheral page to EL1.
+
+| Address range | Owner | Current stage-2 view |
 | --- | --- | --- |
 | `0x00080000` to `__monitor_end` | EL2 text, data, tables, and 16 KiB stack | deliberately unmapped |
 | `0x00200000` to `0x003fffff` | EL1 guest 2 MiB block | identity-mapped normal RWX memory |
 | `0x00200000` | H2 guest payload | guest entry point |
 | `0x003ff000` | initial `SP_EL1` | stack grows downward if used |
+| `0xff846000` to `0xff846fff` | GICV virtual CPU-interface frame | identity-mapped Device-nGnRE, inner-shareable, RW, XN page |
+
+The GICV page descriptor is `0x00400000ff8467c7` in the qemu-pi4 smoke
+configuration. GICD, GICC, GICH, PL011, and the rest of the GICV surrounding
+region remain unmapped at stage 2.
 
 RWX is intentional for this first single-block experiment, not a security
 model. A later scenario can split code and data permissions when that
@@ -45,8 +54,8 @@ distinction becomes part of the test.
 
 The linked monitor is asserted to end before the guest block, and the guest
 payload is asserted not to overlap its stack. Stage-2 translation applies to
-EL0/EL1 accesses; the EL2 monitor continues to access its own RAM and PL011
-directly.
+EL0/EL1 accesses; the EL2 monitor continues to access its own RAM, PL011, and
+physical GIC frames directly.
 
 Normative architecture reference: [Arm Architecture Reference Manual for
 A-profile architecture, 4 KiB stage-2 translation](https://developer.arm.com/documentation/ddi0487/mc/-Part-D-The-AArch64-System-Level-Architecture/-Chapter-D8-The-AArch64-Virtual-Memory-System-Architecture/-D8-2-Translation-process/-D8-2-8-VMSAv8-64-translation-using-the-4KB-granule?lang=en).

@@ -21,7 +21,8 @@ LDFLAGS := --target=aarch64-none-elf -mcpu=cortex-a72 -nostdlib -fuse-ld=lld \
 	-Wl,-T,linker.ld -Wl,-Map,$(TARGET).map -Wl,--build-id=none \
 	-Wl,--gc-sections
 
-C_SOURCES := src/exception.c src/main.c src/print.c src/stage2.c src/uart.c
+C_SOURCES := src/exception.c src/gicv2.c src/main.c src/print.c src/stage2.c \
+	src/uart.c
 ASM_SOURCES := arch/arm64/guest.S arch/arm64/start.S arch/arm64/vectors.S
 OBJECTS := $(C_SOURCES:%.c=$(BUILD)/%.o) \
 	$(ASM_SOURCES:%.S=$(BUILD)/%.o)
@@ -58,7 +59,7 @@ smoke-repeat: all
 			scripts/smoke-qemu.sh "$(TARGET).elf" || exit 1; \
 		run=$$((run + 1)); \
 	done; \
-	echo "gicv2-lab: $(SMOKE_RUNS) consecutive H2 smoke runs passed"
+	echo "gicv2-lab: $(SMOKE_RUNS) consecutive H3 smoke runs passed"
 
 clean:
 	rm -rf $(BUILD)

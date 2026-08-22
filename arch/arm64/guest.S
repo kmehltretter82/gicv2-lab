@@ -1,6 +1,7 @@
 /* SPDX-License-Identifier: GPL-2.0-or-later */
 
 #include "gicv2_lab/hvc.h"
+#include "gicv2_lab/gicv2_defs.h"
 #include "gicv2_lab/layout.h"
 
 .section .text.guest_entry, "ax"
@@ -31,6 +32,15 @@ enter_guest:
 .type guest_start, %function
 
 guest_start:
+    adr x2, guest_vectors
+    msr vbar_el1, x2
+    isb
+
+    adr x2, guest_irq_seen
+    str wzr, [x2]
+    adr x2, guest_maintenance_seen
+    str wzr, [x2]
+
     mrs x1, CurrentEL
     mov x0, #HVC_REPORT
     hvc #0
@@ -42,12 +52,118 @@ guest_start:
     mov x1, #HVC_PASS_MAGIC
     hvc #0
 
+    movz x2, #PI400_GICV_BASE_LO
+    movk x2, #PI400_GICV_BASE_HI, lsl #16
+    ldr w3, [x2, #GICV_CTLR]
+    ldr w4, [x2, #GICV_PMR]
+    orr x1, x3, x4, lsl #32
+    mov x0, #HVC_IRQ_READY
+    hvc #0
+
+    msr daifclr, #2
+
+    adr x2, guest_irq_seen
+1:
+    ldr w3, [x2]
+    cbz w3, 1b
+
+    adr x2, guest_maintenance_seen
+2:
+    ldr w3, [x2]
+    cbz w3, 2b
+
+    msr daifset, #2
     mov x0, #HVC_EXIT
     mov x1, xzr
     hvc #0
 
-1:
+3:
     wfe
-    b 1b
+    b 3b
 
 .size guest_start, . - guest_start
+
+.section .guest.vectors, "ax"
+.align 11
+.global guest_vectors
+.type guest_vectors, %function
+
+.macro GUEST_VECTOR number, target
+    sub sp, sp, #32
+    stp x0, x1, [sp, #0]
+    stp x2, x3, [sp, #16]
+    mov x1, #\number
+    b \target
+    .space 108
+.endm
+
+guest_vectors:
+    GUEST_VECTOR 0, guest_unexpected
+    GUEST_VECTOR 1, guest_unexpected
+    GUEST_VECTOR 2, guest_unexpected
+    GUEST_VECTOR 3, guest_unexpected
+    GUEST_VECTOR 4, guest_unexpected
+    GUEST_VECTOR 5, guest_irq_entry
+    GUEST_VECTOR 6, guest_unexpected
+    GUEST_VECTOR 7, guest_unexpected
+    GUEST_VECTOR 8, guest_unexpected
+    GUEST_VECTOR 9, guest_unexpected
+    GUEST_VECTOR 10, guest_unexpected
+    GUEST_VECTOR 11, guest_unexpected
+    GUEST_VECTOR 12, guest_unexpected
+    GUEST_VECTOR 13, guest_unexpected
+    GUEST_VECTOR 14, guest_unexpected
+    GUEST_VECTOR 15, guest_unexpected
+
+guest_irq_entry:
+    movz x2, #PI400_GICV_BASE_LO
+    movk x2, #PI400_GICV_BASE_HI, lsl #16
+    ldr w1, [x2, #GICV_IAR]
+    and w3, w1, #0x3ff
+    cmp w3, #H3_VIRTUAL_INTID
+    b.ne guest_irq_bad
+
+    str w1, [x2, #GICV_EOIR]
+    dsb sy
+
+    adr x2, guest_irq_seen
+    mov w3, #1
+    str w3, [x2]
+    dsb sy
+
+    mov x0, #HVC_IRQ_EOI
+    hvc #0
+
+    ldp x2, x3, [sp, #16]
+    ldp x0, x1, [sp, #0]
+    add sp, sp, #32
+    eret
+
+guest_irq_bad:
+    mov x0, #HVC_FAIL
+    hvc #0
+    b guest_halt
+
+guest_unexpected:
+    mov x0, #HVC_FAIL
+    hvc #0
+
+guest_halt:
+    wfe
+    b guest_halt
+
+.size guest_vectors, . - guest_vectors
+
+.section .guest.data, "aw"
+.align 2
+.global guest_irq_seen
+.type guest_irq_seen, %object
+guest_irq_seen:
+    .word 0
+.size guest_irq_seen, . - guest_irq_seen
+
+.global guest_maintenance_seen
+.type guest_maintenance_seen, %object
+guest_maintenance_seen:
+    .word 0
+.size guest_maintenance_seen, . - guest_maintenance_seen
