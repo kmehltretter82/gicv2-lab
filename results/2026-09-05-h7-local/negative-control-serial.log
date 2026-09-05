@@ -1,0 +1,23 @@
+[gicv2-lab] H7 SPI lifecycle
+GuestCurrentEL=0x0000000000000001
+GICD_TYPER=0x0000000000000008
+GuestGICC_CTLR=0x0000000000000001
+GuestGICC_PMR=0x00000000000000f8
+GuestGICC_BPR=0x0000000000000002
+GuestIAR_initial=0x00000000000003ff
+GuestRPR_initial=0x00000000000000ff
+[gicv2-lab] H7 interface ready
+GuestPending_before_iar=0x0000000000000400
+GuestHPPIR_pending=0x000000000000002a
+[gicv2-lab] H7 SPI pending
+GuestIAR_active=0x000000000000002b
+GuestRPR_active=0x0000000000000040
+GuestActive_after_iar=0x0000000000000400
+[gicv2-lab] H7 SPI active
+GuestRPR_after_eoi=0x00000000000000ff
+GuestActive_after_eoi=0x0000000000000000
+GuestPending_after_eoi=0x0000000000000000
+GuestHPPIR_final=0x00000000000003ff
+GuestIAR_final=0x00000000000003ff
+[gicv2-lab] H7 SPI completed
+[gicv2-lab] H7 PASS

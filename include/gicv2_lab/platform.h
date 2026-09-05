@@ -8,6 +8,7 @@
 #include "gicv2_lab/gicv2_defs.h"
 
 #define PI400_PL011_BASE UINT64_C(0xfe201000)
+#define PI400_PM_BASE    UINT64_C(0xfe100000)
 
 static inline uint32_t mmio_read32(uint64_t address)
 {

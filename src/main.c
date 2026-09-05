@@ -7,6 +7,7 @@
 #include "gicv2_lab/print.h"
 #include "gicv2_lab/stage2.h"
 #include "gicv2_lab/uart.h"
+#include "gicv2_lab/watchdog.h"
 
 extern void enter_guest(uint64_t entry, uint64_t stack)
     __attribute__((noreturn));
@@ -28,6 +29,18 @@ void lab_main(void)
 
     uart_init();
     lab_puts("\n[gicv2-lab] H4i EL2 monitor\n");
+
+    /*
+     * Bound the whole run. On hardware this returns the board to its vendor
+     * kernel after the monitor halts, and bounds a hang; under QEMU the
+     * capture stops at the success marker long before the timeout expires.
+     * Neither line below is a scenario marker or a compared field.
+     */
+#ifndef GICV2_LAB_OMIT_WATCHDOG
+    watchdog_arm(WATCHDOG_MAX_TICKS);
+    lab_puts("[gicv2-lab] watchdog armed for full reset\n");
+    lab_kv_dec("watchdog_ticks_armed", WATCHDOG_MAX_TICKS);
+#endif
 
     current_el = read_currentel() >> 2;
     lab_kv_dec("CurrentEL", (uint32_t)current_el);

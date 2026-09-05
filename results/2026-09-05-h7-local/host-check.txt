@@ -1,0 +1,1 @@
+gicv2-lab H7: SKIP: KVM execution requires Linux arm64; this host is Darwin arm64

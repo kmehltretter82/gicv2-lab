@@ -1,0 +1,32 @@
+{
+  "KVM_execution": "not performed",
+  "archive_audit": {
+    "H6_hardware_attempts": 0,
+    "H6_status": "ready",
+    "H7_raw_traces_revalidated": 20
+  },
+  "host_tests": {
+    "command": [
+      "make",
+      "h5-test",
+      "h6-test",
+      "h7-test"
+    ],
+    "exit_status": 0,
+    "suites": {
+      "H5": 7,
+      "H6": 11,
+      "H7": 10
+    }
+  },
+  "negative_control": "synthetic IAR 43 rejected against required IAR 42",
+  "qemu_runs": 20,
+  "records_per_trace": 22,
+  "shellcheck": {
+    "command": [
+      "shellcheck",
+      "scripts/h6-repeat.sh"
+    ],
+    "exit_status": 0
+  }
+}

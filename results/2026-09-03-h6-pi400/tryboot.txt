@@ -1,0 +1,11 @@
+# gicv2-lab H6: one-shot bare-metal EL2 boot. Replaces config.txt for a
+# single "reboot '0 tryboot'" only; the next reset returns to config.txt
+# and the vendor kernel.
+[pi4]
+arm_boost=1
+[all]
+arm_64bit=1
+enable_uart=1
+dtoverlay=disable-bt
+init_uart_clock=3000000
+kernel=gicv2-lab-h6.bin

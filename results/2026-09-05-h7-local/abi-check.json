@@ -1,0 +1,29 @@
+{
+  "check_command": [
+    "/opt/homebrew/opt/llvm/bin/clang",
+    "--target=aarch64-none-elf",
+    "-ffreestanding",
+    "-fsyntax-only",
+    "-Wall",
+    "-Wextra",
+    "-Werror",
+    "results/2026-09-05-h7-local/kvm-abi-check.i"
+  ],
+  "compiler_version": "Homebrew clang version 22.1.8\nTarget: arm64-apple-darwin23.6.0\nThread model: posix\nInstalledDir: /opt/homebrew/Cellar/llvm/22.1.8/bin\nConfiguration file: /opt/homebrew/Cellar/llvm/22.1.8/etc/clang/arm64-apple-darwin23.cfg\n",
+  "exit_status": 0,
+  "inputs": {
+    "asm/kvm.h": "f67f3f941744a28f9c89d06a58b9d80718738e733e576e63f15ddc637a4d12c8",
+    "asm/ptrace.h": "09bde0cbc485bdda6454de93b88a4ae8b1181371f5194574a8cd7955a957d8bb",
+    "linux/kvm.h": "f00a90477dbdb8386b7bdc30c8378115f5c6b8e429a66303e82c34962fe3b2b9"
+  },
+  "preprocess_command": [
+    "/opt/homebrew/opt/llvm/bin/clang",
+    "--target=aarch64-none-elf",
+    "-ffreestanding",
+    "-isystem",
+    "/Users/kmehltretter/codex/linux-work/build-virtio-reset-v2-arm64/usr/include",
+    "-E",
+    "-P",
+    "h7/kvm_abi_check.c"
+  ]
+}

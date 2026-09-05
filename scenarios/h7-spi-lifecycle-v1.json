@@ -1,0 +1,46 @@
+{
+  "schema": "gicv2-lab.scenario.v1",
+  "id": "h7-spi-lifecycle-v1",
+  "description": "One EL1 vCPU software-pends SPI 42, acknowledges it, and completes combined EOI.",
+  "qemu": {
+    "machine": "virt,gic-version=2,secure=off,virtualization=off",
+    "cpu": "cortex-a72"
+  },
+  "success_marker": "[gicv2-lab] H7 PASS",
+  "failure_substrings": [" FAIL:"],
+  "semantic_markers": [
+    "[gicv2-lab] H7 SPI lifecycle",
+    "[gicv2-lab] H7 interface ready",
+    "[gicv2-lab] H7 SPI pending",
+    "[gicv2-lab] H7 SPI active",
+    "[gicv2-lab] H7 SPI completed",
+    "[gicv2-lab] H7 PASS"
+  ],
+  "fields": {
+    "exact": [
+      "GuestCurrentEL", "GuestGICC_CTLR", "GuestGICC_PMR", "GuestGICC_BPR",
+      "GuestIAR_initial", "GuestRPR_initial", "GuestPending_before_iar",
+      "GuestHPPIR_pending", "GuestIAR_active", "GuestRPR_active",
+      "GuestActive_after_iar", "GuestRPR_after_eoi", "GuestActive_after_eoi",
+      "GuestPending_after_eoi", "GuestHPPIR_final", "GuestIAR_final"
+    ]
+  },
+  "field_rules": [
+    {"key": "GuestCurrentEL", "mode": "allowed", "values": ["1"]},
+    {"key": "GuestGICC_CTLR", "mode": "allowed", "values": ["1"]},
+    {"key": "GuestGICC_PMR", "mode": "allowed", "values": ["0xf8"]},
+    {"key": "GuestGICC_BPR", "mode": "allowed", "values": ["2"]},
+    {"key": "GuestIAR_initial", "mode": "allowed", "values": ["1023"]},
+    {"key": "GuestRPR_initial", "mode": "allowed", "values": ["0xff"]},
+    {"key": "GuestPending_before_iar", "mode": "allowed", "values": ["0x400"]},
+    {"key": "GuestHPPIR_pending", "mode": "allowed", "values": ["42"]},
+    {"key": "GuestIAR_active", "mode": "allowed", "values": ["42"]},
+    {"key": "GuestRPR_active", "mode": "allowed", "values": ["0x40"]},
+    {"key": "GuestActive_after_iar", "mode": "allowed", "values": ["0x400"]},
+    {"key": "GuestRPR_after_eoi", "mode": "allowed", "values": ["0xff"]},
+    {"key": "GuestActive_after_eoi", "mode": "allowed", "values": ["0"]},
+    {"key": "GuestPending_after_eoi", "mode": "allowed", "values": ["0"]},
+    {"key": "GuestHPPIR_final", "mode": "allowed", "values": ["1023"]},
+    {"key": "GuestIAR_final", "mode": "allowed", "values": ["1023"]}
+  ]
+}

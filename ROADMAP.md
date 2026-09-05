@@ -206,7 +206,7 @@ manifest-pinned replay on 2026-08-22. Every normalized repeat trace matched
 run 1. The exact artifacts are retained in
 `results/2026-08-22-h5-qemu-pi4/`.
 
-## H6 — first real Pi 400 boot (later)
+## H6 — first real Pi 400 boot (first boot completed, gate open)
 
 The H1–H4i QEMU prerequisite is satisfied. Physical execution remains opt-in
 and requires the user's explicit request. The first image:
@@ -221,8 +221,75 @@ and requires the user's explicit request. The first image:
 Do not enable SMP, randomized sequences, repeated resets, guest-controlled
 MMIO, or stage-2 fuzzing on that first hardware run.
 
-## H7 — Linux/KVM workload layer
+### First boot (completed 2026-09-03)
 
-First run existing GICv2 KVM unit tests. Then add a small /dev/kvm runner and,
-only when it adds evidence, the minimum guest PSCI, virtual timer, console, and
-device-tree support needed by a Linux guest.
+The unmodified H4i image booted bare metal on a Pi 400 Rev 1.0 (BCM2711,
+GIC-400) through the firmware's one-shot `tryboot`, was handed off at EL2
+(`CurrentEL=2`), and reached `[gicv2-lab] H4i PASS` on the physical GIC-400.
+All six constraints above held; the image booted is the full H4i payload,
+which does more than constraint 5's minimum, chosen so that no source change
+was introduced on the first physical boot and so the ELF hash matched the
+QEMU baseline that H5's provenance gate requires.
+
+The approved BCM2711 watchdog was not armed and remains unused: with a working
+UART a hang is directly observable, so it would have added MMIO outside
+constraint 3 and changed the ELF hash for no evidence gain.
+
+Its serial trace was imported through `h5_runner.py import-trace` and compared
+with a qemu-pi4 capture of the identical ELF. The comparison reported
+`matches: true` over 25 ordered markers and 221 architectural field values,
+with a negative control confirming it was not vacuous. Six raw lines differ,
+all identity or capability registers the scenario excludes by design; two of
+them — the physical `GICC_PMR` priority width and `VTCR_EL2` bit 31 at reset —
+are fork-fidelity observations that have not been qualified for a report. The
+exact revision, hashes, boot configuration, both raw traces, and the
+comparison are preserved in `results/2026-09-03-h6-pi400/`. See
+`docs/H6_PI400_BOOT.md`.
+
+### Repetition (2026-09-03)
+
+Adding the BCM2711 watchdog to the image made unattended repetition possible:
+the monitor halts, the watchdog warm-resets, the one-shot tryboot selection is
+already consumed, and the board returns to its vendor kernel by itself.
+`scripts/h6-repeat.sh` drove 36 consecutive boots, each compared with a frozen
+qemu-pi4 baseline of the identical ELF. All 36 passed, and all 36 trace bodies
+share one SHA-256 at a constant 11481 bytes.
+
+An attempt to extend the run past 36 was invalidated by two concurrent gate
+instances competing for the one serial port, which truncated each other's
+captures; `import-trace` rejected them and those runs were discarded. The
+script now takes an atomic lock to prevent it. Evidence and the full account
+are in `results/2026-09-03-h6-gate-pi400/`.
+
+Exit gate: **open**. The gate is 100 consecutive fresh hardware boots whose
+traces each compare equal to a frozen qemu-pi4 baseline, with no timeout, FAIL
+marker, or provenance rejection. The historical campaign records 36 passing
+comparisons, but its ELF has changed and only its endpoint raw captures were
+archived. Start a fresh campaign with the complete evidence format below.
+
+### Host preparation and capture integrity
+
+`tools/h6_gate.py` now prepares a source/image/QEMU bundle entirely locally,
+verifies its hashes, and archives all evidence. The repetition driver locks
+the board and serial device across output directories, retains every raw
+capture, checks deployed image bytes, and refuses to overwrite, skip, or
+resume after failed/incomplete attempts. Hardware validation of this updated
+driver remains pending. See `docs/H6_PI400_BOOT.md`.
+
+## H7 — Linux/KVM workload layer (implemented; KVM execution pending)
+
+The minimal `/dev/kvm` runner and its separate one-vCPU EL1 SPI lifecycle
+payload are implemented. The same H7 ELF can run under QEMU TCG and KVM's
+VGICv2 device API; the H5 hash gate and comparison format apply unchanged.
+
+Before KVM capture, the runner requires a preserved passing
+`kvm-unit-tests` `gicv2-mmio-up` result under KVM on the same host/kernel.
+That prerequisite and the real KVM capture remain pending while hardware
+execution is deferred. Local mock tests, Linux UAPI compile checks, and QEMU
+execution validate implementation parts but do not close this gate.
+
+Exit gate: the existing KVM test passes, the H7 guest passes under KVM, and
+its preserved trace compares equal to QEMU's trace of the identical ELF.
+See `docs/H7_KVM.md` for the contract and commands. Add guest PSCI, virtual
+timer, console extensions, and a Linux device tree only when a focused Linux
+workload needs them.

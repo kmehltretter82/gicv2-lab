@@ -85,7 +85,50 @@ failure, passing image and emulator, environment, linked-image audit, and
 lossless traces are recorded in
 `results/2026-08-22-h4f-qemu-pi4/manifest.md`.
 
-This remains a fork defect candidate, not an upstream-ready finding. It still
-requires independent reproduction on unmodified current upstream master,
-prior-report research, and manual user validation. No external report or
-patch was sent.
+## Upstream qualification (2026-09-03)
+
+The defect is no longer only a fork candidate: it reproduces on **unmodified
+upstream QEMU**. The frozen H4f ELF
+`ae78b410d9df46fabb567b6001794965f1b96d3f81390f4d5b5328c83e2c0391` was run on
+an unmodified upstream 11.0.2 release binary under `-machine raspi4b`, and
+diverged from the fork at the first source-tag checkpoint:
+
+    fork     GuestHPPIR_both_pending_observed=0x405
+    upstream GuestHPPIR_both_pending_observed=0x005
+
+The difference is exactly `0x400`, CPUID 1 in `GICV_HPPIR[12:10]`. The matching
+List Register is `GICH_LR0=0x22000405`, VirtualID 5 with CPUID 1, so `0x405` is
+the architecturally required value. Upstream then fails this scenario's own
+oracle with `H4f FAIL: invalid initial SGI HPPIR report`.
+
+Upstream's `gic_cpu_read()` serves `GICV_HPPIR` from
+`gic_get_current_pending_irq()`, which returns the bare INTID, while
+`gic_acknowledge_irq()` behind `GICV_IAR` does apply the List Register's CPUID.
+Upstream therefore reports a different source tag through IAR than through
+HPPIR for the same pending virtual SGI.
+
+The code is still present on upstream master `a925240509` (2026-09-02), and no
+upstream commit addresses it; the only commits touching
+`gic_get_current_pending_irq` are `c5619bf9e8` and `7c0fa108d9`, the latter
+concerning the physical interface's grouping.
+
+Full evidence, both raw traces, and the exact backends are preserved in
+`results/2026-09-03-h4f-upstream-qualification/`.
+
+### What is still outstanding
+
+- **Prior-report research is incomplete.** Upstream git history shows no fix. A
+  local archive search of qemu-devel covering 2026-06-24 to 2026-09-03 (20000
+  messages) found no mention of `HPPIR` at all. That window is far shorter than
+  the age of the code, so an older report cannot be ruled out from here.
+  lore's web search is behind Anubis and unusable from scripts; a complete
+  check needs a browser query such as `HPPIR` or `GICV_HPPIR` on
+  `lore.kernel.org/qemu-devel/`.
+- **User review.** Nothing has been sent anywhere, and nothing should be
+  without it.
+- **The fork's fix cannot simply be posted.** `8460833e53` carries an
+  `Assisted-by: OpenAI Codex` trailer. AGENTS.md forbids turning AI-assisted
+  work from this repository into a QEMU upstream patch, and QEMU's
+  code-provenance policy has to be satisfied independently. That constrains the
+  *patch*; whether to file a defect *report* with a reproducer is a separate
+  decision and remains the user's.

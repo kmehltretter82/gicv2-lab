@@ -53,9 +53,43 @@ matched its frozen contract and produced no QEMU bug candidate. H4f's earlier
 fork candidate and its separate pre-fix evidence remain recorded under the
 H4f result directory.
 
-All planned QEMU-only H4 milestones are complete. No physical boot has been
-performed. Hardware execution remains a separate, explicitly approved H6
-step. See ROADMAP.md.
+All planned QEMU-only H4 milestones are complete.
+
+The first physical boot has now been performed. On 2026-09-03 the unmodified
+H4i image booted bare metal on a Pi 400 Rev 1.0 (BCM2711, GIC-400) through the
+firmware's one-shot `tryboot`, was handed off at EL2, and reached
+`[gicv2-lab] H4i PASS` on the physical GIC-400. Its serial trace was imported
+into H5 and compared with a qemu-pi4 capture of the identical ELF: the
+comparison reported `matches: true` across 25 ordered markers and 221
+architectural field values, verified non-vacuous by a negative control. Six
+raw lines differ, all identity or capability registers the scenario excludes
+by design; two are unqualified fork-fidelity observations. Evidence is in
+`results/2026-09-03-h6-pi400/` and the procedure in `docs/H6_PI400_BOOT.md`.
+
+A follow-up run then booted the board 36 consecutive times unattended, each
+trace compared against a frozen qemu-pi4 baseline of the identical ELF: 36/36
+passed, and all 36 trace bodies share one SHA-256 at a constant 11481 bytes.
+That is short of the 100-boot standard the QEMU milestones use, so the H6 exit
+gate remains **open**; see `results/2026-09-03-h6-gate-pi400/`.
+
+Unattended repetition is possible because the image arms the BCM2711 watchdog,
+which warm-resets the halted board back to its vendor kernel.
+
+Further hardware execution stays opt-in and requires an explicit request.
+`tools/h6_gate.py` now prepares and audits a complete source/image/QEMU bundle
+locally. The updated repetition driver retains every raw capture and locks
+the board and serial port across result directories. A fresh hardware gate
+is needed because the historical ELF and archived evidence are incomplete
+for continuation. See ROADMAP.md and docs/H6_PI400_BOOT.md.
+
+The fork has also been compared with unmodified upstream QEMU for the first
+time. On the H4i contract they agree exactly (`matches: true`). On the H4f
+virtual-SGI contract they do not: upstream omits the SGI source CPUID from
+`GICV_HPPIR`, which reproduces a previously fork-only defect candidate on
+unmodified upstream; the responsible code was also found in the inspected
+upstream master revision. See
+`results/2026-09-03-h4f-upstream-qualification/` and
+docs/H4F_MULTI_SOURCE_SGI.md. Nothing has been reported anywhere.
 
 H5's QEMU-only host-tool baseline is complete: it captures raw serial output,
 pins the ELF and scenario hashes, normalizes selected architectural state,
@@ -63,6 +97,11 @@ compares fresh runs, and reduces a mismatch to its first trace prefix. The
 frozen 20-process gate and replay evidence are in
 `results/2026-08-22-h5-qemu-pi4/`. It does not boot hardware. See
 docs/H5_DIFFERENTIAL_RUNNER.md.
+
+H7's minimal Linux arm64 KVM runner is implemented with a separate EL1 SPI
+lifecycle guest that also runs under QEMU TCG. Build and capture bundles pin
+the source, toolchain, image, and traces. Actual KVM execution and its existing
+GICv2 unit-test prerequisite remain pending. See docs/H7_KVM.md.
 
 ## Build
 
@@ -115,7 +154,8 @@ are in docs/H4F_MULTI_SOURCE_SGI.md, LR exhaustion/refill is in
 docs/H4G_LR_REFILL.md, WFI wake is in docs/H4H_WFI_WAKE.md, paused
 virtual-interface context save/restore is in
 docs/H4I_CONTEXT_SAVE_RESTORE.md, and the guest call interface is in
-docs/HVC_ABI.md.
+docs/HVC_ABI.md. Physical Pi 400 boot, its `tryboot` procedure, and the serial
+requirements are in docs/H6_PI400_BOOT.md.
 
 ## H5 differential runner
 
@@ -137,6 +177,17 @@ exact invocation and hashes, normalized trace, and comparisons. The runner
 does not perform a Pi 400 or KVM action; those traces can only be imported
 after the separately approved H6/H7 work. See docs/H5_DIFFERENTIAL_RUNNER.md
 for replay, cross-backend comparison, allowed-outcome rules, and reduction.
+
+## H7 local build and QEMU test
+
+    make h5-test h6-test h7-test
+    make LLVM_BIN=/opt/homebrew/opt/llvm/bin h7-build H7_BUILD=build/h7-frozen
+    make QEMU=/path/to/qemu-system-aarch64 h7-qemu \
+      H7_BUILD=build/h7-frozen H7_OUT=build/h7-qemu-20 H7_RUNS=20
+
+Use a fresh directory for every build and result. These commands build locally
+and run QEMU TCG. The separate KVM workflow and its pending execution gate are
+documented in docs/H7_KVM.md.
 
 ## Repository boundaries
 

@@ -1,0 +1,17 @@
+{
+  "QEMU": "../qemu-rpi4/qemu-pi4/build-pi4-native-fdt/qemu-system-aarch64",
+  "command": [
+    "bash",
+    "scripts/smoke-qemu.sh",
+    "build/2026-09-05-h6-frozen/image/gicv2-lab.elf"
+  ],
+  "exit_status": 0,
+  "image": {
+    "path": "/Users/kmehltretter/codex/linux-work/gicv2-lab/build/2026-09-05-h6-frozen/image/gicv2-lab.elf",
+    "sha256": "e9615fb39589d21eb7eec7d9ff77723b9e670655bceca843fd62887edb2f019c"
+  },
+  "serial": {
+    "path": "/Users/kmehltretter/codex/linux-work/gicv2-lab/results/2026-09-05-h6-local/smoke-serial.log",
+    "sha256": "7383df4cd36912f2b28cad581ae40e1b4a14f25fc0837fd6c38325ae2bc9702b"
+  }
+}

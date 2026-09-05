@@ -1,0 +1,45 @@
+{
+  "differences": [
+    {
+      "allowed": [
+        "0x2a"
+      ],
+      "index": 11,
+      "key": "GuestIAR_active",
+      "kind": "one-sided-forbidden",
+      "left": {
+        "kind": "field",
+        "name": "GuestIAR_active",
+        "seq": 11,
+        "value": "0x2a"
+      },
+      "right": {
+        "kind": "field",
+        "name": "GuestIAR_active",
+        "seq": 11,
+        "value": "0x2b"
+      }
+    }
+  ],
+  "left": {
+    "backend": "qemu-tcg",
+    "image_sha256": "0b25bfcc1d42d71a459c41ad1fce0570a78953f3bf8a6d9cb993146c290a1207",
+    "raw_trace_sha256": "e04072f9ad1240bb4699abc4b9103a65c1a633d07e72d4d6387b4960142aefa9",
+    "scenario_id": "h7-spi-lifecycle-v1",
+    "scenario_sha256": "d7ba750715b723a0b23693fd40f2720f5521226a77df078f372b5803db572ec1"
+  },
+  "matches": false,
+  "right": {
+    "backend": "synthetic-negative-control",
+    "image_sha256": "0b25bfcc1d42d71a459c41ad1fce0570a78953f3bf8a6d9cb993146c290a1207",
+    "raw_trace_sha256": "c95f2adbbe262813f87ef63a5304fec01c05e385cdb2a4559b53b0af944d20a4",
+    "scenario_id": "h7-spi-lifecycle-v1",
+    "scenario_sha256": "d7ba750715b723a0b23693fd40f2720f5521226a77df078f372b5803db572ec1"
+  },
+  "runner_version": "1",
+  "scenario": {
+    "id": "h7-spi-lifecycle-v1",
+    "sha256": "d7ba750715b723a0b23693fd40f2720f5521226a77df078f372b5803db572ec1"
+  },
+  "schema": "gicv2-lab.comparison.v1"
+}

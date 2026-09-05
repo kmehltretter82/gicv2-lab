@@ -1,0 +1,21 @@
+{
+  "backend": "pi400",
+  "backend_id": "pi400-64-gic400-tryboot-20260903",
+  "image": {
+    "path": "/Users/kmehltretter/codex/linux-work/gicv2-lab/build/gicv2-lab.elf",
+    "sha256": "0bef6082deb828d5b423bc5e081965f05bfa601eaced8dc853bee554541ddec2"
+  },
+  "runner_version": "1",
+  "scenario_path": "/Users/kmehltretter/codex/linux-work/gicv2-lab/scenarios/h4i-context-save-restore-v1.json",
+  "scenario_sha256": "54e8d2ad32f29350a15d6159c2e026e854cefc3222d32b5732efb8284ce3e2e9",
+  "schema": "gicv2-lab.run.v1",
+  "serial": {
+    "path": "/Users/kmehltretter/codex/linux-work/gicv2-lab/build/h5/h6-pi400/serial.log",
+    "sha256": "ad074e7278cf064e6cadfadae57a0a03fe494b01c656e6e61121dfc73529431f"
+  },
+  "source_serial": {
+    "path": "/private/tmp/claude-501/-Users-kmehltretter-codex-linux-work-gicv2-lab/19777f9b-b078-4a9a-9bc0-8e3bc6cffd4e/scratchpad/h6-boot-2.log",
+    "sha256": "ad074e7278cf064e6cadfadae57a0a03fe494b01c656e6e61121dfc73529431f"
+  },
+  "status": "imported"
+}

@@ -1,0 +1,24 @@
+{
+  "differences": [],
+  "left": {
+    "backend": "qemu-tcg",
+    "image_sha256": "e9ad4ca1e831e659ff8e06cf8035d69c3d5fdc6b21db7577ad7f33989756595a",
+    "raw_trace_sha256": "ecf96261e7a9e7ed5c553bdbed0d4f7f56b78637a89db12df9e8bd166fabf457",
+    "scenario_id": "h4i-context-save-restore-raspi4b-v1",
+    "scenario_sha256": "58546037161cafacc7866dda3c28e9357b3a4028614db1efb6ae13bda6c12e24"
+  },
+  "matches": true,
+  "right": {
+    "backend": "qemu-tcg",
+    "image_sha256": "e9ad4ca1e831e659ff8e06cf8035d69c3d5fdc6b21db7577ad7f33989756595a",
+    "raw_trace_sha256": "12592d1e7e50d3348367bb3c13b42518e6517a72647462a07a9a078752257cb9",
+    "scenario_id": "h4i-context-save-restore-raspi4b-v1",
+    "scenario_sha256": "58546037161cafacc7866dda3c28e9357b3a4028614db1efb6ae13bda6c12e24"
+  },
+  "runner_version": "1",
+  "scenario": {
+    "id": "h4i-context-save-restore-raspi4b-v1",
+    "sha256": "58546037161cafacc7866dda3c28e9357b3a4028614db1efb6ae13bda6c12e24"
+  },
+  "schema": "gicv2-lab.comparison.v1"
+}

@@ -1,0 +1,148 @@
+{
+  "raw_trace": {
+    "path": "/Users/kmehltretter/codex/linux-work/gicv2-lab/results/2026-09-05-h7-local/negative-control-serial.log",
+    "sha256": "c95f2adbbe262813f87ef63a5304fec01c05e385cdb2a4559b53b0af944d20a4"
+  },
+  "records": [
+    {
+      "kind": "marker",
+      "name": "[gicv2-lab] H7 SPI lifecycle",
+      "seq": 0
+    },
+    {
+      "kind": "field",
+      "name": "GuestCurrentEL",
+      "seq": 1,
+      "value": "0x1"
+    },
+    {
+      "kind": "field",
+      "name": "GuestGICC_CTLR",
+      "seq": 2,
+      "value": "0x1"
+    },
+    {
+      "kind": "field",
+      "name": "GuestGICC_PMR",
+      "seq": 3,
+      "value": "0xf8"
+    },
+    {
+      "kind": "field",
+      "name": "GuestGICC_BPR",
+      "seq": 4,
+      "value": "0x2"
+    },
+    {
+      "kind": "field",
+      "name": "GuestIAR_initial",
+      "seq": 5,
+      "value": "0x3ff"
+    },
+    {
+      "kind": "field",
+      "name": "GuestRPR_initial",
+      "seq": 6,
+      "value": "0xff"
+    },
+    {
+      "kind": "marker",
+      "name": "[gicv2-lab] H7 interface ready",
+      "seq": 7
+    },
+    {
+      "kind": "field",
+      "name": "GuestPending_before_iar",
+      "seq": 8,
+      "value": "0x400"
+    },
+    {
+      "kind": "field",
+      "name": "GuestHPPIR_pending",
+      "seq": 9,
+      "value": "0x2a"
+    },
+    {
+      "kind": "marker",
+      "name": "[gicv2-lab] H7 SPI pending",
+      "seq": 10
+    },
+    {
+      "kind": "field",
+      "name": "GuestIAR_active",
+      "seq": 11,
+      "value": "0x2b"
+    },
+    {
+      "kind": "field",
+      "name": "GuestRPR_active",
+      "seq": 12,
+      "value": "0x40"
+    },
+    {
+      "kind": "field",
+      "name": "GuestActive_after_iar",
+      "seq": 13,
+      "value": "0x400"
+    },
+    {
+      "kind": "marker",
+      "name": "[gicv2-lab] H7 SPI active",
+      "seq": 14
+    },
+    {
+      "kind": "field",
+      "name": "GuestRPR_after_eoi",
+      "seq": 15,
+      "value": "0xff"
+    },
+    {
+      "kind": "field",
+      "name": "GuestActive_after_eoi",
+      "seq": 16,
+      "value": "0x0"
+    },
+    {
+      "kind": "field",
+      "name": "GuestPending_after_eoi",
+      "seq": 17,
+      "value": "0x0"
+    },
+    {
+      "kind": "field",
+      "name": "GuestHPPIR_final",
+      "seq": 18,
+      "value": "0x3ff"
+    },
+    {
+      "kind": "field",
+      "name": "GuestIAR_final",
+      "seq": 19,
+      "value": "0x3ff"
+    },
+    {
+      "kind": "marker",
+      "name": "[gicv2-lab] H7 SPI completed",
+      "seq": 20
+    },
+    {
+      "kind": "marker",
+      "name": "[gicv2-lab] H7 PASS",
+      "seq": 21
+    }
+  ],
+  "run": {
+    "backend": "synthetic-negative-control",
+    "image": {
+      "path": "/Users/kmehltretter/codex/linux-work/gicv2-lab/build/2026-09-05-h7-qemu-20/bundle/guest.elf",
+      "sha256": "0b25bfcc1d42d71a459c41ad1fce0570a78953f3bf8a6d9cb993146c290a1207"
+    },
+    "synthetic": true
+  },
+  "runner_version": "1",
+  "scenario": {
+    "id": "h7-spi-lifecycle-v1",
+    "sha256": "d7ba750715b723a0b23693fd40f2720f5521226a77df078f372b5803db572ec1"
+  },
+  "schema": "gicv2-lab.trace.v1"
+}

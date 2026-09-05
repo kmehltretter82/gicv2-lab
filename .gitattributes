@@ -1,0 +1,2 @@
+# Preserve lossless serial evidence, including captured CRLF line endings.
+results/**/*.log -text whitespace=cr-at-eol

@@ -1,0 +1,143 @@
+{
+  "schema": "gicv2-lab.scenario.v1",
+  "id": "h4i-context-save-restore-raspi4b-v1",
+  "description": "H4i paused virtual-interface context save and restore on the raspi4b machine. Identical semantic contract to h4i-context-save-restore-v1; the machine is raspi4b rather than raspi400 so that the same invocation runs on both the qemu-pi4 fork and unmodified upstream QEMU, which has no raspi400 machine. Used for fork-versus-upstream differential comparison.",
+  "qemu": {
+    "machine": "raspi4b",
+    "cpu": "cortex-a72,has_el3=off"
+  },
+  "success_marker": "[gicv2-lab] H4i PASS",
+  "failure_substrings": [
+    " FAIL:",
+    "unexpected physical IRQ"
+  ],
+  "semantic_markers": [
+    "[gicv2-lab] H4i EL2 monitor",
+    "[gicv2-lab] deliberate BRK",
+    "[gicv2-lab] expected EL2 BRK",
+    "[gicv2-lab] H1 PASS",
+    "[gicv2-lab] entering EL1 guest",
+    "[gicv2-lab] EL1 guest report",
+    "[gicv2-lab] expected stage-2 translation fault",
+    "[gicv2-lab] EL1 guest resumed after stage-2 fault",
+    "[gicv2-lab] H2 PASS",
+    "[gicv2-lab] EL1 virtual interface ready",
+    "[gicv2-lab] low-priority virtual IRQ pending",
+    "[gicv2-lab] low-priority virtual IRQ active",
+    "[gicv2-lab] active-pending context saved",
+    "[gicv2-lab] virtual interface disabled first",
+    "[gicv2-lab] quiescent context installed",
+    "[gicv2-lab] saved payload restored while disabled",
+    "[gicv2-lab] saved context restored with HCR last",
+    "[gicv2-lab] restored high-priority IRQ active",
+    "[gicv2-lab] high-priority IRQ priority dropped",
+    "[gicv2-lab] high-priority IRQ deactivated",
+    "[gicv2-lab] low-priority handler resumed",
+    "[gicv2-lab] low-priority IRQ priority dropped",
+    "[gicv2-lab] low-priority IRQ deactivated",
+    "[gicv2-lab] restored context LRs cleared",
+    "[gicv2-lab] H4i PASS"
+  ],
+  "fields": {
+    "exact": [
+      "CurrentEL",
+      "GuestCurrentEL",
+      "stage2_fsc",
+      "GICH_HCR_enabled",
+      "GICH_VMCR_enabled",
+      "GuestGICV_CTLR",
+      "GuestGICV_PMR",
+      "GuestGICV_BPR"
+    ],
+    "initial": {
+      "prefixes": [
+        "GICH_MISR",
+        "GICH_EISR0",
+        "GICH_EISR1",
+        "GICH_ELRSR0",
+        "GICH_ELRSR1",
+        "GICH_APR",
+        "GICH_LR0",
+        "GICH_LR1",
+        "GICH_LR2",
+        "GICH_LR3"
+      ],
+      "suffixes": [
+        "initial"
+      ]
+    },
+    "snapshot": {
+      "prefixes": [
+        "GICH_HCR",
+        "GICH_VMCR",
+        "GICH_MISR",
+        "GICH_EISR0",
+        "GICH_EISR1",
+        "GICH_ELRSR0",
+        "GICH_ELRSR1",
+        "GICH_APR",
+        "GICH_LR0",
+        "GICH_LR1",
+        "GICH_LR2",
+        "GICH_LR3"
+      ],
+      "suffixes": [
+        "low_pending",
+        "low_active",
+        "context_saved",
+        "context_disabled",
+        "context_quiescent",
+        "context_restored_disabled",
+        "context_restored",
+        "both_active",
+        "high_drop",
+        "high_deactivated",
+        "low_resumed",
+        "low_drop",
+        "all_deactivated",
+        "cleared"
+      ]
+    },
+    "context": {
+      "prefixes": [
+        "SavedContext_HCR",
+        "SavedContext_VMCR",
+        "SavedContext_APR",
+        "SavedContext_LR0",
+        "SavedContext_LR1",
+        "SavedContext_LR2",
+        "SavedContext_LR3"
+      ],
+      "suffixes": [
+        "context_saved"
+      ]
+    },
+    "guest_state": {
+      "prefixes": [
+        "GuestIAR",
+        "GuestRPR",
+        "GuestHPPIR",
+        "GuestIRQState"
+      ],
+      "suffixes": [
+        "low_active",
+        "high_active",
+        "high_drop",
+        "high_deactivated",
+        "low_resumed",
+        "low_drop",
+        "low_deactivated"
+      ]
+    }
+  },
+  "field_rules": [
+    {
+      "key": "GICH_VMCR_context_quiescent",
+      "mode": "allowed",
+      "values": [
+        "0x4c0000"
+      ],
+      "reason": "The scenario requires the architectural minimum BPR and ABPR readback implied by its discovered priority width; expand this set only with a cited architectural alternative."
+    }
+  ]
+}
