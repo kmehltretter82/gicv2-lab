@@ -1,0 +1,6 @@
+[
+  "scp",
+  "-p",
+  "karl@192.168.1.15:/home/karl/gicv2-lab-20260905-hardware/h7-kvm-evidence.tar.gz",
+  "results/2026-09-05-h7-pi400-kvm"
+]

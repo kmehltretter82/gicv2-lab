@@ -1,0 +1,9 @@
+{
+  "operation": "lossless gzip-to-xz recompression; the complete tar byte stream is unchanged",
+  "downloaded_archive_sha256": "ce48f0d1e41870e664c527e5847cf00197d08f2e08306ed923f438a3b7541c52",
+  "stored_archive_sha256": "2e61e57da54bee594df7504d3b5fd0d7841e1cc9a9622f38ef8485c55b0dd7e2",
+  "uncompressed_tar_sha256": "51d46abdaa798380af593d858ab34d2a8dd90fbb798cfaab5fb22b84fc296a79",
+  "downloaded_bytes": 22709065,
+  "stored_bytes": 844040,
+  "identical_uncompressed_stream_verified": true
+}

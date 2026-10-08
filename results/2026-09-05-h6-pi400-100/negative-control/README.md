@@ -1,0 +1,1 @@
+This is a synthetic local copy of hardware run 001 with only CurrentEL changed from 2 to 3. It was never executed on the Pi. The H5 comparator rejected it; the original hardware trace remains unchanged in the campaign.

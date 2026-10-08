@@ -179,11 +179,40 @@ class H7Test(unittest.TestCase):
             h7.require_prerequisite(self.directory)
 
     def test_scenario_rejects_shared_forbidden_values(self):
-        scenario = h5.load_scenario(ROOT / "scenarios/h7-spi-lifecycle-v1.json")
-        fields = [h5.field_record(i, name, rule["values"][0])
-                  for i, (name, rule) in enumerate(scenario["rules"].items())]
-        fields[0]["value"] = "0x2"  # EL2 is forbidden even if both traces agree.
-        self.assertEqual(h5.compare_records(scenario, fields, fields)[0]["kind"], "forbidden-outcome")
+        for scenario_id, _ in h7.WORKLOADS.values():
+            scenario = h5.load_scenario(ROOT / ("scenarios/" + scenario_id + ".json"))
+            self.assertEqual(set(scenario["rules"]), scenario["expected_keys"])
+            fields = [h5.field_record(i, name, rule["values"][0])
+                      for i, (name, rule) in enumerate(scenario["rules"].items())]
+            self.assertEqual(h5.compare_records(scenario, fields, fields), [])
+            for field in fields:
+                with self.subTest(scenario=scenario_id, field=field["name"]):
+                    allowed = field["value"]
+                    field["value"] = hex(int(allowed, 0) + 1)
+                    differences = h5.compare_records(scenario, fields, fields)
+                    self.assertEqual(differences[0]["kind"], "forbidden-outcome")
+                    field["value"] = allowed
+
+    def test_bundle_workload_binding_and_legacy_compatibility(self):
+        scenario_path = self.directory / "scenario.json"
+        manifest_path = self.directory / "build.json"
+        for workload, (scenario_id, _) in h7.WORKLOADS.items():
+            scenario_path.write_bytes((ROOT / ("scenarios/" + scenario_id + ".json")).read_bytes())
+            manifest = {"schema": h7.BUILD_SCHEMA, "workload": workload,
+                        "artifacts": {p.name: h5.sha256_file(p) for p in (self.image, scenario_path)}}
+            h5.write_json(manifest_path, manifest, replace=True)
+            self.assertEqual(h7.verify_bundle(self.directory)["workload"], workload)
+            del manifest["workload"]
+            h5.write_json(manifest_path, manifest, replace=True)
+            if workload == "spi-lifecycle":
+                self.assertEqual(h7.verify_bundle(self.directory)["workload"], workload)
+            else:
+                with self.assertRaisesRegex(h5.H5Error, "does not match"):
+                    h7.verify_bundle(self.directory)
+            manifest["workload"] = "unregistered"
+            h5.write_json(manifest_path, manifest, replace=True)
+            with self.assertRaisesRegex(h5.H5Error, "unsupported fixed workload"):
+                h7.verify_bundle(self.directory)
 
     def test_capture_timeout_preserves_image_command_and_partial_serial(self):
         bundle = self.directory / "bundle"

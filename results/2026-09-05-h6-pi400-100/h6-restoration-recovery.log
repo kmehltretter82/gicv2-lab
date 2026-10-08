@@ -1,0 +1,13 @@
+/boot/firmware/config.txt: OK
+/boot/firmware/tryboot.txt: OK
+pi400-64
+Linux pi400-64 6.18.39+rpt-rpi-v8 #1 SMP PREEMPT Debian 1:6.18.39-1+rpt1 (2026-07-29) aarch64 GNU/Linux
+lo               UNKNOWN        127.0.0.1/8 ::1/128 
+eth0             DOWN           
+wlan0            UP             192.168.1.15/24 2a02:3100:a4eb:3001:8a3:5452:c47a:e8b2/64 fe80::4d5:1a9d:a4e:4f7c/64 
+ 09:00:33 up 1 min,  1 user,  load average: 0.71, 0.38, 0.15
+14: ip    pn | hi // GPIO14 = input
+15: ip    pu | hi // GPIO15 = input
+throttled=0x0
+temp=39.9'C
+Sat Sep  5 07:00:33 UTC 2026

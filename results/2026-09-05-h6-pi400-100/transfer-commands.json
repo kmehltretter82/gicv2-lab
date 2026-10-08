@@ -1,0 +1,10 @@
+[
+  [
+    "scp",
+    "-p",
+    "results/2026-09-05-h7-local/qemu-campaign.tar.gz",
+    "build/2026-09-05-h6-frozen/image/gicv2-lab.bin",
+    "build/2026-09-05-pi400-hardware/session/tryboot-h6.txt",
+    "karl@192.168.1.15:/home/karl/gicv2-lab-20260905-hardware/"
+  ]
+]

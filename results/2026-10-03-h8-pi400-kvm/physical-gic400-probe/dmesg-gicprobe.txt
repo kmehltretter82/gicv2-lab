@@ -1,0 +1,109 @@
+[ 6717.184367] gicprobe: loading out-of-tree module taints kernel.
+[ 6717.185061] gicprobe: GICD_IIDR=0200143b GICC_IIDR=0202143b GICD_TYPER=0000fc67 GICD_CTLR=00000001
+[ 6717.185100] gicprobe: mode=level intid=255 cpu_if_mask=02 GICC_CTLR=00000261 GICC_PMR=f0 result=0
+[ 6717.185106] gicprobe: level prio_readback=0x40
+[ 6717.185110] gicprobe: level icfgr_bit=0x0
+[ 6717.185113] gicprobe: level pend_initial=0x0
+[ 6717.185116] gicprobe: level act_initial=0x0
+[ 6717.185119] gicprobe: level pend_after_set=0x1
+[ 6717.185122] gicprobe: level act_after_set=0x0
+[ 6717.185124] gicprobe: level hppir_pending=0xff
+[ 6717.185127] gicprobe: level iar=0xff
+[ 6717.185130] gicprobe: level rpr_active=0x40
+[ 6717.185133] gicprobe: level PEND_AFTER_IAR=0x0
+[ 6717.185135] gicprobe: level act_after_iar=0x1
+[ 6717.185138] gicprobe: level rpr_after_eoir=0xff
+[ 6717.185141] gicprobe: level pend_after_eoir=0x0
+[ 6717.185144] gicprobe: level act_after_eoir=0x1
+[ 6717.185146] gicprobe: level hppir_after_eoir=0x3ff
+[ 6717.185149] gicprobe: level PEND_AFTER_DIR=0x0
+[ 6717.185152] gicprobe: level act_after_dir=0x0
+[ 6717.185154] gicprobe: level hppir_after_dir=0x3ff
+[ 6717.185157] gicprobe: level pend_final=0x0
+[ 6717.185160] gicprobe: level act_final=0x0
+[ 6717.185198] gicprobe: mode=level-repend intid=255 cpu_if_mask=02 GICC_CTLR=00000261 GICC_PMR=f0 result=0
+[ 6717.185203] gicprobe: level-repend prio_readback=0x40
+[ 6717.185206] gicprobe: level-repend icfgr_bit=0x0
+[ 6717.185209] gicprobe: level-repend pend_initial=0x0
+[ 6717.185211] gicprobe: level-repend act_initial=0x0
+[ 6717.185214] gicprobe: level-repend pend_after_set=0x1
+[ 6717.185217] gicprobe: level-repend act_after_set=0x0
+[ 6717.185219] gicprobe: level-repend hppir_pending=0xff
+[ 6717.185222] gicprobe: level-repend iar=0xff
+[ 6717.185225] gicprobe: level-repend rpr_active=0x40
+[ 6717.185228] gicprobe: level-repend PEND_AFTER_IAR=0x0
+[ 6717.185230] gicprobe: level-repend act_after_iar=0x1
+[ 6717.185233] gicprobe: level-repend pend_after_repend=0x1
+[ 6717.185236] gicprobe: level-repend act_after_repend=0x1
+[ 6717.185239] gicprobe: level-repend hppir_after_repend=0x3ff
+[ 6717.185242] gicprobe: level-repend rpr_after_eoir=0xff
+[ 6717.185244] gicprobe: level-repend pend_after_eoir=0x1
+[ 6717.185247] gicprobe: level-repend act_after_eoir=0x1
+[ 6717.185250] gicprobe: level-repend hppir_after_eoir=0x3ff
+[ 6717.185253] gicprobe: level-repend PEND_AFTER_DIR=0x1
+[ 6717.185255] gicprobe: level-repend act_after_dir=0x0
+[ 6717.185258] gicprobe: level-repend hppir_after_dir=0xff
+[ 6717.185261] gicprobe: level-repend iar_second=0xff
+[ 6717.185264] gicprobe: level-repend pend_after_iar2=0x0
+[ 6717.185266] gicprobe: level-repend act_after_iar2=0x1
+[ 6717.185269] gicprobe: level-repend pend_after_dir2=0x0
+[ 6717.185272] gicprobe: level-repend act_after_dir2=0x0
+[ 6717.185274] gicprobe: level-repend hppir_after_dir2=0x3ff
+[ 6717.185277] gicprobe: level-repend pend_final=0x0
+[ 6717.185280] gicprobe: level-repend act_final=0x0
+[ 6717.185311] gicprobe: mode=edge intid=255 cpu_if_mask=02 GICC_CTLR=00000261 GICC_PMR=f0 result=0
+[ 6717.185315] gicprobe: edge prio_readback=0x40
+[ 6717.185318] gicprobe: edge icfgr_bit=0x1
+[ 6717.185321] gicprobe: edge pend_initial=0x0
+[ 6717.185324] gicprobe: edge act_initial=0x0
+[ 6717.185326] gicprobe: edge pend_after_set=0x1
+[ 6717.185329] gicprobe: edge act_after_set=0x0
+[ 6717.185332] gicprobe: edge hppir_pending=0xff
+[ 6717.185335] gicprobe: edge iar=0xff
+[ 6717.185337] gicprobe: edge rpr_active=0x40
+[ 6717.185340] gicprobe: edge PEND_AFTER_IAR=0x0
+[ 6717.185343] gicprobe: edge act_after_iar=0x1
+[ 6717.185345] gicprobe: edge rpr_after_eoir=0xff
+[ 6717.185348] gicprobe: edge pend_after_eoir=0x0
+[ 6717.185351] gicprobe: edge act_after_eoir=0x1
+[ 6717.185353] gicprobe: edge hppir_after_eoir=0x3ff
+[ 6717.185356] gicprobe: edge PEND_AFTER_DIR=0x0
+[ 6717.185359] gicprobe: edge act_after_dir=0x0
+[ 6717.185362] gicprobe: edge hppir_after_dir=0x3ff
+[ 6717.185364] gicprobe: edge pend_final=0x0
+[ 6717.185367] gicprobe: edge act_final=0x0
+[ 6717.185405] gicprobe: mode=edge-repend intid=255 cpu_if_mask=02 GICC_CTLR=00000261 GICC_PMR=f0 result=0
+[ 6717.185409] gicprobe: edge-repend prio_readback=0x40
+[ 6717.185412] gicprobe: edge-repend icfgr_bit=0x1
+[ 6717.185415] gicprobe: edge-repend pend_initial=0x0
+[ 6717.185417] gicprobe: edge-repend act_initial=0x0
+[ 6717.185420] gicprobe: edge-repend pend_after_set=0x1
+[ 6717.185423] gicprobe: edge-repend act_after_set=0x0
+[ 6717.185425] gicprobe: edge-repend hppir_pending=0xff
+[ 6717.185428] gicprobe: edge-repend iar=0xff
+[ 6717.185431] gicprobe: edge-repend rpr_active=0x40
+[ 6717.185434] gicprobe: edge-repend PEND_AFTER_IAR=0x0
+[ 6717.185436] gicprobe: edge-repend act_after_iar=0x1
+[ 6717.185439] gicprobe: edge-repend pend_after_repend=0x1
+[ 6717.185442] gicprobe: edge-repend act_after_repend=0x1
+[ 6717.185444] gicprobe: edge-repend hppir_after_repend=0x3ff
+[ 6717.185447] gicprobe: edge-repend rpr_after_eoir=0xff
+[ 6717.185450] gicprobe: edge-repend pend_after_eoir=0x1
+[ 6717.185453] gicprobe: edge-repend act_after_eoir=0x1
+[ 6717.185456] gicprobe: edge-repend hppir_after_eoir=0x3ff
+[ 6717.185458] gicprobe: edge-repend PEND_AFTER_DIR=0x1
+[ 6717.185461] gicprobe: edge-repend act_after_dir=0x0
+[ 6717.185464] gicprobe: edge-repend hppir_after_dir=0xff
+[ 6717.185467] gicprobe: edge-repend iar_second=0xff
+[ 6717.185469] gicprobe: edge-repend pend_after_iar2=0x0
+[ 6717.185472] gicprobe: edge-repend act_after_iar2=0x1
+[ 6717.185475] gicprobe: edge-repend pend_after_dir2=0x0
+[ 6717.185478] gicprobe: edge-repend act_after_dir2=0x0
+[ 6717.185480] gicprobe: edge-repend hppir_after_dir2=0x3ff
+[ 6717.185483] gicprobe: edge-repend pend_final=0x0
+[ 6717.185486] gicprobe: edge-repend act_final=0x0
+[ 6717.185488] gicprobe: done
+
+Linux pi400-64 6.18.39+rpt-rpi-v8 #1 SMP PREEMPT Debian 1:6.18.39-1+rpt1 (2026-07-29) aarch64 GNU/Linux
+ae56e4c5f77b8a5eceee26d3620c7fae9b4dde4bba6857aeefcd8e2526b3256f  /home/karl/gicprobe/gicprobe.ko
+bac10af8448ca3f10a6aa1e0cf605fd5456bf2c39caf897ec96accbe27f91a2e  /home/karl/gicprobe/gicprobe.c

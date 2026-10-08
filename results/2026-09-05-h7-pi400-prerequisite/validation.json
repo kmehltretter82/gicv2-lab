@@ -1,0 +1,15 @@
+{
+  "status": "pass",
+  "test": "gicv2-mmio-up",
+  "accelerator": "kvm",
+  "tests_passed": 17,
+  "wrapper_exit_status": 0,
+  "host": "pi400-64",
+  "kernel": "6.18.39+rpt-rpi-v8",
+  "source_commit": "f20b0b8d3373ab489ef3ed9f2ebdf6839bcddd9c",
+  "gic_flat_sha256": "021e8bcaae20f7484d5ec4d5f6106b37ec679f373cd43c37ed34a49d061034fa",
+  "archive_sha256": "53fff2c2fa9c6ae61445d46a51815b75dc24b7de8a6f0d3a39b1fcaa680a76f8",
+  "archive_files_verified": true,
+  "h7_guest_run": false,
+  "h6_boot_run": false
+}

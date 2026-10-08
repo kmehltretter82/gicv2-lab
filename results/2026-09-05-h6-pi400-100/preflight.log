@@ -1,0 +1,67 @@
+Sat Sep  5 05:13:01 UTC 2026
+pi400-64
+Linux pi400-64 6.18.39+rpt-rpi-v8 #1 SMP PREEMPT Debian 1:6.18.39-1+rpt1 (2026-07-29) aarch64 GNU/Linux
+processor	: 0
+BogoMIPS	: 108.00
+Features	: fp asimd evtstrm crc32 cpuid
+CPU implementer	: 0x41
+CPU architecture: 8
+CPU variant	: 0x0
+CPU part	: 0xd08
+CPU revision	: 3
+
+processor	: 1
+BogoMIPS	: 108.00
+Features	: fp asimd evtstrm crc32 cpuid
+CPU implementer	: 0x41
+CPU architecture: 8
+CPU variant	: 0x0
+CPU part	: 0xd08
+CPU revision	: 3
+
+processor	: 2
+BogoMIPS	: 108.00
+Features	: fp asimd evtstrm crc32 cpuid
+CPU implementer	: 0x41
+CPU architecture: 8
+CPU variant	: 0x0
+CPU part	: 0xd08
+CPU revision	: 3
+
+processor	: 3
+BogoMIPS	: 108.00
+Features	: fp asimd evtstrm crc32 cpuid
+CPU implementer	: 0x41
+CPU architecture: 8
+CPU variant	: 0x0
+CPU part	: 0xd08
+CPU revision	: 3
+
+Revision	: c03130
+Serial		: 10000000f6a94abc
+Model		: Raspberry Pi 400 Rev 1.0
+lo               UNKNOWN        127.0.0.1/8 ::1/128 
+eth0             DOWN           
+wlan0            UP             192.168.1.15/24 2a02:3100:a4f2:6901:3ede:5a4d:e8b6:9f15/64 2a02:3100:a4eb:3001:8a3:5452:c47a:e8b2/64 fe80::4d5:1a9d:a4e:4f7c/64 
+ 07:13:01 up  4:09,  1 user,  load average: 0.00, 0.00, 0.00
+uid=1000(karl) gid=1000(karl) groups=1000(karl),4(adm),20(dialout),24(cdrom),27(sudo),29(audio),44(video),46(plugdev),60(games),100(users),102(netdev),986(gpio),988(i2c),989(spi),992(render),996(input)
+crw-rw---- 1 root kvm 10, 232 Sep  5 03:02 /dev/kvm
+Python 3.13.5
+gcc (Debian 14.2.0-19) 14.2.0
+Copyright (C) 2024 Free Software Foundation, Inc.
+This is free software; see the source for copying conditions.  There is NO
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+QEMU emulator version 10.0.11 (Debian 1:10.0.11+ds-0+deb13u1)
+Copyright (c) 2003-2025 Fabrice Bellard and the QEMU Project developers
+14: ip    pn | hi // GPIO14 = input
+15: ip    pu | hi // GPIO15 = input
+May 21 2026 11:20:25 
+Copyright (c) 2012 Broadcom
+version 288930ab4712b99596f32732664aaaeb881ef1e0 (clean) (release) (start)
+throttled=0x0
+temp=35.5'C
+Filesystem      Size  Used Avail Use% Mounted on
+/dev/mmcblk0p2   15G   13G  638M  96% /
+/dev/mmcblk0p1  505M  268M  238M  53% /boot/firmware
+sudo: a password is required

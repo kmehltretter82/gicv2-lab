@@ -123,7 +123,7 @@ while test "$(date +%s)" -lt "$deadline"; do
         require_line 'stage2_gicv_dir_desc=0x00400000ff8477c7'
         require_line 'VTCR_EL2_enabled=0x0000000080003560'
         require_line 'HCR_EL2_enabled=0x0000000080000011'
-        require_line 'GICC_PMR_enabled=0x00000000000000ff'
+        require_line 'GICC_PMR_enabled=0x00000000000000f0'
         require_line 'GICD_ISENABLER0_enabled=0x000000000000ffff'
         require_line 'GICH_HCR_enabled=0x0000000000000001'
         require_line 'GICH_VMCR_enabled=0x00000000f85c0201'

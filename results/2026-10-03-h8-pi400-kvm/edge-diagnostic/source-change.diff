@@ -1,0 +1,4 @@
+1c1
+<     guest_write32(GUEST_GICD + 0xc08, 0); /* Level; no external line is asserted. */
+---
+>     guest_write32(GUEST_GICD + 0xc08, 0xaaaaaaaa); /* DIAGNOSTIC: edge-triggered variant. */

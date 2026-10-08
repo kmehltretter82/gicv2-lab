@@ -1,0 +1,146 @@
+observe 7.3.0-rc3-p13rtguardfinal-00511-gd4e2f1e3e415 split-eoi run 1 rc=2 sha=72111d76c58eca71
+observe 7.3.0-rc3-p13rtguardfinal-00511-gd4e2f1e3e415 split-eoi run 2 rc=2 sha=72111d76c58eca71
+observe 7.3.0-rc3-p13rtguardfinal-00511-gd4e2f1e3e415 split-eoi run 3 rc=2 sha=72111d76c58eca71
+observe 7.3.0-rc3-p13rtguardfinal-00511-gd4e2f1e3e415 split-eoi run 4 rc=2 sha=72111d76c58eca71
+observe 7.3.0-rc3-p13rtguardfinal-00511-gd4e2f1e3e415 split-eoi run 5 rc=2 sha=72111d76c58eca71
+--- split-eoi (7.3.0-rc3-p13rtguardfinal-00511-gd4e2f1e3e415) run-001 full serial
+[gicv2-lab] H8a begin
+GuestCurrentEL=0x0000000000000001
+GuestDAIF=0x00000000000003c0
+GuestSCTLR_MCI=0x0000000000000000
+GICD_TYPER=0x0000000000000001
+GuestGICC_CTLR=0x0000000000000201
+GuestGICC_PMR=0x00000000000000f8
+GuestGICC_BPR=0x0000000000000002
+GuestIAR_initial=0x00000000000003ff
+GuestRPR_initial=0x00000000000000ff
+GuestPending_initial=0x0000000000000000
+GuestActive_initial=0x0000000000000000
+[gicv2-lab] H8a interface ready
+GuestPending_before_iar=0x0000000000000400
+GuestHPPIR_pending=0x000000000000002a
+[gicv2-lab] H8a pending
+GuestIAR_active=0x000000000000002a
+GuestRPR_active=0x0000000000000040
+GuestActive_after_iar=0x0000000000000400
+GuestPending_after_iar=0x0000000000000400
+MISMATCH_expected=0x0000000000000000
+[gicv2-lab] H8a active
+GuestRPR_after_eoir=0x00000000000000ff
+GuestActive_after_eoir=0x0000000000000400
+GuestPending_after_eoir=0x0000000000000400
+MISMATCH_expected=0x0000000000000000
+GuestIAR_before_dir=0x00000000000003ff
+[gicv2-lab] H8a priority dropped
+GuestActive_after_dir=0x0000000000000000
+[gicv2-lab] H8a deactivated
+GuestRPR_final=0x00000000000000ff
+GuestActive_final=0x0000000000000000
+GuestPending_final=0x0000000000000000
+GuestHPPIR_final=0x00000000000003ff
+GuestIAR_final=0x00000000000003ff
+[gicv2-lab] H8a OBSERVE-END
+observe 7.3.0-rc3-p13rtguardfinal-00511-gd4e2f1e3e415 priority run 1 rc=2 sha=d8764c2c34af76d9
+observe 7.3.0-rc3-p13rtguardfinal-00511-gd4e2f1e3e415 priority run 2 rc=2 sha=d8764c2c34af76d9
+observe 7.3.0-rc3-p13rtguardfinal-00511-gd4e2f1e3e415 priority run 3 rc=2 sha=d8764c2c34af76d9
+observe 7.3.0-rc3-p13rtguardfinal-00511-gd4e2f1e3e415 priority run 4 rc=2 sha=d8764c2c34af76d9
+observe 7.3.0-rc3-p13rtguardfinal-00511-gd4e2f1e3e415 priority run 5 rc=2 sha=d8764c2c34af76d9
+--- priority (7.3.0-rc3-p13rtguardfinal-00511-gd4e2f1e3e415) run-001 full serial
+[gicv2-lab] H8b begin
+GuestCurrentEL=0x0000000000000001
+GuestDAIF=0x00000000000003c0
+GuestSCTLR_MCI=0x0000000000000000
+GICD_TYPER=0x0000000000000001
+GuestGICC_CTLR=0x0000000000000001
+GuestGICC_PMR=0x00000000000000f8
+GuestGICC_BPR=0x0000000000000002
+GuestIAR_initial=0x00000000000003ff
+GuestRPR_initial=0x00000000000000ff
+GuestPending_initial=0x0000000000000000
+GuestActive_initial=0x0000000000000000
+[gicv2-lab] H8b interface ready
+GuestPMR_masked=0x0000000000000080
+GuestPending_masked=0x0000000000000400
+GuestIAR_masked=0x00000000000003ff
+GuestRPR_masked=0x00000000000000ff
+GuestActive_masked=0x0000000000000000
+[gicv2-lab] H8b priority masked
+GuestIAR_low=0x000000000000002a
+GuestRPR_low=0x0000000000000080
+GuestActive_low=0x0000000000000400
+[gicv2-lab] H8b low active
+GuestPending_high=0x0000000000000c00
+MISMATCH_expected=0x0000000000000800
+GuestIAR_high=0x000000000000002b
+GuestRPR_both=0x0000000000000020
+GuestActive_both=0x0000000000000c00
+[gicv2-lab] H8b both active
+GuestRPR_after_high_eoi=0x0000000000000080
+GuestActive_after_high_eoi=0x0000000000000400
+[gicv2-lab] H8b high completed
+[gicv2-lab] H8b low completed
+GuestRPR_final=0x00000000000000ff
+GuestActive_final=0x0000000000000000
+GuestPending_final=0x0000000000000000
+GuestHPPIR_final=0x00000000000003ff
+GuestIAR_final=0x00000000000003ff
+[gicv2-lab] H8b OBSERVE-END
+observe 7.3.0-rc3-p13rtguardfinal-00511-gd4e2f1e3e415 redelivery run 1 rc=2 sha=206a9e89438e618e
+observe 7.3.0-rc3-p13rtguardfinal-00511-gd4e2f1e3e415 redelivery run 2 rc=2 sha=206a9e89438e618e
+observe 7.3.0-rc3-p13rtguardfinal-00511-gd4e2f1e3e415 redelivery run 3 rc=2 sha=206a9e89438e618e
+observe 7.3.0-rc3-p13rtguardfinal-00511-gd4e2f1e3e415 redelivery run 4 rc=2 sha=206a9e89438e618e
+observe 7.3.0-rc3-p13rtguardfinal-00511-gd4e2f1e3e415 redelivery run 5 rc=2 sha=206a9e89438e618e
+--- redelivery (7.3.0-rc3-p13rtguardfinal-00511-gd4e2f1e3e415) run-001 full serial
+[gicv2-lab] H8c begin
+GuestCurrentEL=0x0000000000000001
+GuestDAIF=0x00000000000003c0
+GuestSCTLR_MCI=0x0000000000000000
+GICD_TYPER=0x0000000000000001
+GuestGICC_CTLR=0x0000000000000201
+GuestGICC_PMR=0x00000000000000f8
+GuestGICC_BPR=0x0000000000000002
+GuestIAR_initial=0x00000000000003ff
+GuestRPR_initial=0x00000000000000ff
+GuestPending_initial=0x0000000000000000
+GuestActive_initial=0x0000000000000000
+[gicv2-lab] H8c interface ready
+GuestIAR_first=0x000000000000002a
+GuestRPR_first=0x0000000000000040
+GuestActive_first=0x0000000000000400
+GuestPending_first=0x0000000000000400
+MISMATCH_expected=0x0000000000000000
+[gicv2-lab] H8c first active
+GuestPending_repend=0x0000000000000400
+GuestActive_repend=0x0000000000000400
+GuestHPPIR_repend=0x00000000000003ff
+[gicv2-lab] H8c active and pending
+GuestRPR_after_first_eoir=0x00000000000000ff
+GuestActive_after_first_eoir=0x0000000000000400
+GuestPending_after_first_eoir=0x0000000000000400
+GuestIAR_before_first_dir=0x00000000000003ff
+[gicv2-lab] H8c first priority dropped
+GuestActive_after_first_dir=0x0000000000000000
+GuestPending_after_first_dir=0x0000000000000000
+MISMATCH_expected=0x0000000000000400
+GuestHPPIR_after_first_dir=0x00000000000003ff
+MISMATCH_expected=0x000000000000002a
+[gicv2-lab] H8c eligible again
+GuestIAR_second=0x00000000000003ff
+MISMATCH_expected=0x000000000000002a
+GuestRPR_second=0x00000000000000ff
+MISMATCH_expected=0x0000000000000040
+GuestActive_second=0x0000000000000000
+MISMATCH_expected=0x0000000000000400
+GuestPending_second=0x0000000000000000
+[gicv2-lab] H8c second active
+GuestRPR_after_second_eoir=0x00000000000000ff
+GuestActive_after_second_eoir=0x0000000000000000
+MISMATCH_expected=0x0000000000000400
+[gicv2-lab] H8c second deactivated
+GuestRPR_final=0x00000000000000ff
+GuestActive_final=0x0000000000000000
+GuestPending_final=0x0000000000000000
+GuestHPPIR_final=0x00000000000003ff
+GuestIAR_final=0x00000000000003ff
+[gicv2-lab] H8c OBSERVE-END
+8510a21a28e502bc16e21b494ee04df737b38f52387228dad887cd5431722b1d  h8-observe-kvm-7.3.0-rc3-p13rtguardfinal-00511-gd4e2f1e3e415.tar.xz

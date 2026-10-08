@@ -1,0 +1,4 @@
+{
+  "marker-order": "marker out of order at /Users/kmehltretter/codex/linux-work/gicv2-lab/results/2026-09-05-h8-local/split-eoi/negative-controls/marker-order/serial.log:13: got '[gicv2-lab] H8a pending', expected '[gicv2-lab] H8a interface ready'",
+  "truncated": "trace /Users/kmehltretter/codex/linux-work/gicv2-lab/results/2026-09-05-h8-local/split-eoi/negative-controls/truncated/serial.log ended before semantic marker '[gicv2-lab] H8a PASS'"
+}

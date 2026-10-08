@@ -1,0 +1,162 @@
+SUPERSEDED on 2026-10-03 by the patch series in
+linux-work/kvm-vgic-level-pending-series-20261003/ (fix, selftest, cover
+letter). Kept for the record only.
+
+DRAFT - not sent. For Karl's review.
+
+Open before sending:
+  - Re-run on an unmodified mainline kernel. The newer of the two kernels
+    tested is 7.3-rc3 plus three unrelated locking/mm patches.
+  - Decide whether to attach a kvm-unit-tests case instead of the
+    guest sequence below.
+  - The runs were driven by the assistant, not by you. Re-run at least
+    one sequence yourself and fill in the last paragraph.
+  - The Zephyr test was run (zephyr-kvm/results-20261003). The statement
+    about the TTC counter driver is from source reading only.
+  - Ask in a browser for an all-lists lore search. Only kvmarm back to
+    November 2017 was searched (ISPENDR, pending_latch, "soft pending").
+
+To: kvmarm@lists.linux.dev
+Cc: Marc Zyngier <maz@kernel.org>
+Cc: Oliver Upton <oliver.upton@linux.dev>
+Cc: linux-arm-kernel@lists.infradead.org
+Subject: KVM: arm64: vgic-v2: GICD_ISPENDR on an active level-sensitive SPI differs from a GIC-400
+
+Hi,
+
+a GICv2 guest that sets a level-sensitive SPI pending through
+GICD_ISPENDR sees two things under KVM that a physical GIC-400 does not
+do. Both follow from how the vgic handles pending_latch for level
+interrupts. Linux as a guest is not affected, because check_irq_resend()
+never retriggers a level interrupt.
+
+Zephyr can do it. k_irq_set_pending() writes GICD_ISPENDR with no
+check of the trigger type. A Zephyr application that connects SPI 118
+as level-sensitive, pends it with k_irq_set_pending() and pends it
+again from the handler gets one handler run under KVM and two on a
+software GICv2:
+
+                                        level SPI   edge SPI
+  QEMU 11.0.2 TCG, virt, gic-version=2   2 runs      2 runs    5/5
+  KVM on the Pi 400, 6.18.39 vendor      1 run       2 runs    5/5
+
+Both rows ran the same ELF (Zephyr d65f1e67ae74, qemu_cortex_a53 with
+a GICv2 devicetree overlay). In the KVM row k_irq_is_pending() also
+returns true at handler entry. In tree, the Xilinx TTC counter driver
+calls k_irq_set_pending() for a late alarm on an interrupt it connects
+as level-sensitive, and alarm callbacks run from that interrupt's
+handler. I have not run that driver.
+
+Setup in the guest: one vCPU, GICv2, SPI 42 configured level-sensitive
+in GICD_ICFGR, enabled, priority 0x40, GICC_PMR 0xf8, GICC_CTLR 0x201
+(EOImode set). Nothing drives the SPI's input line. DAIF stays masked
+and the guest polls GICC_IAR.
+
+1. The pending bit stays set after the acknowledge
+
+   write GICD_ISPENDR1 bit 10
+   read  GICC_IAR            -> 42
+   read  GICD_ISPENDR1       -> bit 10 set under KVM, clear on GIC-400
+   write GICC_EOIR 42
+   read  GICD_ISPENDR1       -> bit 10 set under KVM, clear on GIC-400
+   write GICC_DIR 42
+   read  GICD_ISPENDR1       -> clear on both
+
+2. A second write while the interrupt is active is lost
+
+   write GICD_ISPENDR1 bit 10
+   read  GICC_IAR            -> 42
+   write GICD_ISPENDR1 bit 10
+   write GICC_EOIR 42
+   write GICC_DIR 42
+   read  GICD_ISPENDR1       -> clear under KVM, set on GIC-400
+   read  GICC_HPPIR          -> 1023 under KVM, 42 on GIC-400
+   read  GICC_IAR            -> 1023 under KVM, 42 on GIC-400
+
+With SPI 42 configured edge-triggered KVM gives the GIC-400 result in
+both sequences.
+
+IHI 0048B.b describes the GIC-400 result. Table 4-11 says a write of 1
+to GICD_ISPENDR for a level-sensitive interrupt changes it to "active
+and pending if it was previously active". Figure 4-10 shows the latch
+set by that write being cleared by a write to GICD_ICPENDR or by a read
+of GICC_IAR that acknowledges the interrupt.
+
+In the code, as of 50d05c7c76c9:
+
+  - vgic_v2_populate_lr() clears pending_latch only for edge interrupts.
+    __read_pending() returns irq_is_pending(), so the bit reads as set
+    while the level interrupt is active. This is result 1.
+
+  - vgic_v2_compute_lr() does not allow pending and active together for
+    a level interrupt. That is 67b5b673ad4d ("KVM: arm/arm64: vgic:
+    Disallow Active+Pending for level interrupts").
+
+  - vgic_v2_fold_lr() clears pending_latch for a level interrupt once
+    the LR has no state left ("Clear soft pending state when level irqs
+    have been acked"). The latch was never cleared at the acknowledge,
+    so this cannot tell the first write from a second one made while
+    the interrupt was active. This is result 2.
+
+Both results date from 67b5b673ad4d. Before it, the fold cleared
+pending_latch for a level interrupt as soon as the LR had no pending
+bit, which is the state right after the acknowledge. A latch written
+while the interrupt was active went into the LR as pending and active.
+The commit changed the fold condition from !(val & GICH_LR_PENDING_BIT)
+to !(val & GICH_LR_STATE) and stopped putting pending and active into
+one LR for level interrupts.
+
+67b5b673ad4d describes the pending and active state as an optimisation
+for level interrupts. That holds when the input line is the source,
+because the line is sampled again after the deactivation. It does not
+hold for the latch, which nothing samples again.
+
+Tested on a Raspberry Pi 400 (BCM2711, GIC-400), nVHE:
+
+                                     sequence 1      sequence 2
+  6.18.39+rpt-rpi-v8 (vendor)        differs 20/20   differs 5/5
+  7.3.0-rc3 + 3 unrelated patches    differs 10/10   differs 5/5
+  same kernels, edge-triggered       matches         matches
+
+Sequence 1 has more runs because the first guests stop at the first
+unexpected value. Sequence 2 comes from a build that records every
+value and continues.
+
+The 7.3-rc3 kernel is PREEMPT_RT with three locking and mm patches on
+top. None of them touches arch/arm64/kvm. I have not yet run an
+unmodified mainline kernel.
+
+The GIC-400 column comes from the same board. A small module ran both
+sequences on an unused SPI from the host, with local interrupts masked
+on one CPU, in the Non-secure view Linux has. QEMU's GICv2 model (TCG,
+11.0.2) gives the GIC-400 result as well.
+
+Not tested:
+
+  - GICv3. vgic-v3.c has the same three pieces of logic. The board has
+    no GICv3. IHI 0069H.b differs from the GICv2 text on result 1.
+    Section 4.5 makes it IMPLEMENTATION DEFINED whether acknowledging a
+    level-sensitive interrupt that was set pending through
+    GICD_ISPENDR<n> clears the pending state. Result 2 is not left open
+    there. The GICD_ISPENDR<n> and GICR_ISPENDR0 descriptions say a
+    write changes an active interrupt to active and pending. With a
+    latch that survives the acknowledge the interrupt would stay
+    pending after the deactivation. KVM clears it at that point.
+  - A level-sensitive SPI whose line is also asserted by a device or by
+    userspace.
+  - PPIs.
+
+The existing tests do not cover this. kvm-unit-tests gicv2-ipi,
+gicv2-mmio, gicv2-mmio-up, gicv2-mmio-3p and gicv2-active pass on the
+7.3-rc3 kernel. The vgic_irq selftest writes ISPENDR for level
+interrupts but does not read it back after the acknowledge and does not
+write it again while the interrupt is active.
+
+Is this the intended behaviour for a level interrupt pended through
+ISPENDR? If not, I can send a kvm-unit-tests case for both sequences.
+
+The guests, the probe module and the runs on the board were done with
+an AI coding assistant.
+[Karl: say here what you checked or re-ran yourself before sending.]
+
+Karl

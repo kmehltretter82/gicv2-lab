@@ -1,0 +1,1486 @@
+{
+  "raw_trace": {
+    "path": "/Users/kmehltretter/codex/linux-work/gicv2-lab/results/2026-09-05-h6-pi400-100/negative-control/h5/serial.log",
+    "sha256": "1b46cf7eefa28ca1e9dfb5097022d84efb98da7938bee91b84bc2243b99ca1ac"
+  },
+  "records": [
+    {
+      "kind": "marker",
+      "name": "[gicv2-lab] H4i EL2 monitor",
+      "seq": 0
+    },
+    {
+      "kind": "field",
+      "name": "CurrentEL",
+      "seq": 1,
+      "value": "0x3"
+    },
+    {
+      "kind": "marker",
+      "name": "[gicv2-lab] deliberate BRK",
+      "seq": 2
+    },
+    {
+      "kind": "marker",
+      "name": "[gicv2-lab] expected EL2 BRK",
+      "seq": 3
+    },
+    {
+      "kind": "marker",
+      "name": "[gicv2-lab] H1 PASS",
+      "seq": 4
+    },
+    {
+      "kind": "field",
+      "name": "GICH_HCR_enabled",
+      "seq": 5,
+      "value": "0x1"
+    },
+    {
+      "kind": "field",
+      "name": "GICH_VMCR_enabled",
+      "seq": 6,
+      "value": "0xf85c0201"
+    },
+    {
+      "kind": "field",
+      "name": "GICH_MISR_initial",
+      "seq": 7,
+      "value": "0x0"
+    },
+    {
+      "kind": "field",
+      "name": "GICH_EISR0_initial",
+      "seq": 8,
+      "value": "0x0"
+    },
+    {
+      "kind": "field",
+      "name": "GICH_EISR1_initial",
+      "seq": 9,
+      "value": "0x0"
+    },
+    {
+      "kind": "field",
+      "name": "GICH_ELRSR0_initial",
+      "seq": 10,
+      "value": "0xf"
+    },
+    {
+      "kind": "field",
+      "name": "GICH_ELRSR1_initial",
+      "seq": 11,
+      "value": "0x0"
+    },
+    {
+      "kind": "field",
+      "name": "GICH_APR_initial",
+      "seq": 12,
+      "value": "0x0"
+    },
+    {
+      "kind": "field",
+      "name": "GICH_LR0_initial",
+      "seq": 13,
+      "value": "0x0"
+    },
+    {
+      "kind": "field",
+      "name": "GICH_LR1_initial",
+      "seq": 14,
+      "value": "0x0"
+    },
+    {
+      "kind": "field",
+      "name": "GICH_LR2_initial",
+      "seq": 15,
+      "value": "0x0"
+    },
+    {
+      "kind": "field",
+      "name": "GICH_LR3_initial",
+      "seq": 16,
+      "value": "0x0"
+    },
+    {
+      "kind": "marker",
+      "name": "[gicv2-lab] entering EL1 guest",
+      "seq": 17
+    },
+    {
+      "kind": "marker",
+      "name": "[gicv2-lab] EL1 guest report",
+      "seq": 18
+    },
+    {
+      "kind": "field",
+      "name": "GuestCurrentEL",
+      "seq": 19,
+      "value": "0x1"
+    },
+    {
+      "kind": "marker",
+      "name": "[gicv2-lab] expected stage-2 translation fault",
+      "seq": 20
+    },
+    {
+      "kind": "field",
+      "name": "stage2_fsc",
+      "seq": 21,
+      "value": "0x6"
+    },
+    {
+      "kind": "marker",
+      "name": "[gicv2-lab] EL1 guest resumed after stage-2 fault",
+      "seq": 22
+    },
+    {
+      "kind": "marker",
+      "name": "[gicv2-lab] H2 PASS",
+      "seq": 23
+    },
+    {
+      "kind": "marker",
+      "name": "[gicv2-lab] EL1 virtual interface ready",
+      "seq": 24
+    },
+    {
+      "kind": "field",
+      "name": "GuestGICV_CTLR",
+      "seq": 25,
+      "value": "0x201"
+    },
+    {
+      "kind": "field",
+      "name": "GuestGICV_PMR",
+      "seq": 26,
+      "value": "0xf8"
+    },
+    {
+      "kind": "field",
+      "name": "GuestGICV_BPR",
+      "seq": 27,
+      "value": "0x2"
+    },
+    {
+      "kind": "marker",
+      "name": "[gicv2-lab] low-priority virtual IRQ pending",
+      "seq": 28
+    },
+    {
+      "kind": "field",
+      "name": "GICH_HCR_low_pending",
+      "seq": 29,
+      "value": "0x1"
+    },
+    {
+      "kind": "field",
+      "name": "GICH_VMCR_low_pending",
+      "seq": 30,
+      "value": "0xf85c0201"
+    },
+    {
+      "kind": "field",
+      "name": "GICH_MISR_low_pending",
+      "seq": 31,
+      "value": "0x0"
+    },
+    {
+      "kind": "field",
+      "name": "GICH_EISR0_low_pending",
+      "seq": 32,
+      "value": "0x0"
+    },
+    {
+      "kind": "field",
+      "name": "GICH_EISR1_low_pending",
+      "seq": 33,
+      "value": "0x0"
+    },
+    {
+      "kind": "field",
+      "name": "GICH_ELRSR0_low_pending",
+      "seq": 34,
+      "value": "0xe"
+    },
+    {
+      "kind": "field",
+      "name": "GICH_ELRSR1_low_pending",
+      "seq": 35,
+      "value": "0x0"
+    },
+    {
+      "kind": "field",
+      "name": "GICH_APR_low_pending",
+      "seq": 36,
+      "value": "0x0"
+    },
+    {
+      "kind": "field",
+      "name": "GICH_LR0_low_pending",
+      "seq": 37,
+      "value": "0x18000032"
+    },
+    {
+      "kind": "field",
+      "name": "GICH_LR1_low_pending",
+      "seq": 38,
+      "value": "0x0"
+    },
+    {
+      "kind": "field",
+      "name": "GICH_LR2_low_pending",
+      "seq": 39,
+      "value": "0x0"
+    },
+    {
+      "kind": "field",
+      "name": "GICH_LR3_low_pending",
+      "seq": 40,
+      "value": "0x0"
+    },
+    {
+      "kind": "marker",
+      "name": "[gicv2-lab] low-priority virtual IRQ active",
+      "seq": 41
+    },
+    {
+      "kind": "field",
+      "name": "GuestIAR_low_active",
+      "seq": 42,
+      "value": "0x32"
+    },
+    {
+      "kind": "field",
+      "name": "GuestRPR_low_active",
+      "seq": 43,
+      "value": "0x80"
+    },
+    {
+      "kind": "field",
+      "name": "GuestHPPIR_low_active",
+      "seq": 44,
+      "value": "0x3ff"
+    },
+    {
+      "kind": "field",
+      "name": "GuestIRQState_low_active",
+      "seq": 45,
+      "value": "0x3ff8000000032"
+    },
+    {
+      "kind": "field",
+      "name": "GICH_HCR_low_active",
+      "seq": 46,
+      "value": "0x1"
+    },
+    {
+      "kind": "field",
+      "name": "GICH_VMCR_low_active",
+      "seq": 47,
+      "value": "0xf85c0201"
+    },
+    {
+      "kind": "field",
+      "name": "GICH_MISR_low_active",
+      "seq": 48,
+      "value": "0x0"
+    },
+    {
+      "kind": "field",
+      "name": "GICH_EISR0_low_active",
+      "seq": 49,
+      "value": "0x0"
+    },
+    {
+      "kind": "field",
+      "name": "GICH_EISR1_low_active",
+      "seq": 50,
+      "value": "0x0"
+    },
+    {
+      "kind": "field",
+      "name": "GICH_ELRSR0_low_active",
+      "seq": 51,
+      "value": "0xe"
+    },
+    {
+      "kind": "field",
+      "name": "GICH_ELRSR1_low_active",
+      "seq": 52,
+      "value": "0x0"
+    },
+    {
+      "kind": "field",
+      "name": "GICH_APR_low_active",
+      "seq": 53,
+      "value": "0x10000"
+    },
+    {
+      "kind": "field",
+      "name": "GICH_LR0_low_active",
+      "seq": 54,
+      "value": "0x28000032"
+    },
+    {
+      "kind": "field",
+      "name": "GICH_LR1_low_active",
+      "seq": 55,
+      "value": "0x0"
+    },
+    {
+      "kind": "field",
+      "name": "GICH_LR2_low_active",
+      "seq": 56,
+      "value": "0x0"
+    },
+    {
+      "kind": "field",
+      "name": "GICH_LR3_low_active",
+      "seq": 57,
+      "value": "0x0"
+    },
+    {
+      "kind": "marker",
+      "name": "[gicv2-lab] active-pending context saved",
+      "seq": 58
+    },
+    {
+      "kind": "field",
+      "name": "GICH_HCR_context_saved",
+      "seq": 59,
+      "value": "0x1"
+    },
+    {
+      "kind": "field",
+      "name": "GICH_VMCR_context_saved",
+      "seq": 60,
+      "value": "0xf85c0201"
+    },
+    {
+      "kind": "field",
+      "name": "GICH_MISR_context_saved",
+      "seq": 61,
+      "value": "0x0"
+    },
+    {
+      "kind": "field",
+      "name": "GICH_EISR0_context_saved",
+      "seq": 62,
+      "value": "0x0"
+    },
+    {
+      "kind": "field",
+      "name": "GICH_EISR1_context_saved",
+      "seq": 63,
+      "value": "0x0"
+    },
+    {
+      "kind": "field",
+      "name": "GICH_ELRSR0_context_saved",
+      "seq": 64,
+      "value": "0xc"
+    },
+    {
+      "kind": "field",
+      "name": "GICH_ELRSR1_context_saved",
+      "seq": 65,
+      "value": "0x0"
+    },
+    {
+      "kind": "field",
+      "name": "GICH_APR_context_saved",
+      "seq": 66,
+      "value": "0x10000"
+    },
+    {
+      "kind": "field",
+      "name": "GICH_LR0_context_saved",
+      "seq": 67,
+      "value": "0x28000032"
+    },
+    {
+      "kind": "field",
+      "name": "GICH_LR1_context_saved",
+      "seq": 68,
+      "value": "0x12000033"
+    },
+    {
+      "kind": "field",
+      "name": "GICH_LR2_context_saved",
+      "seq": 69,
+      "value": "0x0"
+    },
+    {
+      "kind": "field",
+      "name": "GICH_LR3_context_saved",
+      "seq": 70,
+      "value": "0x0"
+    },
+    {
+      "kind": "field",
+      "name": "SavedContext_HCR_context_saved",
+      "seq": 71,
+      "value": "0x1"
+    },
+    {
+      "kind": "field",
+      "name": "SavedContext_VMCR_context_saved",
+      "seq": 72,
+      "value": "0xf85c0201"
+    },
+    {
+      "kind": "field",
+      "name": "SavedContext_APR_context_saved",
+      "seq": 73,
+      "value": "0x10000"
+    },
+    {
+      "kind": "field",
+      "name": "SavedContext_LR0_context_saved",
+      "seq": 74,
+      "value": "0x28000032"
+    },
+    {
+      "kind": "field",
+      "name": "SavedContext_LR1_context_saved",
+      "seq": 75,
+      "value": "0x12000033"
+    },
+    {
+      "kind": "field",
+      "name": "SavedContext_LR2_context_saved",
+      "seq": 76,
+      "value": "0x0"
+    },
+    {
+      "kind": "field",
+      "name": "SavedContext_LR3_context_saved",
+      "seq": 77,
+      "value": "0x0"
+    },
+    {
+      "kind": "marker",
+      "name": "[gicv2-lab] virtual interface disabled first",
+      "seq": 78
+    },
+    {
+      "kind": "field",
+      "name": "GICH_HCR_context_disabled",
+      "seq": 79,
+      "value": "0x0"
+    },
+    {
+      "kind": "field",
+      "name": "GICH_VMCR_context_disabled",
+      "seq": 80,
+      "value": "0xf85c0201"
+    },
+    {
+      "kind": "field",
+      "name": "GICH_MISR_context_disabled",
+      "seq": 81,
+      "value": "0x0"
+    },
+    {
+      "kind": "field",
+      "name": "GICH_EISR0_context_disabled",
+      "seq": 82,
+      "value": "0x0"
+    },
+    {
+      "kind": "field",
+      "name": "GICH_EISR1_context_disabled",
+      "seq": 83,
+      "value": "0x0"
+    },
+    {
+      "kind": "field",
+      "name": "GICH_ELRSR0_context_disabled",
+      "seq": 84,
+      "value": "0xc"
+    },
+    {
+      "kind": "field",
+      "name": "GICH_ELRSR1_context_disabled",
+      "seq": 85,
+      "value": "0x0"
+    },
+    {
+      "kind": "field",
+      "name": "GICH_APR_context_disabled",
+      "seq": 86,
+      "value": "0x10000"
+    },
+    {
+      "kind": "field",
+      "name": "GICH_LR0_context_disabled",
+      "seq": 87,
+      "value": "0x28000032"
+    },
+    {
+      "kind": "field",
+      "name": "GICH_LR1_context_disabled",
+      "seq": 88,
+      "value": "0x12000033"
+    },
+    {
+      "kind": "field",
+      "name": "GICH_LR2_context_disabled",
+      "seq": 89,
+      "value": "0x0"
+    },
+    {
+      "kind": "field",
+      "name": "GICH_LR3_context_disabled",
+      "seq": 90,
+      "value": "0x0"
+    },
+    {
+      "kind": "marker",
+      "name": "[gicv2-lab] quiescent context installed",
+      "seq": 91
+    },
+    {
+      "kind": "field",
+      "name": "GICH_HCR_context_quiescent",
+      "seq": 92,
+      "value": "0x0"
+    },
+    {
+      "kind": "field",
+      "name": "GICH_VMCR_context_quiescent",
+      "seq": 93,
+      "value": "0x4c0000"
+    },
+    {
+      "kind": "field",
+      "name": "GICH_MISR_context_quiescent",
+      "seq": 94,
+      "value": "0x0"
+    },
+    {
+      "kind": "field",
+      "name": "GICH_EISR0_context_quiescent",
+      "seq": 95,
+      "value": "0x0"
+    },
+    {
+      "kind": "field",
+      "name": "GICH_EISR1_context_quiescent",
+      "seq": 96,
+      "value": "0x0"
+    },
+    {
+      "kind": "field",
+      "name": "GICH_ELRSR0_context_quiescent",
+      "seq": 97,
+      "value": "0xf"
+    },
+    {
+      "kind": "field",
+      "name": "GICH_ELRSR1_context_quiescent",
+      "seq": 98,
+      "value": "0x0"
+    },
+    {
+      "kind": "field",
+      "name": "GICH_APR_context_quiescent",
+      "seq": 99,
+      "value": "0x0"
+    },
+    {
+      "kind": "field",
+      "name": "GICH_LR0_context_quiescent",
+      "seq": 100,
+      "value": "0x0"
+    },
+    {
+      "kind": "field",
+      "name": "GICH_LR1_context_quiescent",
+      "seq": 101,
+      "value": "0x0"
+    },
+    {
+      "kind": "field",
+      "name": "GICH_LR2_context_quiescent",
+      "seq": 102,
+      "value": "0x0"
+    },
+    {
+      "kind": "field",
+      "name": "GICH_LR3_context_quiescent",
+      "seq": 103,
+      "value": "0x0"
+    },
+    {
+      "kind": "marker",
+      "name": "[gicv2-lab] saved payload restored while disabled",
+      "seq": 104
+    },
+    {
+      "kind": "field",
+      "name": "GICH_HCR_context_restored_disabled",
+      "seq": 105,
+      "value": "0x0"
+    },
+    {
+      "kind": "field",
+      "name": "GICH_VMCR_context_restored_disabled",
+      "seq": 106,
+      "value": "0xf85c0201"
+    },
+    {
+      "kind": "field",
+      "name": "GICH_MISR_context_restored_disabled",
+      "seq": 107,
+      "value": "0x0"
+    },
+    {
+      "kind": "field",
+      "name": "GICH_EISR0_context_restored_disabled",
+      "seq": 108,
+      "value": "0x0"
+    },
+    {
+      "kind": "field",
+      "name": "GICH_EISR1_context_restored_disabled",
+      "seq": 109,
+      "value": "0x0"
+    },
+    {
+      "kind": "field",
+      "name": "GICH_ELRSR0_context_restored_disabled",
+      "seq": 110,
+      "value": "0xc"
+    },
+    {
+      "kind": "field",
+      "name": "GICH_ELRSR1_context_restored_disabled",
+      "seq": 111,
+      "value": "0x0"
+    },
+    {
+      "kind": "field",
+      "name": "GICH_APR_context_restored_disabled",
+      "seq": 112,
+      "value": "0x10000"
+    },
+    {
+      "kind": "field",
+      "name": "GICH_LR0_context_restored_disabled",
+      "seq": 113,
+      "value": "0x28000032"
+    },
+    {
+      "kind": "field",
+      "name": "GICH_LR1_context_restored_disabled",
+      "seq": 114,
+      "value": "0x12000033"
+    },
+    {
+      "kind": "field",
+      "name": "GICH_LR2_context_restored_disabled",
+      "seq": 115,
+      "value": "0x0"
+    },
+    {
+      "kind": "field",
+      "name": "GICH_LR3_context_restored_disabled",
+      "seq": 116,
+      "value": "0x0"
+    },
+    {
+      "kind": "marker",
+      "name": "[gicv2-lab] saved context restored with HCR last",
+      "seq": 117
+    },
+    {
+      "kind": "field",
+      "name": "GICH_HCR_context_restored",
+      "seq": 118,
+      "value": "0x1"
+    },
+    {
+      "kind": "field",
+      "name": "GICH_VMCR_context_restored",
+      "seq": 119,
+      "value": "0xf85c0201"
+    },
+    {
+      "kind": "field",
+      "name": "GICH_MISR_context_restored",
+      "seq": 120,
+      "value": "0x0"
+    },
+    {
+      "kind": "field",
+      "name": "GICH_EISR0_context_restored",
+      "seq": 121,
+      "value": "0x0"
+    },
+    {
+      "kind": "field",
+      "name": "GICH_EISR1_context_restored",
+      "seq": 122,
+      "value": "0x0"
+    },
+    {
+      "kind": "field",
+      "name": "GICH_ELRSR0_context_restored",
+      "seq": 123,
+      "value": "0xc"
+    },
+    {
+      "kind": "field",
+      "name": "GICH_ELRSR1_context_restored",
+      "seq": 124,
+      "value": "0x0"
+    },
+    {
+      "kind": "field",
+      "name": "GICH_APR_context_restored",
+      "seq": 125,
+      "value": "0x10000"
+    },
+    {
+      "kind": "field",
+      "name": "GICH_LR0_context_restored",
+      "seq": 126,
+      "value": "0x28000032"
+    },
+    {
+      "kind": "field",
+      "name": "GICH_LR1_context_restored",
+      "seq": 127,
+      "value": "0x12000033"
+    },
+    {
+      "kind": "field",
+      "name": "GICH_LR2_context_restored",
+      "seq": 128,
+      "value": "0x0"
+    },
+    {
+      "kind": "field",
+      "name": "GICH_LR3_context_restored",
+      "seq": 129,
+      "value": "0x0"
+    },
+    {
+      "kind": "marker",
+      "name": "[gicv2-lab] restored high-priority IRQ active",
+      "seq": 130
+    },
+    {
+      "kind": "field",
+      "name": "GuestIAR_high_active",
+      "seq": 131,
+      "value": "0x33"
+    },
+    {
+      "kind": "field",
+      "name": "GuestRPR_high_active",
+      "seq": 132,
+      "value": "0x20"
+    },
+    {
+      "kind": "field",
+      "name": "GuestHPPIR_high_active",
+      "seq": 133,
+      "value": "0x3ff"
+    },
+    {
+      "kind": "field",
+      "name": "GuestIRQState_high_active",
+      "seq": 134,
+      "value": "0x3ff2000000033"
+    },
+    {
+      "kind": "field",
+      "name": "GICH_HCR_both_active",
+      "seq": 135,
+      "value": "0x1"
+    },
+    {
+      "kind": "field",
+      "name": "GICH_VMCR_both_active",
+      "seq": 136,
+      "value": "0xf85c0201"
+    },
+    {
+      "kind": "field",
+      "name": "GICH_MISR_both_active",
+      "seq": 137,
+      "value": "0x0"
+    },
+    {
+      "kind": "field",
+      "name": "GICH_EISR0_both_active",
+      "seq": 138,
+      "value": "0x0"
+    },
+    {
+      "kind": "field",
+      "name": "GICH_EISR1_both_active",
+      "seq": 139,
+      "value": "0x0"
+    },
+    {
+      "kind": "field",
+      "name": "GICH_ELRSR0_both_active",
+      "seq": 140,
+      "value": "0xc"
+    },
+    {
+      "kind": "field",
+      "name": "GICH_ELRSR1_both_active",
+      "seq": 141,
+      "value": "0x0"
+    },
+    {
+      "kind": "field",
+      "name": "GICH_APR_both_active",
+      "seq": 142,
+      "value": "0x10010"
+    },
+    {
+      "kind": "field",
+      "name": "GICH_LR0_both_active",
+      "seq": 143,
+      "value": "0x28000032"
+    },
+    {
+      "kind": "field",
+      "name": "GICH_LR1_both_active",
+      "seq": 144,
+      "value": "0x22000033"
+    },
+    {
+      "kind": "field",
+      "name": "GICH_LR2_both_active",
+      "seq": 145,
+      "value": "0x0"
+    },
+    {
+      "kind": "field",
+      "name": "GICH_LR3_both_active",
+      "seq": 146,
+      "value": "0x0"
+    },
+    {
+      "kind": "marker",
+      "name": "[gicv2-lab] high-priority IRQ priority dropped",
+      "seq": 147
+    },
+    {
+      "kind": "field",
+      "name": "GuestIAR_high_drop",
+      "seq": 148,
+      "value": "0x33"
+    },
+    {
+      "kind": "field",
+      "name": "GuestRPR_high_drop",
+      "seq": 149,
+      "value": "0x80"
+    },
+    {
+      "kind": "field",
+      "name": "GuestHPPIR_high_drop",
+      "seq": 150,
+      "value": "0x3ff"
+    },
+    {
+      "kind": "field",
+      "name": "GuestIRQState_high_drop",
+      "seq": 151,
+      "value": "0x3ff8000000033"
+    },
+    {
+      "kind": "field",
+      "name": "GICH_HCR_high_drop",
+      "seq": 152,
+      "value": "0x1"
+    },
+    {
+      "kind": "field",
+      "name": "GICH_VMCR_high_drop",
+      "seq": 153,
+      "value": "0xf85c0201"
+    },
+    {
+      "kind": "field",
+      "name": "GICH_MISR_high_drop",
+      "seq": 154,
+      "value": "0x0"
+    },
+    {
+      "kind": "field",
+      "name": "GICH_EISR0_high_drop",
+      "seq": 155,
+      "value": "0x0"
+    },
+    {
+      "kind": "field",
+      "name": "GICH_EISR1_high_drop",
+      "seq": 156,
+      "value": "0x0"
+    },
+    {
+      "kind": "field",
+      "name": "GICH_ELRSR0_high_drop",
+      "seq": 157,
+      "value": "0xc"
+    },
+    {
+      "kind": "field",
+      "name": "GICH_ELRSR1_high_drop",
+      "seq": 158,
+      "value": "0x0"
+    },
+    {
+      "kind": "field",
+      "name": "GICH_APR_high_drop",
+      "seq": 159,
+      "value": "0x10000"
+    },
+    {
+      "kind": "field",
+      "name": "GICH_LR0_high_drop",
+      "seq": 160,
+      "value": "0x28000032"
+    },
+    {
+      "kind": "field",
+      "name": "GICH_LR1_high_drop",
+      "seq": 161,
+      "value": "0x22000033"
+    },
+    {
+      "kind": "field",
+      "name": "GICH_LR2_high_drop",
+      "seq": 162,
+      "value": "0x0"
+    },
+    {
+      "kind": "field",
+      "name": "GICH_LR3_high_drop",
+      "seq": 163,
+      "value": "0x0"
+    },
+    {
+      "kind": "marker",
+      "name": "[gicv2-lab] high-priority IRQ deactivated",
+      "seq": 164
+    },
+    {
+      "kind": "field",
+      "name": "GuestIAR_high_deactivated",
+      "seq": 165,
+      "value": "0x33"
+    },
+    {
+      "kind": "field",
+      "name": "GuestRPR_high_deactivated",
+      "seq": 166,
+      "value": "0x80"
+    },
+    {
+      "kind": "field",
+      "name": "GuestHPPIR_high_deactivated",
+      "seq": 167,
+      "value": "0x3ff"
+    },
+    {
+      "kind": "field",
+      "name": "GuestIRQState_high_deactivated",
+      "seq": 168,
+      "value": "0x3ff8000000033"
+    },
+    {
+      "kind": "field",
+      "name": "GICH_HCR_high_deactivated",
+      "seq": 169,
+      "value": "0x1"
+    },
+    {
+      "kind": "field",
+      "name": "GICH_VMCR_high_deactivated",
+      "seq": 170,
+      "value": "0xf85c0201"
+    },
+    {
+      "kind": "field",
+      "name": "GICH_MISR_high_deactivated",
+      "seq": 171,
+      "value": "0x0"
+    },
+    {
+      "kind": "field",
+      "name": "GICH_EISR0_high_deactivated",
+      "seq": 172,
+      "value": "0x0"
+    },
+    {
+      "kind": "field",
+      "name": "GICH_EISR1_high_deactivated",
+      "seq": 173,
+      "value": "0x0"
+    },
+    {
+      "kind": "field",
+      "name": "GICH_ELRSR0_high_deactivated",
+      "seq": 174,
+      "value": "0xe"
+    },
+    {
+      "kind": "field",
+      "name": "GICH_ELRSR1_high_deactivated",
+      "seq": 175,
+      "value": "0x0"
+    },
+    {
+      "kind": "field",
+      "name": "GICH_APR_high_deactivated",
+      "seq": 176,
+      "value": "0x10000"
+    },
+    {
+      "kind": "field",
+      "name": "GICH_LR0_high_deactivated",
+      "seq": 177,
+      "value": "0x28000032"
+    },
+    {
+      "kind": "field",
+      "name": "GICH_LR1_high_deactivated",
+      "seq": 178,
+      "value": "0x2000033"
+    },
+    {
+      "kind": "field",
+      "name": "GICH_LR2_high_deactivated",
+      "seq": 179,
+      "value": "0x0"
+    },
+    {
+      "kind": "field",
+      "name": "GICH_LR3_high_deactivated",
+      "seq": 180,
+      "value": "0x0"
+    },
+    {
+      "kind": "marker",
+      "name": "[gicv2-lab] low-priority handler resumed",
+      "seq": 181
+    },
+    {
+      "kind": "field",
+      "name": "GuestIAR_low_resumed",
+      "seq": 182,
+      "value": "0x32"
+    },
+    {
+      "kind": "field",
+      "name": "GuestRPR_low_resumed",
+      "seq": 183,
+      "value": "0x80"
+    },
+    {
+      "kind": "field",
+      "name": "GuestHPPIR_low_resumed",
+      "seq": 184,
+      "value": "0x3ff"
+    },
+    {
+      "kind": "field",
+      "name": "GuestIRQState_low_resumed",
+      "seq": 185,
+      "value": "0x3ff8000000032"
+    },
+    {
+      "kind": "field",
+      "name": "GICH_HCR_low_resumed",
+      "seq": 186,
+      "value": "0x1"
+    },
+    {
+      "kind": "field",
+      "name": "GICH_VMCR_low_resumed",
+      "seq": 187,
+      "value": "0xf85c0201"
+    },
+    {
+      "kind": "field",
+      "name": "GICH_MISR_low_resumed",
+      "seq": 188,
+      "value": "0x0"
+    },
+    {
+      "kind": "field",
+      "name": "GICH_EISR0_low_resumed",
+      "seq": 189,
+      "value": "0x0"
+    },
+    {
+      "kind": "field",
+      "name": "GICH_EISR1_low_resumed",
+      "seq": 190,
+      "value": "0x0"
+    },
+    {
+      "kind": "field",
+      "name": "GICH_ELRSR0_low_resumed",
+      "seq": 191,
+      "value": "0xe"
+    },
+    {
+      "kind": "field",
+      "name": "GICH_ELRSR1_low_resumed",
+      "seq": 192,
+      "value": "0x0"
+    },
+    {
+      "kind": "field",
+      "name": "GICH_APR_low_resumed",
+      "seq": 193,
+      "value": "0x10000"
+    },
+    {
+      "kind": "field",
+      "name": "GICH_LR0_low_resumed",
+      "seq": 194,
+      "value": "0x28000032"
+    },
+    {
+      "kind": "field",
+      "name": "GICH_LR1_low_resumed",
+      "seq": 195,
+      "value": "0x2000033"
+    },
+    {
+      "kind": "field",
+      "name": "GICH_LR2_low_resumed",
+      "seq": 196,
+      "value": "0x0"
+    },
+    {
+      "kind": "field",
+      "name": "GICH_LR3_low_resumed",
+      "seq": 197,
+      "value": "0x0"
+    },
+    {
+      "kind": "marker",
+      "name": "[gicv2-lab] low-priority IRQ priority dropped",
+      "seq": 198
+    },
+    {
+      "kind": "field",
+      "name": "GuestIAR_low_drop",
+      "seq": 199,
+      "value": "0x32"
+    },
+    {
+      "kind": "field",
+      "name": "GuestRPR_low_drop",
+      "seq": 200,
+      "value": "0xff"
+    },
+    {
+      "kind": "field",
+      "name": "GuestHPPIR_low_drop",
+      "seq": 201,
+      "value": "0x3ff"
+    },
+    {
+      "kind": "field",
+      "name": "GuestIRQState_low_drop",
+      "seq": 202,
+      "value": "0x3ffff00000032"
+    },
+    {
+      "kind": "field",
+      "name": "GICH_HCR_low_drop",
+      "seq": 203,
+      "value": "0x1"
+    },
+    {
+      "kind": "field",
+      "name": "GICH_VMCR_low_drop",
+      "seq": 204,
+      "value": "0xf85c0201"
+    },
+    {
+      "kind": "field",
+      "name": "GICH_MISR_low_drop",
+      "seq": 205,
+      "value": "0x0"
+    },
+    {
+      "kind": "field",
+      "name": "GICH_EISR0_low_drop",
+      "seq": 206,
+      "value": "0x0"
+    },
+    {
+      "kind": "field",
+      "name": "GICH_EISR1_low_drop",
+      "seq": 207,
+      "value": "0x0"
+    },
+    {
+      "kind": "field",
+      "name": "GICH_ELRSR0_low_drop",
+      "seq": 208,
+      "value": "0xe"
+    },
+    {
+      "kind": "field",
+      "name": "GICH_ELRSR1_low_drop",
+      "seq": 209,
+      "value": "0x0"
+    },
+    {
+      "kind": "field",
+      "name": "GICH_APR_low_drop",
+      "seq": 210,
+      "value": "0x0"
+    },
+    {
+      "kind": "field",
+      "name": "GICH_LR0_low_drop",
+      "seq": 211,
+      "value": "0x28000032"
+    },
+    {
+      "kind": "field",
+      "name": "GICH_LR1_low_drop",
+      "seq": 212,
+      "value": "0x2000033"
+    },
+    {
+      "kind": "field",
+      "name": "GICH_LR2_low_drop",
+      "seq": 213,
+      "value": "0x0"
+    },
+    {
+      "kind": "field",
+      "name": "GICH_LR3_low_drop",
+      "seq": 214,
+      "value": "0x0"
+    },
+    {
+      "kind": "marker",
+      "name": "[gicv2-lab] low-priority IRQ deactivated",
+      "seq": 215
+    },
+    {
+      "kind": "field",
+      "name": "GuestIAR_low_deactivated",
+      "seq": 216,
+      "value": "0x32"
+    },
+    {
+      "kind": "field",
+      "name": "GuestRPR_low_deactivated",
+      "seq": 217,
+      "value": "0xff"
+    },
+    {
+      "kind": "field",
+      "name": "GuestHPPIR_low_deactivated",
+      "seq": 218,
+      "value": "0x3ff"
+    },
+    {
+      "kind": "field",
+      "name": "GuestIRQState_low_deactivated",
+      "seq": 219,
+      "value": "0x3ffff00000032"
+    },
+    {
+      "kind": "field",
+      "name": "GICH_HCR_all_deactivated",
+      "seq": 220,
+      "value": "0x1"
+    },
+    {
+      "kind": "field",
+      "name": "GICH_VMCR_all_deactivated",
+      "seq": 221,
+      "value": "0xf85c0201"
+    },
+    {
+      "kind": "field",
+      "name": "GICH_MISR_all_deactivated",
+      "seq": 222,
+      "value": "0x0"
+    },
+    {
+      "kind": "field",
+      "name": "GICH_EISR0_all_deactivated",
+      "seq": 223,
+      "value": "0x0"
+    },
+    {
+      "kind": "field",
+      "name": "GICH_EISR1_all_deactivated",
+      "seq": 224,
+      "value": "0x0"
+    },
+    {
+      "kind": "field",
+      "name": "GICH_ELRSR0_all_deactivated",
+      "seq": 225,
+      "value": "0xf"
+    },
+    {
+      "kind": "field",
+      "name": "GICH_ELRSR1_all_deactivated",
+      "seq": 226,
+      "value": "0x0"
+    },
+    {
+      "kind": "field",
+      "name": "GICH_APR_all_deactivated",
+      "seq": 227,
+      "value": "0x0"
+    },
+    {
+      "kind": "field",
+      "name": "GICH_LR0_all_deactivated",
+      "seq": 228,
+      "value": "0x8000032"
+    },
+    {
+      "kind": "field",
+      "name": "GICH_LR1_all_deactivated",
+      "seq": 229,
+      "value": "0x2000033"
+    },
+    {
+      "kind": "field",
+      "name": "GICH_LR2_all_deactivated",
+      "seq": 230,
+      "value": "0x0"
+    },
+    {
+      "kind": "field",
+      "name": "GICH_LR3_all_deactivated",
+      "seq": 231,
+      "value": "0x0"
+    },
+    {
+      "kind": "marker",
+      "name": "[gicv2-lab] restored context LRs cleared",
+      "seq": 232
+    },
+    {
+      "kind": "field",
+      "name": "GICH_HCR_cleared",
+      "seq": 233,
+      "value": "0x1"
+    },
+    {
+      "kind": "field",
+      "name": "GICH_VMCR_cleared",
+      "seq": 234,
+      "value": "0xf85c0201"
+    },
+    {
+      "kind": "field",
+      "name": "GICH_MISR_cleared",
+      "seq": 235,
+      "value": "0x0"
+    },
+    {
+      "kind": "field",
+      "name": "GICH_EISR0_cleared",
+      "seq": 236,
+      "value": "0x0"
+    },
+    {
+      "kind": "field",
+      "name": "GICH_EISR1_cleared",
+      "seq": 237,
+      "value": "0x0"
+    },
+    {
+      "kind": "field",
+      "name": "GICH_ELRSR0_cleared",
+      "seq": 238,
+      "value": "0xf"
+    },
+    {
+      "kind": "field",
+      "name": "GICH_ELRSR1_cleared",
+      "seq": 239,
+      "value": "0x0"
+    },
+    {
+      "kind": "field",
+      "name": "GICH_APR_cleared",
+      "seq": 240,
+      "value": "0x0"
+    },
+    {
+      "kind": "field",
+      "name": "GICH_LR0_cleared",
+      "seq": 241,
+      "value": "0x0"
+    },
+    {
+      "kind": "field",
+      "name": "GICH_LR1_cleared",
+      "seq": 242,
+      "value": "0x0"
+    },
+    {
+      "kind": "field",
+      "name": "GICH_LR2_cleared",
+      "seq": 243,
+      "value": "0x0"
+    },
+    {
+      "kind": "field",
+      "name": "GICH_LR3_cleared",
+      "seq": 244,
+      "value": "0x0"
+    },
+    {
+      "kind": "marker",
+      "name": "[gicv2-lab] H4i PASS",
+      "seq": 245
+    }
+  ],
+  "run": {
+    "backend": "pi400",
+    "backend_id": "synthetic-negative-control-from-pi400-run-001",
+    "image": {
+      "path": "/Users/kmehltretter/codex/linux-work/gicv2-lab/build/2026-09-05-pi400-hardware/h6/gate/image/gicv2-lab.elf",
+      "sha256": "e9615fb39589d21eb7eec7d9ff77723b9e670655bceca843fd62887edb2f019c"
+    },
+    "runner_version": "1",
+    "scenario_path": "/Users/kmehltretter/codex/linux-work/gicv2-lab/build/2026-09-05-pi400-hardware/h6/gate/scenario.json",
+    "scenario_sha256": "54e8d2ad32f29350a15d6159c2e026e854cefc3222d32b5732efb8284ce3e2e9",
+    "schema": "gicv2-lab.run.v1",
+    "serial": {
+      "path": "/Users/kmehltretter/codex/linux-work/gicv2-lab/results/2026-09-05-h6-pi400-100/negative-control/h5/serial.log",
+      "sha256": "1b46cf7eefa28ca1e9dfb5097022d84efb98da7938bee91b84bc2243b99ca1ac"
+    },
+    "source_serial": {
+      "path": "/Users/kmehltretter/codex/linux-work/gicv2-lab/results/2026-09-05-h6-pi400-100/negative-control/serial.log",
+      "sha256": "1b46cf7eefa28ca1e9dfb5097022d84efb98da7938bee91b84bc2243b99ca1ac"
+    },
+    "status": "imported"
+  },
+  "runner_version": "1",
+  "scenario": {
+    "id": "h4i-context-save-restore-v1",
+    "sha256": "54e8d2ad32f29350a15d6159c2e026e854cefc3222d32b5732efb8284ce3e2e9"
+  },
+  "schema": "gicv2-lab.trace.v1"
+}

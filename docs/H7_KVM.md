@@ -6,9 +6,10 @@ and Linux arm64 KVM with `KVM_DEV_TYPE_ARM_VGIC_V2`. It software-pends SPI 42,
 acknowledges it, and completes combined EOI. No physical Pi execution is
 performed by the build or QEMU commands below.
 
-Implementation and local validation do **not** close the KVM gate. Running
-the existing KVM unit test, capturing the new guest under KVM, and comparing
-that capture with QEMU remain pending until Linux arm64 execution is requested.
+The first KVM gate passed on the Pi 400 on 2026-09-05 after the user requested
+hardware execution: the existing KVM unit test passed all 17 checks, and
+twenty fresh H7 KVM captures matched QEMU's trace of the identical ELF.
+The complete evidence is in `results/2026-09-05-h7-pi400-kvm/`.
 
 ## Architectural contract and preconditions
 
@@ -139,5 +140,18 @@ KVM capture to pass the guest's contract, and an H5 comparison to match the
 QEMU capture of the identical ELF. Repeatability on KVM is additional evidence;
 local mock tests or QEMU results do not establish KVM behavior.
 
+This gate passed on `pi400-64` with vendor kernel `6.18.39+rpt-rpi-v8` on
+2026-09-05. The prerequisite was unmodified upstream `kvm-unit-tests`
+`gicv2-mmio-up` (17 passing checks); all twenty subsequent H7 KVM captures
+matched the QEMU baseline across six markers and sixteen fields. Every raw
+trace, frozen image/source bundle, prerequisite, and comparison is archived
+in `results/2026-09-05-h7-pi400-kvm/`. A native Linux UAPI compile check passed,
+and a synthetic IAR-value mutation was rejected by the comparator.
+
 Linux guest boot, guest PSCI, virtual timer workloads, and a device tree remain
 conditional extensions. None is needed for this focused interrupt test.
+
+The same runner now also builds the three fixed
+[H8 interrupt contracts](H8_KVM_CONTRACTS.md), selected by `--workload` or
+`H7_WORKLOAD`. Original H7 bundles remain valid without a workload field;
+new bundles explicitly bind their workload selection to a scenario ID.

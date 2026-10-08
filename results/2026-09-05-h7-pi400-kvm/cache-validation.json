@@ -1,0 +1,367 @@
+{
+  "python": "3.13.5 (main, May  5 2026, 21:05:52) [GCC 14.2.0]",
+  "cache_files_checked": 60,
+  "all_match_preserved_source": true,
+  "files": [
+    {
+      "path": "run-001/bundle/source/tools/__pycache__/h5_runner.cpython-313.pyc",
+      "sha256": "675e54c907a0769a42b7c7d3839a01b233ef5824a03126fecb30aa1528124c69",
+      "source_sha256": "dd2b06922818b4e51227ec5e85baaad9466fdf13f0267493fc3589a27e47e61d",
+      "matches_source": true
+    },
+    {
+      "path": "run-001/bundle/source/tools/__pycache__/h6_gate.cpython-313.pyc",
+      "sha256": "0bfbf0e38613164ff622815b22ac81e8b20061b43dd863547bb8861c4ac3ce59",
+      "source_sha256": "60d019cbd44019e43f7418572d8fcacc9b55cafa044ce52b0ed1468b3b775874",
+      "matches_source": true
+    },
+    {
+      "path": "run-001/bundle/source/tools/__pycache__/kvm_arm64.cpython-313.pyc",
+      "sha256": "e20a3ae57e4da658b8f157a0f09e9d7c5e053f81e8e4703cac54b0909981ef18",
+      "source_sha256": "b7f1a17ea2a409bfe4dabb56b1dcbba388c7c20283a866ead6d476811111b63a",
+      "matches_source": true
+    },
+    {
+      "path": "run-002/bundle/source/tools/__pycache__/h5_runner.cpython-313.pyc",
+      "sha256": "675e54c907a0769a42b7c7d3839a01b233ef5824a03126fecb30aa1528124c69",
+      "source_sha256": "dd2b06922818b4e51227ec5e85baaad9466fdf13f0267493fc3589a27e47e61d",
+      "matches_source": true
+    },
+    {
+      "path": "run-002/bundle/source/tools/__pycache__/h6_gate.cpython-313.pyc",
+      "sha256": "0bfbf0e38613164ff622815b22ac81e8b20061b43dd863547bb8861c4ac3ce59",
+      "source_sha256": "60d019cbd44019e43f7418572d8fcacc9b55cafa044ce52b0ed1468b3b775874",
+      "matches_source": true
+    },
+    {
+      "path": "run-002/bundle/source/tools/__pycache__/kvm_arm64.cpython-313.pyc",
+      "sha256": "e20a3ae57e4da658b8f157a0f09e9d7c5e053f81e8e4703cac54b0909981ef18",
+      "source_sha256": "b7f1a17ea2a409bfe4dabb56b1dcbba388c7c20283a866ead6d476811111b63a",
+      "matches_source": true
+    },
+    {
+      "path": "run-003/bundle/source/tools/__pycache__/h5_runner.cpython-313.pyc",
+      "sha256": "675e54c907a0769a42b7c7d3839a01b233ef5824a03126fecb30aa1528124c69",
+      "source_sha256": "dd2b06922818b4e51227ec5e85baaad9466fdf13f0267493fc3589a27e47e61d",
+      "matches_source": true
+    },
+    {
+      "path": "run-003/bundle/source/tools/__pycache__/h6_gate.cpython-313.pyc",
+      "sha256": "0bfbf0e38613164ff622815b22ac81e8b20061b43dd863547bb8861c4ac3ce59",
+      "source_sha256": "60d019cbd44019e43f7418572d8fcacc9b55cafa044ce52b0ed1468b3b775874",
+      "matches_source": true
+    },
+    {
+      "path": "run-003/bundle/source/tools/__pycache__/kvm_arm64.cpython-313.pyc",
+      "sha256": "e20a3ae57e4da658b8f157a0f09e9d7c5e053f81e8e4703cac54b0909981ef18",
+      "source_sha256": "b7f1a17ea2a409bfe4dabb56b1dcbba388c7c20283a866ead6d476811111b63a",
+      "matches_source": true
+    },
+    {
+      "path": "run-004/bundle/source/tools/__pycache__/h5_runner.cpython-313.pyc",
+      "sha256": "675e54c907a0769a42b7c7d3839a01b233ef5824a03126fecb30aa1528124c69",
+      "source_sha256": "dd2b06922818b4e51227ec5e85baaad9466fdf13f0267493fc3589a27e47e61d",
+      "matches_source": true
+    },
+    {
+      "path": "run-004/bundle/source/tools/__pycache__/h6_gate.cpython-313.pyc",
+      "sha256": "0bfbf0e38613164ff622815b22ac81e8b20061b43dd863547bb8861c4ac3ce59",
+      "source_sha256": "60d019cbd44019e43f7418572d8fcacc9b55cafa044ce52b0ed1468b3b775874",
+      "matches_source": true
+    },
+    {
+      "path": "run-004/bundle/source/tools/__pycache__/kvm_arm64.cpython-313.pyc",
+      "sha256": "e20a3ae57e4da658b8f157a0f09e9d7c5e053f81e8e4703cac54b0909981ef18",
+      "source_sha256": "b7f1a17ea2a409bfe4dabb56b1dcbba388c7c20283a866ead6d476811111b63a",
+      "matches_source": true
+    },
+    {
+      "path": "run-005/bundle/source/tools/__pycache__/h5_runner.cpython-313.pyc",
+      "sha256": "675e54c907a0769a42b7c7d3839a01b233ef5824a03126fecb30aa1528124c69",
+      "source_sha256": "dd2b06922818b4e51227ec5e85baaad9466fdf13f0267493fc3589a27e47e61d",
+      "matches_source": true
+    },
+    {
+      "path": "run-005/bundle/source/tools/__pycache__/h6_gate.cpython-313.pyc",
+      "sha256": "0bfbf0e38613164ff622815b22ac81e8b20061b43dd863547bb8861c4ac3ce59",
+      "source_sha256": "60d019cbd44019e43f7418572d8fcacc9b55cafa044ce52b0ed1468b3b775874",
+      "matches_source": true
+    },
+    {
+      "path": "run-005/bundle/source/tools/__pycache__/kvm_arm64.cpython-313.pyc",
+      "sha256": "e20a3ae57e4da658b8f157a0f09e9d7c5e053f81e8e4703cac54b0909981ef18",
+      "source_sha256": "b7f1a17ea2a409bfe4dabb56b1dcbba388c7c20283a866ead6d476811111b63a",
+      "matches_source": true
+    },
+    {
+      "path": "run-006/bundle/source/tools/__pycache__/h5_runner.cpython-313.pyc",
+      "sha256": "675e54c907a0769a42b7c7d3839a01b233ef5824a03126fecb30aa1528124c69",
+      "source_sha256": "dd2b06922818b4e51227ec5e85baaad9466fdf13f0267493fc3589a27e47e61d",
+      "matches_source": true
+    },
+    {
+      "path": "run-006/bundle/source/tools/__pycache__/h6_gate.cpython-313.pyc",
+      "sha256": "0bfbf0e38613164ff622815b22ac81e8b20061b43dd863547bb8861c4ac3ce59",
+      "source_sha256": "60d019cbd44019e43f7418572d8fcacc9b55cafa044ce52b0ed1468b3b775874",
+      "matches_source": true
+    },
+    {
+      "path": "run-006/bundle/source/tools/__pycache__/kvm_arm64.cpython-313.pyc",
+      "sha256": "e20a3ae57e4da658b8f157a0f09e9d7c5e053f81e8e4703cac54b0909981ef18",
+      "source_sha256": "b7f1a17ea2a409bfe4dabb56b1dcbba388c7c20283a866ead6d476811111b63a",
+      "matches_source": true
+    },
+    {
+      "path": "run-007/bundle/source/tools/__pycache__/h5_runner.cpython-313.pyc",
+      "sha256": "675e54c907a0769a42b7c7d3839a01b233ef5824a03126fecb30aa1528124c69",
+      "source_sha256": "dd2b06922818b4e51227ec5e85baaad9466fdf13f0267493fc3589a27e47e61d",
+      "matches_source": true
+    },
+    {
+      "path": "run-007/bundle/source/tools/__pycache__/h6_gate.cpython-313.pyc",
+      "sha256": "0bfbf0e38613164ff622815b22ac81e8b20061b43dd863547bb8861c4ac3ce59",
+      "source_sha256": "60d019cbd44019e43f7418572d8fcacc9b55cafa044ce52b0ed1468b3b775874",
+      "matches_source": true
+    },
+    {
+      "path": "run-007/bundle/source/tools/__pycache__/kvm_arm64.cpython-313.pyc",
+      "sha256": "e20a3ae57e4da658b8f157a0f09e9d7c5e053f81e8e4703cac54b0909981ef18",
+      "source_sha256": "b7f1a17ea2a409bfe4dabb56b1dcbba388c7c20283a866ead6d476811111b63a",
+      "matches_source": true
+    },
+    {
+      "path": "run-008/bundle/source/tools/__pycache__/h5_runner.cpython-313.pyc",
+      "sha256": "675e54c907a0769a42b7c7d3839a01b233ef5824a03126fecb30aa1528124c69",
+      "source_sha256": "dd2b06922818b4e51227ec5e85baaad9466fdf13f0267493fc3589a27e47e61d",
+      "matches_source": true
+    },
+    {
+      "path": "run-008/bundle/source/tools/__pycache__/h6_gate.cpython-313.pyc",
+      "sha256": "0bfbf0e38613164ff622815b22ac81e8b20061b43dd863547bb8861c4ac3ce59",
+      "source_sha256": "60d019cbd44019e43f7418572d8fcacc9b55cafa044ce52b0ed1468b3b775874",
+      "matches_source": true
+    },
+    {
+      "path": "run-008/bundle/source/tools/__pycache__/kvm_arm64.cpython-313.pyc",
+      "sha256": "e20a3ae57e4da658b8f157a0f09e9d7c5e053f81e8e4703cac54b0909981ef18",
+      "source_sha256": "b7f1a17ea2a409bfe4dabb56b1dcbba388c7c20283a866ead6d476811111b63a",
+      "matches_source": true
+    },
+    {
+      "path": "run-009/bundle/source/tools/__pycache__/h5_runner.cpython-313.pyc",
+      "sha256": "675e54c907a0769a42b7c7d3839a01b233ef5824a03126fecb30aa1528124c69",
+      "source_sha256": "dd2b06922818b4e51227ec5e85baaad9466fdf13f0267493fc3589a27e47e61d",
+      "matches_source": true
+    },
+    {
+      "path": "run-009/bundle/source/tools/__pycache__/h6_gate.cpython-313.pyc",
+      "sha256": "0bfbf0e38613164ff622815b22ac81e8b20061b43dd863547bb8861c4ac3ce59",
+      "source_sha256": "60d019cbd44019e43f7418572d8fcacc9b55cafa044ce52b0ed1468b3b775874",
+      "matches_source": true
+    },
+    {
+      "path": "run-009/bundle/source/tools/__pycache__/kvm_arm64.cpython-313.pyc",
+      "sha256": "e20a3ae57e4da658b8f157a0f09e9d7c5e053f81e8e4703cac54b0909981ef18",
+      "source_sha256": "b7f1a17ea2a409bfe4dabb56b1dcbba388c7c20283a866ead6d476811111b63a",
+      "matches_source": true
+    },
+    {
+      "path": "run-010/bundle/source/tools/__pycache__/h5_runner.cpython-313.pyc",
+      "sha256": "675e54c907a0769a42b7c7d3839a01b233ef5824a03126fecb30aa1528124c69",
+      "source_sha256": "dd2b06922818b4e51227ec5e85baaad9466fdf13f0267493fc3589a27e47e61d",
+      "matches_source": true
+    },
+    {
+      "path": "run-010/bundle/source/tools/__pycache__/h6_gate.cpython-313.pyc",
+      "sha256": "0bfbf0e38613164ff622815b22ac81e8b20061b43dd863547bb8861c4ac3ce59",
+      "source_sha256": "60d019cbd44019e43f7418572d8fcacc9b55cafa044ce52b0ed1468b3b775874",
+      "matches_source": true
+    },
+    {
+      "path": "run-010/bundle/source/tools/__pycache__/kvm_arm64.cpython-313.pyc",
+      "sha256": "e20a3ae57e4da658b8f157a0f09e9d7c5e053f81e8e4703cac54b0909981ef18",
+      "source_sha256": "b7f1a17ea2a409bfe4dabb56b1dcbba388c7c20283a866ead6d476811111b63a",
+      "matches_source": true
+    },
+    {
+      "path": "run-011/bundle/source/tools/__pycache__/h5_runner.cpython-313.pyc",
+      "sha256": "675e54c907a0769a42b7c7d3839a01b233ef5824a03126fecb30aa1528124c69",
+      "source_sha256": "dd2b06922818b4e51227ec5e85baaad9466fdf13f0267493fc3589a27e47e61d",
+      "matches_source": true
+    },
+    {
+      "path": "run-011/bundle/source/tools/__pycache__/h6_gate.cpython-313.pyc",
+      "sha256": "0bfbf0e38613164ff622815b22ac81e8b20061b43dd863547bb8861c4ac3ce59",
+      "source_sha256": "60d019cbd44019e43f7418572d8fcacc9b55cafa044ce52b0ed1468b3b775874",
+      "matches_source": true
+    },
+    {
+      "path": "run-011/bundle/source/tools/__pycache__/kvm_arm64.cpython-313.pyc",
+      "sha256": "e20a3ae57e4da658b8f157a0f09e9d7c5e053f81e8e4703cac54b0909981ef18",
+      "source_sha256": "b7f1a17ea2a409bfe4dabb56b1dcbba388c7c20283a866ead6d476811111b63a",
+      "matches_source": true
+    },
+    {
+      "path": "run-012/bundle/source/tools/__pycache__/h5_runner.cpython-313.pyc",
+      "sha256": "675e54c907a0769a42b7c7d3839a01b233ef5824a03126fecb30aa1528124c69",
+      "source_sha256": "dd2b06922818b4e51227ec5e85baaad9466fdf13f0267493fc3589a27e47e61d",
+      "matches_source": true
+    },
+    {
+      "path": "run-012/bundle/source/tools/__pycache__/h6_gate.cpython-313.pyc",
+      "sha256": "0bfbf0e38613164ff622815b22ac81e8b20061b43dd863547bb8861c4ac3ce59",
+      "source_sha256": "60d019cbd44019e43f7418572d8fcacc9b55cafa044ce52b0ed1468b3b775874",
+      "matches_source": true
+    },
+    {
+      "path": "run-012/bundle/source/tools/__pycache__/kvm_arm64.cpython-313.pyc",
+      "sha256": "e20a3ae57e4da658b8f157a0f09e9d7c5e053f81e8e4703cac54b0909981ef18",
+      "source_sha256": "b7f1a17ea2a409bfe4dabb56b1dcbba388c7c20283a866ead6d476811111b63a",
+      "matches_source": true
+    },
+    {
+      "path": "run-013/bundle/source/tools/__pycache__/h5_runner.cpython-313.pyc",
+      "sha256": "675e54c907a0769a42b7c7d3839a01b233ef5824a03126fecb30aa1528124c69",
+      "source_sha256": "dd2b06922818b4e51227ec5e85baaad9466fdf13f0267493fc3589a27e47e61d",
+      "matches_source": true
+    },
+    {
+      "path": "run-013/bundle/source/tools/__pycache__/h6_gate.cpython-313.pyc",
+      "sha256": "0bfbf0e38613164ff622815b22ac81e8b20061b43dd863547bb8861c4ac3ce59",
+      "source_sha256": "60d019cbd44019e43f7418572d8fcacc9b55cafa044ce52b0ed1468b3b775874",
+      "matches_source": true
+    },
+    {
+      "path": "run-013/bundle/source/tools/__pycache__/kvm_arm64.cpython-313.pyc",
+      "sha256": "e20a3ae57e4da658b8f157a0f09e9d7c5e053f81e8e4703cac54b0909981ef18",
+      "source_sha256": "b7f1a17ea2a409bfe4dabb56b1dcbba388c7c20283a866ead6d476811111b63a",
+      "matches_source": true
+    },
+    {
+      "path": "run-014/bundle/source/tools/__pycache__/h5_runner.cpython-313.pyc",
+      "sha256": "675e54c907a0769a42b7c7d3839a01b233ef5824a03126fecb30aa1528124c69",
+      "source_sha256": "dd2b06922818b4e51227ec5e85baaad9466fdf13f0267493fc3589a27e47e61d",
+      "matches_source": true
+    },
+    {
+      "path": "run-014/bundle/source/tools/__pycache__/h6_gate.cpython-313.pyc",
+      "sha256": "0bfbf0e38613164ff622815b22ac81e8b20061b43dd863547bb8861c4ac3ce59",
+      "source_sha256": "60d019cbd44019e43f7418572d8fcacc9b55cafa044ce52b0ed1468b3b775874",
+      "matches_source": true
+    },
+    {
+      "path": "run-014/bundle/source/tools/__pycache__/kvm_arm64.cpython-313.pyc",
+      "sha256": "e20a3ae57e4da658b8f157a0f09e9d7c5e053f81e8e4703cac54b0909981ef18",
+      "source_sha256": "b7f1a17ea2a409bfe4dabb56b1dcbba388c7c20283a866ead6d476811111b63a",
+      "matches_source": true
+    },
+    {
+      "path": "run-015/bundle/source/tools/__pycache__/h5_runner.cpython-313.pyc",
+      "sha256": "675e54c907a0769a42b7c7d3839a01b233ef5824a03126fecb30aa1528124c69",
+      "source_sha256": "dd2b06922818b4e51227ec5e85baaad9466fdf13f0267493fc3589a27e47e61d",
+      "matches_source": true
+    },
+    {
+      "path": "run-015/bundle/source/tools/__pycache__/h6_gate.cpython-313.pyc",
+      "sha256": "0bfbf0e38613164ff622815b22ac81e8b20061b43dd863547bb8861c4ac3ce59",
+      "source_sha256": "60d019cbd44019e43f7418572d8fcacc9b55cafa044ce52b0ed1468b3b775874",
+      "matches_source": true
+    },
+    {
+      "path": "run-015/bundle/source/tools/__pycache__/kvm_arm64.cpython-313.pyc",
+      "sha256": "e20a3ae57e4da658b8f157a0f09e9d7c5e053f81e8e4703cac54b0909981ef18",
+      "source_sha256": "b7f1a17ea2a409bfe4dabb56b1dcbba388c7c20283a866ead6d476811111b63a",
+      "matches_source": true
+    },
+    {
+      "path": "run-016/bundle/source/tools/__pycache__/h5_runner.cpython-313.pyc",
+      "sha256": "675e54c907a0769a42b7c7d3839a01b233ef5824a03126fecb30aa1528124c69",
+      "source_sha256": "dd2b06922818b4e51227ec5e85baaad9466fdf13f0267493fc3589a27e47e61d",
+      "matches_source": true
+    },
+    {
+      "path": "run-016/bundle/source/tools/__pycache__/h6_gate.cpython-313.pyc",
+      "sha256": "0bfbf0e38613164ff622815b22ac81e8b20061b43dd863547bb8861c4ac3ce59",
+      "source_sha256": "60d019cbd44019e43f7418572d8fcacc9b55cafa044ce52b0ed1468b3b775874",
+      "matches_source": true
+    },
+    {
+      "path": "run-016/bundle/source/tools/__pycache__/kvm_arm64.cpython-313.pyc",
+      "sha256": "e20a3ae57e4da658b8f157a0f09e9d7c5e053f81e8e4703cac54b0909981ef18",
+      "source_sha256": "b7f1a17ea2a409bfe4dabb56b1dcbba388c7c20283a866ead6d476811111b63a",
+      "matches_source": true
+    },
+    {
+      "path": "run-017/bundle/source/tools/__pycache__/h5_runner.cpython-313.pyc",
+      "sha256": "675e54c907a0769a42b7c7d3839a01b233ef5824a03126fecb30aa1528124c69",
+      "source_sha256": "dd2b06922818b4e51227ec5e85baaad9466fdf13f0267493fc3589a27e47e61d",
+      "matches_source": true
+    },
+    {
+      "path": "run-017/bundle/source/tools/__pycache__/h6_gate.cpython-313.pyc",
+      "sha256": "0bfbf0e38613164ff622815b22ac81e8b20061b43dd863547bb8861c4ac3ce59",
+      "source_sha256": "60d019cbd44019e43f7418572d8fcacc9b55cafa044ce52b0ed1468b3b775874",
+      "matches_source": true
+    },
+    {
+      "path": "run-017/bundle/source/tools/__pycache__/kvm_arm64.cpython-313.pyc",
+      "sha256": "e20a3ae57e4da658b8f157a0f09e9d7c5e053f81e8e4703cac54b0909981ef18",
+      "source_sha256": "b7f1a17ea2a409bfe4dabb56b1dcbba388c7c20283a866ead6d476811111b63a",
+      "matches_source": true
+    },
+    {
+      "path": "run-018/bundle/source/tools/__pycache__/h5_runner.cpython-313.pyc",
+      "sha256": "675e54c907a0769a42b7c7d3839a01b233ef5824a03126fecb30aa1528124c69",
+      "source_sha256": "dd2b06922818b4e51227ec5e85baaad9466fdf13f0267493fc3589a27e47e61d",
+      "matches_source": true
+    },
+    {
+      "path": "run-018/bundle/source/tools/__pycache__/h6_gate.cpython-313.pyc",
+      "sha256": "0bfbf0e38613164ff622815b22ac81e8b20061b43dd863547bb8861c4ac3ce59",
+      "source_sha256": "60d019cbd44019e43f7418572d8fcacc9b55cafa044ce52b0ed1468b3b775874",
+      "matches_source": true
+    },
+    {
+      "path": "run-018/bundle/source/tools/__pycache__/kvm_arm64.cpython-313.pyc",
+      "sha256": "e20a3ae57e4da658b8f157a0f09e9d7c5e053f81e8e4703cac54b0909981ef18",
+      "source_sha256": "b7f1a17ea2a409bfe4dabb56b1dcbba388c7c20283a866ead6d476811111b63a",
+      "matches_source": true
+    },
+    {
+      "path": "run-019/bundle/source/tools/__pycache__/h5_runner.cpython-313.pyc",
+      "sha256": "675e54c907a0769a42b7c7d3839a01b233ef5824a03126fecb30aa1528124c69",
+      "source_sha256": "dd2b06922818b4e51227ec5e85baaad9466fdf13f0267493fc3589a27e47e61d",
+      "matches_source": true
+    },
+    {
+      "path": "run-019/bundle/source/tools/__pycache__/h6_gate.cpython-313.pyc",
+      "sha256": "0bfbf0e38613164ff622815b22ac81e8b20061b43dd863547bb8861c4ac3ce59",
+      "source_sha256": "60d019cbd44019e43f7418572d8fcacc9b55cafa044ce52b0ed1468b3b775874",
+      "matches_source": true
+    },
+    {
+      "path": "run-019/bundle/source/tools/__pycache__/kvm_arm64.cpython-313.pyc",
+      "sha256": "e20a3ae57e4da658b8f157a0f09e9d7c5e053f81e8e4703cac54b0909981ef18",
+      "source_sha256": "b7f1a17ea2a409bfe4dabb56b1dcbba388c7c20283a866ead6d476811111b63a",
+      "matches_source": true
+    },
+    {
+      "path": "run-020/bundle/source/tools/__pycache__/h5_runner.cpython-313.pyc",
+      "sha256": "675e54c907a0769a42b7c7d3839a01b233ef5824a03126fecb30aa1528124c69",
+      "source_sha256": "dd2b06922818b4e51227ec5e85baaad9466fdf13f0267493fc3589a27e47e61d",
+      "matches_source": true
+    },
+    {
+      "path": "run-020/bundle/source/tools/__pycache__/h6_gate.cpython-313.pyc",
+      "sha256": "0bfbf0e38613164ff622815b22ac81e8b20061b43dd863547bb8861c4ac3ce59",
+      "source_sha256": "60d019cbd44019e43f7418572d8fcacc9b55cafa044ce52b0ed1468b3b775874",
+      "matches_source": true
+    },
+    {
+      "path": "run-020/bundle/source/tools/__pycache__/kvm_arm64.cpython-313.pyc",
+      "sha256": "e20a3ae57e4da658b8f157a0f09e9d7c5e053f81e8e4703cac54b0909981ef18",
+      "source_sha256": "b7f1a17ea2a409bfe4dabb56b1dcbba388c7c20283a866ead6d476811111b63a",
+      "matches_source": true
+    }
+  ]
+}

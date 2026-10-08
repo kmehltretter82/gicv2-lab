@@ -1,0 +1,45 @@
+{
+  "differences": [
+    {
+      "allowed": [
+        "0x400"
+      ],
+      "index": 27,
+      "key": "GuestPending_after_first_dir",
+      "kind": "forbidden-outcome",
+      "left": {
+        "kind": "field",
+        "name": "GuestPending_after_first_dir",
+        "seq": 27,
+        "value": "0x0"
+      },
+      "right": {
+        "kind": "field",
+        "name": "GuestPending_after_first_dir",
+        "seq": 27,
+        "value": "0x0"
+      }
+    }
+  ],
+  "left": {
+    "backend": "synthetic-negative-control",
+    "image_sha256": "ec0ea3b41d08976bfc7aea338940d2fa2ef56a17a95681d137814559184bd848",
+    "raw_trace_sha256": "baacd4d23b28d7695a0ed1562133fe8e0a815a7809f7268f72388c6aa9ee4546",
+    "scenario_id": "h8c-redelivery-v1",
+    "scenario_sha256": "d304006e7f741beb041a4b9e4aaec296ad2f45f8679e40c2ed0fcaaab8402559"
+  },
+  "matches": false,
+  "right": {
+    "backend": "synthetic-negative-control",
+    "image_sha256": "ec0ea3b41d08976bfc7aea338940d2fa2ef56a17a95681d137814559184bd848",
+    "raw_trace_sha256": "baacd4d23b28d7695a0ed1562133fe8e0a815a7809f7268f72388c6aa9ee4546",
+    "scenario_id": "h8c-redelivery-v1",
+    "scenario_sha256": "d304006e7f741beb041a4b9e4aaec296ad2f45f8679e40c2ed0fcaaab8402559"
+  },
+  "runner_version": "1",
+  "scenario": {
+    "id": "h8c-redelivery-v1",
+    "sha256": "d304006e7f741beb041a4b9e4aaec296ad2f45f8679e40c2ed0fcaaab8402559"
+  },
+  "schema": "gicv2-lab.comparison.v1"
+}

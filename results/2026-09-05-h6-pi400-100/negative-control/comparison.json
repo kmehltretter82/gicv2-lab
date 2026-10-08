@@ -1,0 +1,42 @@
+{
+  "differences": [
+    {
+      "index": 1,
+      "key": "CurrentEL",
+      "kind": "field-value-mismatch",
+      "left": {
+        "kind": "field",
+        "name": "CurrentEL",
+        "seq": 1,
+        "value": "0x2"
+      },
+      "right": {
+        "kind": "field",
+        "name": "CurrentEL",
+        "seq": 1,
+        "value": "0x3"
+      }
+    }
+  ],
+  "left": {
+    "backend": "qemu-tcg",
+    "image_sha256": "e9615fb39589d21eb7eec7d9ff77723b9e670655bceca843fd62887edb2f019c",
+    "raw_trace_sha256": "7383df4cd36912f2b28cad581ae40e1b4a14f25fc0837fd6c38325ae2bc9702b",
+    "scenario_id": "h4i-context-save-restore-v1",
+    "scenario_sha256": "54e8d2ad32f29350a15d6159c2e026e854cefc3222d32b5732efb8284ce3e2e9"
+  },
+  "matches": false,
+  "right": {
+    "backend": "pi400",
+    "image_sha256": "e9615fb39589d21eb7eec7d9ff77723b9e670655bceca843fd62887edb2f019c",
+    "raw_trace_sha256": "1b46cf7eefa28ca1e9dfb5097022d84efb98da7938bee91b84bc2243b99ca1ac",
+    "scenario_id": "h4i-context-save-restore-v1",
+    "scenario_sha256": "54e8d2ad32f29350a15d6159c2e026e854cefc3222d32b5732efb8284ce3e2e9"
+  },
+  "runner_version": "1",
+  "scenario": {
+    "id": "h4i-context-save-restore-v1",
+    "sha256": "54e8d2ad32f29350a15d6159c2e026e854cefc3222d32b5732efb8284ce3e2e9"
+  },
+  "schema": "gicv2-lab.comparison.v1"
+}

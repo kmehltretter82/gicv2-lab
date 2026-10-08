@@ -1,0 +1,45 @@
+{
+  "differences": [
+    {
+      "allowed": [
+        "0x400"
+      ],
+      "index": 21,
+      "key": "GuestActive_after_eoir",
+      "kind": "one-sided-forbidden",
+      "left": {
+        "kind": "field",
+        "name": "GuestActive_after_eoir",
+        "seq": 21,
+        "value": "0x400"
+      },
+      "right": {
+        "kind": "field",
+        "name": "GuestActive_after_eoir",
+        "seq": 21,
+        "value": "0x0"
+      }
+    }
+  ],
+  "left": {
+    "backend": "qemu-tcg",
+    "image_sha256": "51a7b685042acdb681744affa46178094791f8d6d0cd37618d47222f2f2f7007",
+    "raw_trace_sha256": "c9bdb58e0ef2c3c236150719e465b2efb7ed18eb0b7ec1845a5e3af42d8fdf3b",
+    "scenario_id": "h8a-split-eoi-v1",
+    "scenario_sha256": "04f56c5cb817ed157a570766235c9f6ecd90b82c053ada3fbad72c4aa5be448a"
+  },
+  "matches": false,
+  "right": {
+    "backend": "synthetic-negative-control",
+    "image_sha256": "51a7b685042acdb681744affa46178094791f8d6d0cd37618d47222f2f2f7007",
+    "raw_trace_sha256": "b3a7454bc94a142f0c520f74d0044601a33c0992af5e093eb1a175f0b5e46b49",
+    "scenario_id": "h8a-split-eoi-v1",
+    "scenario_sha256": "04f56c5cb817ed157a570766235c9f6ecd90b82c053ada3fbad72c4aa5be448a"
+  },
+  "runner_version": "1",
+  "scenario": {
+    "id": "h8a-split-eoi-v1",
+    "sha256": "04f56c5cb817ed157a570766235c9f6ecd90b82c053ada3fbad72c4aa5be448a"
+  },
+  "schema": "gicv2-lab.comparison.v1"
+}

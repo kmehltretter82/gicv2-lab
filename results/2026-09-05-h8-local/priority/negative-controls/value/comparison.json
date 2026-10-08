@@ -1,0 +1,45 @@
+{
+  "differences": [
+    {
+      "allowed": [
+        "0x3ff"
+      ],
+      "index": 14,
+      "key": "GuestIAR_masked",
+      "kind": "one-sided-forbidden",
+      "left": {
+        "kind": "field",
+        "name": "GuestIAR_masked",
+        "seq": 14,
+        "value": "0x3ff"
+      },
+      "right": {
+        "kind": "field",
+        "name": "GuestIAR_masked",
+        "seq": 14,
+        "value": "0x2a"
+      }
+    }
+  ],
+  "left": {
+    "backend": "qemu-tcg",
+    "image_sha256": "0ae6231073efb14438d7d9383703662e9e0a01d08cbb7b340a850628bb507d77",
+    "raw_trace_sha256": "122344b836d2751d0bfe62b1c54ad4ee80f9f388f86425191a0f1de40febd8d1",
+    "scenario_id": "h8b-priority-v1",
+    "scenario_sha256": "ae0b014990f421c36e6f83c4fe543479788a32f309047442ec56d611f28cfdf6"
+  },
+  "matches": false,
+  "right": {
+    "backend": "synthetic-negative-control",
+    "image_sha256": "0ae6231073efb14438d7d9383703662e9e0a01d08cbb7b340a850628bb507d77",
+    "raw_trace_sha256": "c1faee803fb456f674d347ff87ffb5e778ae9ddb032360930ff99f5bd185364b",
+    "scenario_id": "h8b-priority-v1",
+    "scenario_sha256": "ae0b014990f421c36e6f83c4fe543479788a32f309047442ec56d611f28cfdf6"
+  },
+  "runner_version": "1",
+  "scenario": {
+    "id": "h8b-priority-v1",
+    "sha256": "ae0b014990f421c36e6f83c4fe543479788a32f309047442ec56d611f28cfdf6"
+  },
+  "schema": "gicv2-lab.comparison.v1"
+}

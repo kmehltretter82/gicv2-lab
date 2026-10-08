@@ -1,0 +1,108 @@
+unit-tests rc=0
+TESTNAME=gicv2-mmio-up TIMEOUT=30s MACHINE=virt ACCEL=kvm ./arm/run arm/gic.flat -smp 1 -append mmio -machine gic-version=2
+[32mPASS[0m gicv2-mmio-up (17 tests)
+H8 7.3.0-rc3-p13rtguardfinal-00511-gd4e2f1e3e415 level split-eoi run 001 capture_rc=2 compare_rc=skipped serial_sha256=e5d5514e74966d33
+H8 7.3.0-rc3-p13rtguardfinal-00511-gd4e2f1e3e415 level split-eoi run 002 capture_rc=2 compare_rc=skipped serial_sha256=e5d5514e74966d33
+H8 7.3.0-rc3-p13rtguardfinal-00511-gd4e2f1e3e415 level split-eoi run 003 capture_rc=2 compare_rc=skipped serial_sha256=e5d5514e74966d33
+H8 7.3.0-rc3-p13rtguardfinal-00511-gd4e2f1e3e415 level split-eoi run 004 capture_rc=2 compare_rc=skipped serial_sha256=e5d5514e74966d33
+H8 7.3.0-rc3-p13rtguardfinal-00511-gd4e2f1e3e415 level split-eoi run 005 capture_rc=2 compare_rc=skipped serial_sha256=e5d5514e74966d33
+H8 7.3.0-rc3-p13rtguardfinal-00511-gd4e2f1e3e415 level split-eoi run 006 capture_rc=2 compare_rc=skipped serial_sha256=e5d5514e74966d33
+H8 7.3.0-rc3-p13rtguardfinal-00511-gd4e2f1e3e415 level split-eoi run 007 capture_rc=2 compare_rc=skipped serial_sha256=e5d5514e74966d33
+H8 7.3.0-rc3-p13rtguardfinal-00511-gd4e2f1e3e415 level split-eoi run 008 capture_rc=2 compare_rc=skipped serial_sha256=e5d5514e74966d33
+H8 7.3.0-rc3-p13rtguardfinal-00511-gd4e2f1e3e415 level split-eoi run 009 capture_rc=2 compare_rc=skipped serial_sha256=e5d5514e74966d33
+H8 7.3.0-rc3-p13rtguardfinal-00511-gd4e2f1e3e415 level split-eoi run 010 capture_rc=2 compare_rc=skipped serial_sha256=e5d5514e74966d33
+--- level split-eoi run-001 serial tail
+[gicv2-lab] H8a pending
+GuestIAR_active=0x000000000000002a
+GuestRPR_active=0x0000000000000040
+GuestActive_after_iar=0x0000000000000400
+GuestPending_after_iar=0x0000000000000400
+[gicv2-lab] H8a FAIL: contract violation
+H8 7.3.0-rc3-p13rtguardfinal-00511-gd4e2f1e3e415 level priority run 001 capture_rc=2 compare_rc=skipped serial_sha256=468598e4e6a4f8ba
+H8 7.3.0-rc3-p13rtguardfinal-00511-gd4e2f1e3e415 level priority run 002 capture_rc=2 compare_rc=skipped serial_sha256=468598e4e6a4f8ba
+H8 7.3.0-rc3-p13rtguardfinal-00511-gd4e2f1e3e415 level priority run 003 capture_rc=2 compare_rc=skipped serial_sha256=468598e4e6a4f8ba
+H8 7.3.0-rc3-p13rtguardfinal-00511-gd4e2f1e3e415 level priority run 004 capture_rc=2 compare_rc=skipped serial_sha256=468598e4e6a4f8ba
+H8 7.3.0-rc3-p13rtguardfinal-00511-gd4e2f1e3e415 level priority run 005 capture_rc=2 compare_rc=skipped serial_sha256=468598e4e6a4f8ba
+H8 7.3.0-rc3-p13rtguardfinal-00511-gd4e2f1e3e415 level priority run 006 capture_rc=2 compare_rc=skipped serial_sha256=468598e4e6a4f8ba
+H8 7.3.0-rc3-p13rtguardfinal-00511-gd4e2f1e3e415 level priority run 007 capture_rc=2 compare_rc=skipped serial_sha256=468598e4e6a4f8ba
+H8 7.3.0-rc3-p13rtguardfinal-00511-gd4e2f1e3e415 level priority run 008 capture_rc=2 compare_rc=skipped serial_sha256=468598e4e6a4f8ba
+H8 7.3.0-rc3-p13rtguardfinal-00511-gd4e2f1e3e415 level priority run 009 capture_rc=2 compare_rc=skipped serial_sha256=468598e4e6a4f8ba
+H8 7.3.0-rc3-p13rtguardfinal-00511-gd4e2f1e3e415 level priority run 010 capture_rc=2 compare_rc=skipped serial_sha256=468598e4e6a4f8ba
+--- level priority run-001 serial tail
+GuestIAR_low=0x000000000000002a
+GuestRPR_low=0x0000000000000080
+GuestActive_low=0x0000000000000400
+[gicv2-lab] H8b low active
+GuestPending_high=0x0000000000000c00
+[gicv2-lab] H8b FAIL: contract violation
+H8 7.3.0-rc3-p13rtguardfinal-00511-gd4e2f1e3e415 level redelivery run 001 capture_rc=2 compare_rc=skipped serial_sha256=834a305138dc59c6
+H8 7.3.0-rc3-p13rtguardfinal-00511-gd4e2f1e3e415 level redelivery run 002 capture_rc=2 compare_rc=skipped serial_sha256=834a305138dc59c6
+H8 7.3.0-rc3-p13rtguardfinal-00511-gd4e2f1e3e415 level redelivery run 003 capture_rc=2 compare_rc=skipped serial_sha256=834a305138dc59c6
+H8 7.3.0-rc3-p13rtguardfinal-00511-gd4e2f1e3e415 level redelivery run 004 capture_rc=2 compare_rc=skipped serial_sha256=834a305138dc59c6
+H8 7.3.0-rc3-p13rtguardfinal-00511-gd4e2f1e3e415 level redelivery run 005 capture_rc=2 compare_rc=skipped serial_sha256=834a305138dc59c6
+H8 7.3.0-rc3-p13rtguardfinal-00511-gd4e2f1e3e415 level redelivery run 006 capture_rc=2 compare_rc=skipped serial_sha256=834a305138dc59c6
+H8 7.3.0-rc3-p13rtguardfinal-00511-gd4e2f1e3e415 level redelivery run 007 capture_rc=2 compare_rc=skipped serial_sha256=834a305138dc59c6
+H8 7.3.0-rc3-p13rtguardfinal-00511-gd4e2f1e3e415 level redelivery run 008 capture_rc=2 compare_rc=skipped serial_sha256=834a305138dc59c6
+H8 7.3.0-rc3-p13rtguardfinal-00511-gd4e2f1e3e415 level redelivery run 009 capture_rc=2 compare_rc=skipped serial_sha256=834a305138dc59c6
+H8 7.3.0-rc3-p13rtguardfinal-00511-gd4e2f1e3e415 level redelivery run 010 capture_rc=2 compare_rc=skipped serial_sha256=834a305138dc59c6
+--- level redelivery run-001 serial tail
+[gicv2-lab] H8c interface ready
+GuestIAR_first=0x000000000000002a
+GuestRPR_first=0x0000000000000040
+GuestActive_first=0x0000000000000400
+GuestPending_first=0x0000000000000400
+[gicv2-lab] H8c FAIL: contract violation
+H8 7.3.0-rc3-p13rtguardfinal-00511-gd4e2f1e3e415 edge split-eoi run 001 capture_rc=0 compare_rc=0 serial_sha256=c990d8ee311e5f6d
+H8 7.3.0-rc3-p13rtguardfinal-00511-gd4e2f1e3e415 edge split-eoi run 002 capture_rc=0 compare_rc=0 serial_sha256=c990d8ee311e5f6d
+H8 7.3.0-rc3-p13rtguardfinal-00511-gd4e2f1e3e415 edge split-eoi run 003 capture_rc=0 compare_rc=0 serial_sha256=c990d8ee311e5f6d
+H8 7.3.0-rc3-p13rtguardfinal-00511-gd4e2f1e3e415 edge split-eoi run 004 capture_rc=0 compare_rc=0 serial_sha256=c990d8ee311e5f6d
+H8 7.3.0-rc3-p13rtguardfinal-00511-gd4e2f1e3e415 edge split-eoi run 005 capture_rc=0 compare_rc=0 serial_sha256=c990d8ee311e5f6d
+H8 7.3.0-rc3-p13rtguardfinal-00511-gd4e2f1e3e415 edge split-eoi run 006 capture_rc=0 compare_rc=0 serial_sha256=c990d8ee311e5f6d
+H8 7.3.0-rc3-p13rtguardfinal-00511-gd4e2f1e3e415 edge split-eoi run 007 capture_rc=0 compare_rc=0 serial_sha256=c990d8ee311e5f6d
+H8 7.3.0-rc3-p13rtguardfinal-00511-gd4e2f1e3e415 edge split-eoi run 008 capture_rc=0 compare_rc=0 serial_sha256=c990d8ee311e5f6d
+H8 7.3.0-rc3-p13rtguardfinal-00511-gd4e2f1e3e415 edge split-eoi run 009 capture_rc=0 compare_rc=0 serial_sha256=c990d8ee311e5f6d
+H8 7.3.0-rc3-p13rtguardfinal-00511-gd4e2f1e3e415 edge split-eoi run 010 capture_rc=0 compare_rc=0 serial_sha256=c990d8ee311e5f6d
+--- edge split-eoi run-001 serial tail
+GuestRPR_final=0x00000000000000ff
+GuestActive_final=0x0000000000000000
+GuestPending_final=0x0000000000000000
+GuestHPPIR_final=0x00000000000003ff
+GuestIAR_final=0x00000000000003ff
+[gicv2-lab] H8a PASS
+H8 7.3.0-rc3-p13rtguardfinal-00511-gd4e2f1e3e415 edge priority run 001 capture_rc=0 compare_rc=0 serial_sha256=3c8d3c6cfa539379
+H8 7.3.0-rc3-p13rtguardfinal-00511-gd4e2f1e3e415 edge priority run 002 capture_rc=0 compare_rc=0 serial_sha256=3c8d3c6cfa539379
+H8 7.3.0-rc3-p13rtguardfinal-00511-gd4e2f1e3e415 edge priority run 003 capture_rc=0 compare_rc=0 serial_sha256=3c8d3c6cfa539379
+H8 7.3.0-rc3-p13rtguardfinal-00511-gd4e2f1e3e415 edge priority run 004 capture_rc=0 compare_rc=0 serial_sha256=3c8d3c6cfa539379
+H8 7.3.0-rc3-p13rtguardfinal-00511-gd4e2f1e3e415 edge priority run 005 capture_rc=0 compare_rc=0 serial_sha256=3c8d3c6cfa539379
+H8 7.3.0-rc3-p13rtguardfinal-00511-gd4e2f1e3e415 edge priority run 006 capture_rc=0 compare_rc=0 serial_sha256=3c8d3c6cfa539379
+H8 7.3.0-rc3-p13rtguardfinal-00511-gd4e2f1e3e415 edge priority run 007 capture_rc=0 compare_rc=0 serial_sha256=3c8d3c6cfa539379
+H8 7.3.0-rc3-p13rtguardfinal-00511-gd4e2f1e3e415 edge priority run 008 capture_rc=0 compare_rc=0 serial_sha256=3c8d3c6cfa539379
+H8 7.3.0-rc3-p13rtguardfinal-00511-gd4e2f1e3e415 edge priority run 009 capture_rc=0 compare_rc=0 serial_sha256=3c8d3c6cfa539379
+H8 7.3.0-rc3-p13rtguardfinal-00511-gd4e2f1e3e415 edge priority run 010 capture_rc=0 compare_rc=0 serial_sha256=3c8d3c6cfa539379
+--- edge priority run-001 serial tail
+GuestRPR_final=0x00000000000000ff
+GuestActive_final=0x0000000000000000
+GuestPending_final=0x0000000000000000
+GuestHPPIR_final=0x00000000000003ff
+GuestIAR_final=0x00000000000003ff
+[gicv2-lab] H8b PASS
+H8 7.3.0-rc3-p13rtguardfinal-00511-gd4e2f1e3e415 edge redelivery run 001 capture_rc=0 compare_rc=0 serial_sha256=cd6d688022805a13
+H8 7.3.0-rc3-p13rtguardfinal-00511-gd4e2f1e3e415 edge redelivery run 002 capture_rc=0 compare_rc=0 serial_sha256=cd6d688022805a13
+H8 7.3.0-rc3-p13rtguardfinal-00511-gd4e2f1e3e415 edge redelivery run 003 capture_rc=0 compare_rc=0 serial_sha256=cd6d688022805a13
+H8 7.3.0-rc3-p13rtguardfinal-00511-gd4e2f1e3e415 edge redelivery run 004 capture_rc=0 compare_rc=0 serial_sha256=cd6d688022805a13
+H8 7.3.0-rc3-p13rtguardfinal-00511-gd4e2f1e3e415 edge redelivery run 005 capture_rc=0 compare_rc=0 serial_sha256=cd6d688022805a13
+H8 7.3.0-rc3-p13rtguardfinal-00511-gd4e2f1e3e415 edge redelivery run 006 capture_rc=0 compare_rc=0 serial_sha256=cd6d688022805a13
+H8 7.3.0-rc3-p13rtguardfinal-00511-gd4e2f1e3e415 edge redelivery run 007 capture_rc=0 compare_rc=0 serial_sha256=cd6d688022805a13
+H8 7.3.0-rc3-p13rtguardfinal-00511-gd4e2f1e3e415 edge redelivery run 008 capture_rc=0 compare_rc=0 serial_sha256=cd6d688022805a13
+H8 7.3.0-rc3-p13rtguardfinal-00511-gd4e2f1e3e415 edge redelivery run 009 capture_rc=0 compare_rc=0 serial_sha256=cd6d688022805a13
+H8 7.3.0-rc3-p13rtguardfinal-00511-gd4e2f1e3e415 edge redelivery run 010 capture_rc=0 compare_rc=0 serial_sha256=cd6d688022805a13
+--- edge redelivery run-001 serial tail
+GuestRPR_final=0x00000000000000ff
+GuestActive_final=0x0000000000000000
+GuestPending_final=0x0000000000000000
+GuestHPPIR_final=0x00000000000003ff
+GuestIAR_final=0x00000000000003ff
+[gicv2-lab] H8c PASS
+d4550bf4dca7f1d5ef9138eaa17af02678f5ec5c0ddb98ff5fe5ac30af6c6c9e  h8-kvm-7.3.0-rc3-p13rtguardfinal-00511-gd4e2f1e3e415-evidence.tar.xz
+Linux pi400-64 7.3.0-rc3-p13rtguardfinal-00511-gd4e2f1e3e415 #1 SMP PREEMPT_RT Thu Oct  1 06:28:50 UTC 2026 aarch64 GNU/Linux
+/dev/root        15G   13G  487M  97% /

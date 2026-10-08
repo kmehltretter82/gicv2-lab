@@ -1,0 +1,167 @@
+{
+  "all_frozen_artifact_hashes_verified": true,
+  "all_match_qemu": true,
+  "all_prerequisites_verified": true,
+  "fields_per_capture": 16,
+  "host": {
+    "machine": "aarch64",
+    "node": "pi400-64",
+    "processor": "",
+    "release": "6.18.39+rpt-rpi-v8",
+    "system": "Linux",
+    "version": "#1 SMP PREEMPT Debian 1:6.18.39-1+rpt1 (2026-07-29)"
+  },
+  "image_sha256": "0b25bfcc1d42d71a459c41ad1fce0570a78953f3bf8a6d9cb993146c290a1207",
+  "kvm_captures": 20,
+  "markers_per_capture": 6,
+  "native_linux_uapi_check_passed": true,
+  "negative_control_rejected": true,
+  "raw_trace_hash_counts": {
+    "a586195cb78ac35a1eb0a61809b8a45a46fe63a644a2c810c21a4522141e1026": 20
+  },
+  "records_per_capture": 22,
+  "runs": [
+    {
+      "matches_qemu": true,
+      "records": 22,
+      "run": 1,
+      "serial_bytes": 781,
+      "serial_sha256": "a586195cb78ac35a1eb0a61809b8a45a46fe63a644a2c810c21a4522141e1026"
+    },
+    {
+      "matches_qemu": true,
+      "records": 22,
+      "run": 2,
+      "serial_bytes": 781,
+      "serial_sha256": "a586195cb78ac35a1eb0a61809b8a45a46fe63a644a2c810c21a4522141e1026"
+    },
+    {
+      "matches_qemu": true,
+      "records": 22,
+      "run": 3,
+      "serial_bytes": 781,
+      "serial_sha256": "a586195cb78ac35a1eb0a61809b8a45a46fe63a644a2c810c21a4522141e1026"
+    },
+    {
+      "matches_qemu": true,
+      "records": 22,
+      "run": 4,
+      "serial_bytes": 781,
+      "serial_sha256": "a586195cb78ac35a1eb0a61809b8a45a46fe63a644a2c810c21a4522141e1026"
+    },
+    {
+      "matches_qemu": true,
+      "records": 22,
+      "run": 5,
+      "serial_bytes": 781,
+      "serial_sha256": "a586195cb78ac35a1eb0a61809b8a45a46fe63a644a2c810c21a4522141e1026"
+    },
+    {
+      "matches_qemu": true,
+      "records": 22,
+      "run": 6,
+      "serial_bytes": 781,
+      "serial_sha256": "a586195cb78ac35a1eb0a61809b8a45a46fe63a644a2c810c21a4522141e1026"
+    },
+    {
+      "matches_qemu": true,
+      "records": 22,
+      "run": 7,
+      "serial_bytes": 781,
+      "serial_sha256": "a586195cb78ac35a1eb0a61809b8a45a46fe63a644a2c810c21a4522141e1026"
+    },
+    {
+      "matches_qemu": true,
+      "records": 22,
+      "run": 8,
+      "serial_bytes": 781,
+      "serial_sha256": "a586195cb78ac35a1eb0a61809b8a45a46fe63a644a2c810c21a4522141e1026"
+    },
+    {
+      "matches_qemu": true,
+      "records": 22,
+      "run": 9,
+      "serial_bytes": 781,
+      "serial_sha256": "a586195cb78ac35a1eb0a61809b8a45a46fe63a644a2c810c21a4522141e1026"
+    },
+    {
+      "matches_qemu": true,
+      "records": 22,
+      "run": 10,
+      "serial_bytes": 781,
+      "serial_sha256": "a586195cb78ac35a1eb0a61809b8a45a46fe63a644a2c810c21a4522141e1026"
+    },
+    {
+      "matches_qemu": true,
+      "records": 22,
+      "run": 11,
+      "serial_bytes": 781,
+      "serial_sha256": "a586195cb78ac35a1eb0a61809b8a45a46fe63a644a2c810c21a4522141e1026"
+    },
+    {
+      "matches_qemu": true,
+      "records": 22,
+      "run": 12,
+      "serial_bytes": 781,
+      "serial_sha256": "a586195cb78ac35a1eb0a61809b8a45a46fe63a644a2c810c21a4522141e1026"
+    },
+    {
+      "matches_qemu": true,
+      "records": 22,
+      "run": 13,
+      "serial_bytes": 781,
+      "serial_sha256": "a586195cb78ac35a1eb0a61809b8a45a46fe63a644a2c810c21a4522141e1026"
+    },
+    {
+      "matches_qemu": true,
+      "records": 22,
+      "run": 14,
+      "serial_bytes": 781,
+      "serial_sha256": "a586195cb78ac35a1eb0a61809b8a45a46fe63a644a2c810c21a4522141e1026"
+    },
+    {
+      "matches_qemu": true,
+      "records": 22,
+      "run": 15,
+      "serial_bytes": 781,
+      "serial_sha256": "a586195cb78ac35a1eb0a61809b8a45a46fe63a644a2c810c21a4522141e1026"
+    },
+    {
+      "matches_qemu": true,
+      "records": 22,
+      "run": 16,
+      "serial_bytes": 781,
+      "serial_sha256": "a586195cb78ac35a1eb0a61809b8a45a46fe63a644a2c810c21a4522141e1026"
+    },
+    {
+      "matches_qemu": true,
+      "records": 22,
+      "run": 17,
+      "serial_bytes": 781,
+      "serial_sha256": "a586195cb78ac35a1eb0a61809b8a45a46fe63a644a2c810c21a4522141e1026"
+    },
+    {
+      "matches_qemu": true,
+      "records": 22,
+      "run": 18,
+      "serial_bytes": 781,
+      "serial_sha256": "a586195cb78ac35a1eb0a61809b8a45a46fe63a644a2c810c21a4522141e1026"
+    },
+    {
+      "matches_qemu": true,
+      "records": 22,
+      "run": 19,
+      "serial_bytes": 781,
+      "serial_sha256": "a586195cb78ac35a1eb0a61809b8a45a46fe63a644a2c810c21a4522141e1026"
+    },
+    {
+      "matches_qemu": true,
+      "records": 22,
+      "run": 20,
+      "serial_bytes": 781,
+      "serial_sha256": "a586195cb78ac35a1eb0a61809b8a45a46fe63a644a2c810c21a4522141e1026"
+    }
+  ],
+  "scenario_sha256": "d7ba750715b723a0b23693fd40f2720f5521226a77df078f372b5803db572ec1",
+  "status": "pass"
+}

@@ -1,0 +1,15 @@
+{
+  "command": [
+    "ssh",
+    "-o",
+    "BatchMode=yes",
+    "-o",
+    "ConnectTimeout=10",
+    "karl@192.168.1.15",
+    "bash -se"
+  ],
+  "script": "remote-h6-restore.sh",
+  "exit_status": 0,
+  "finished_utc": "2026-09-05T07:00:33.090753+00:00",
+  "reason": "Initial cp -p restored the tryboot bytes but returned failure preserving ownership on the FAT boot filesystem; rerun verifies the already-restored bytes and completes temporary-image removal."
+}

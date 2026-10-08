@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # SPDX-License-Identifier: GPL-2.0-or-later
-"""Build H7 locally, preserve existing unit-test evidence, and compare QEMU/KVM.
+"""Build fixed EL1 contracts, preserve unit-test evidence, and compare QEMU/KVM.
 
 Only unit-tests --accel kvm and capture-kvm execute KVM. Both require Linux
 arm64. Build, verify, and capture-qemu work without hardware access.
@@ -26,6 +26,12 @@ ROOT = Path(__file__).resolve().parents[1]
 BUILD_SCHEMA = "gicv2-lab.h7-build.v1"
 UNIT_SCHEMA = "gicv2-lab.h7-unit-tests.v1"
 TEST_NAME = "gicv2-mmio-up"
+WORKLOADS = {
+    "spi-lifecycle": ("h7-spi-lifecycle-v1", ["h7/guest.c"]),
+    "split-eoi": ("h8a-split-eoi-v1", ["h7/guest_support.c", "h7/split_eoi.c"]),
+    "priority": ("h8b-priority-v1", ["h7/guest_support.c", "h7/priority.c"]),
+    "redelivery": ("h8c-redelivery-v1", ["h7/guest_support.c", "h7/redelivery.c"]),
+}
 
 
 def host_identity():
@@ -53,10 +59,11 @@ def stop_process(process):
 def build(args):
     bundle = args.out.resolve()
     evidence.require(not bundle.exists(), "refusing to reuse build bundle")
+    scenario_id, sources = WORKLOADS[args.workload]
     tools = evidence.llvm_tools(args.llvm_bin)
     bundle.mkdir(parents=True)
     evidence.source_snapshot(bundle / "source")
-    shutil.copyfile(bundle / "source/scenarios/h7-spi-lifecycle-v1.json", bundle / "scenario.json")
+    shutil.copyfile(bundle / ("source/scenarios/" + scenario_id + ".json"), bundle / "scenario.json")
     (bundle / "source.diff").write_bytes(subprocess.check_output(["git", "diff", "--binary", "HEAD"], cwd=ROOT))
     command = [tools["clang"]["path"], "--target=aarch64-none-elf", "-mcpu=cortex-a72",
                "-ffreestanding", "-fno-builtin", "-fno-pic", "-fno-stack-protector",
@@ -65,7 +72,7 @@ def build(args):
                "-nostdlib", "--ld-path=" + tools["ld.lld"]["path"],
                "-Wl,-T,h7/linker.ld", "-Wl,--build-id=none",
                "-Wl,--gc-sections", "-Wl,-Map," + str(bundle / "guest.map"),
-               "h7/start.S", "h7/guest.c", "src/print.c", "-o", str(bundle / "guest.elf")]
+               "h7/start.S", *sources, "src/print.c", "-o", str(bundle / "guest.elf")]
     commands = [command,
                 [tools["llvm-objcopy"]["path"], "-O", "binary", str(bundle / "guest.elf"), str(bundle / "guest.bin")],
                 [tools["llvm-objdump"]["path"], "-d", str(bundle / "guest.elf")]]
@@ -76,7 +83,8 @@ def build(args):
             subprocess.run(commands[2], stdout=disassembly, stderr=log, check=True)
     kvm.load_elf(bundle / "guest.elf", bytearray(kvm.RAM_SIZE))
     h5.write_json(bundle / "build.json", {
-        "schema": BUILD_SCHEMA, "created_utc": evidence.utc_now(), "host": host_identity(),
+        "schema": BUILD_SCHEMA, "workload": args.workload,
+        "created_utc": evidence.utc_now(), "host": host_identity(),
         "source_commit": evidence.output(["git", "rev-parse", "HEAD"], ROOT),
         "source_status": evidence.output(["git", "status", "--porcelain=v1", "--untracked-files=all"], ROOT),
         "source_note": "source/ preserves working files, including uncommitted changes",
@@ -91,9 +99,13 @@ def verify_bundle(bundle):
     for name, digest in manifest["artifacts"].items():
         evidence.pinned_file(bundle, name, digest)
     scenario = h5.load_scenario(bundle / "scenario.json")
-    evidence.require(scenario["id"] == "h7-spi-lifecycle-v1", "unsupported H7 scenario")
+    # Bundles made before workload selection existed contain only the H7 guest.
+    workload = manifest.get("workload", "spi-lifecycle")
+    evidence.require(workload in WORKLOADS, "unsupported fixed workload")
+    evidence.require(scenario["id"] == WORKLOADS[workload][0],
+                     "scenario does not match the recorded workload")
     entry = kvm.load_elf(bundle / "guest.elf", bytearray(kvm.RAM_SIZE))
-    return {"image_sha256": h5.sha256_file(bundle / "guest.elf"),
+    return {"workload": workload, "image_sha256": h5.sha256_file(bundle / "guest.elf"),
             "scenario_sha256": scenario["sha256"], "entry": hex(entry)}
 
 
@@ -255,6 +267,7 @@ def main(argv):
     build_parser = commands.add_parser("build")
     build_parser.add_argument("--out", required=True, type=Path)
     build_parser.add_argument("--llvm-bin", type=Path)
+    build_parser.add_argument("--workload", choices=tuple(WORKLOADS), default="spi-lifecycle")
     commands.add_parser("check-host", help="check local OS and /dev/kvm presence without opening it")
     unit = commands.add_parser("unit-tests")
     unit.add_argument("--checkout", required=True, type=Path)

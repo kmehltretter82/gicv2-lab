@@ -1,0 +1,20 @@
+      4   gicprobe: edge PEND_AFTER_DIR=0x0
+      4   gicprobe: edge PEND_AFTER_IAR=0x0
+      4   gicprobe: edge-repend PEND_AFTER_DIR=0x1
+      4   gicprobe: edge-repend PEND_AFTER_IAR=0x0
+      4   gicprobe: level PEND_AFTER_DIR=0x0
+      4   gicprobe: level PEND_AFTER_IAR=0x0
+      4   gicprobe: level-repend PEND_AFTER_DIR=0x1
+      4   gicprobe: level-repend PEND_AFTER_IAR=0x0
+      1   gicprobe: mode=edge intid=255 cpu_if_mask=02 GICC_CTLR=00000261 GICC_PMR=f0 result=0
+      2   gicprobe: mode=edge intid=255 cpu_if_mask=04 GICC_CTLR=00000261 GICC_PMR=f0 result=0
+      1   gicprobe: mode=edge intid=255 cpu_if_mask=08 GICC_CTLR=00000261 GICC_PMR=f0 result=0
+      1   gicprobe: mode=edge-repend intid=255 cpu_if_mask=02 GICC_CTLR=00000261 GICC_PMR=f0 result=0
+      2   gicprobe: mode=edge-repend intid=255 cpu_if_mask=04 GICC_CTLR=00000261 GICC_PMR=f0 result=0
+      1   gicprobe: mode=edge-repend intid=255 cpu_if_mask=08 GICC_CTLR=00000261 GICC_PMR=f0 result=0
+      1   gicprobe: mode=level intid=255 cpu_if_mask=02 GICC_CTLR=00000261 GICC_PMR=f0 result=0
+      2   gicprobe: mode=level intid=255 cpu_if_mask=04 GICC_CTLR=00000261 GICC_PMR=f0 result=0
+      1   gicprobe: mode=level intid=255 cpu_if_mask=08 GICC_CTLR=00000261 GICC_PMR=f0 result=0
+      1   gicprobe: mode=level-repend intid=255 cpu_if_mask=02 GICC_CTLR=00000261 GICC_PMR=f0 result=0
+      2   gicprobe: mode=level-repend intid=255 cpu_if_mask=04 GICC_CTLR=00000261 GICC_PMR=f0 result=0
+      1   gicprobe: mode=level-repend intid=255 cpu_if_mask=08 GICC_CTLR=00000261 GICC_PMR=f0 result=0

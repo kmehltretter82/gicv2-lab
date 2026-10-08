@@ -1,0 +1,249 @@
+{
+  "raw_trace": {
+    "path": "/Users/kmehltretter/codex/linux-work/gicv2-lab/results/2026-09-05-h8-local/priority/negative-controls/value/serial.log",
+    "sha256": "c1faee803fb456f674d347ff87ffb5e778ae9ddb032360930ff99f5bd185364b"
+  },
+  "records": [
+    {
+      "kind": "marker",
+      "name": "[gicv2-lab] H8b begin",
+      "seq": 0
+    },
+    {
+      "kind": "field",
+      "name": "GuestCurrentEL",
+      "seq": 1,
+      "value": "0x1"
+    },
+    {
+      "kind": "field",
+      "name": "GuestDAIF",
+      "seq": 2,
+      "value": "0x3c0"
+    },
+    {
+      "kind": "field",
+      "name": "GuestSCTLR_MCI",
+      "seq": 3,
+      "value": "0x0"
+    },
+    {
+      "kind": "field",
+      "name": "GuestGICC_CTLR",
+      "seq": 4,
+      "value": "0x1"
+    },
+    {
+      "kind": "field",
+      "name": "GuestGICC_PMR",
+      "seq": 5,
+      "value": "0xf8"
+    },
+    {
+      "kind": "field",
+      "name": "GuestGICC_BPR",
+      "seq": 6,
+      "value": "0x2"
+    },
+    {
+      "kind": "field",
+      "name": "GuestIAR_initial",
+      "seq": 7,
+      "value": "0x3ff"
+    },
+    {
+      "kind": "field",
+      "name": "GuestRPR_initial",
+      "seq": 8,
+      "value": "0xff"
+    },
+    {
+      "kind": "field",
+      "name": "GuestPending_initial",
+      "seq": 9,
+      "value": "0x0"
+    },
+    {
+      "kind": "field",
+      "name": "GuestActive_initial",
+      "seq": 10,
+      "value": "0x0"
+    },
+    {
+      "kind": "marker",
+      "name": "[gicv2-lab] H8b interface ready",
+      "seq": 11
+    },
+    {
+      "kind": "field",
+      "name": "GuestPMR_masked",
+      "seq": 12,
+      "value": "0x80"
+    },
+    {
+      "kind": "field",
+      "name": "GuestPending_masked",
+      "seq": 13,
+      "value": "0x400"
+    },
+    {
+      "kind": "field",
+      "name": "GuestIAR_masked",
+      "seq": 14,
+      "value": "0x2a"
+    },
+    {
+      "kind": "field",
+      "name": "GuestRPR_masked",
+      "seq": 15,
+      "value": "0xff"
+    },
+    {
+      "kind": "field",
+      "name": "GuestActive_masked",
+      "seq": 16,
+      "value": "0x0"
+    },
+    {
+      "kind": "marker",
+      "name": "[gicv2-lab] H8b priority masked",
+      "seq": 17
+    },
+    {
+      "kind": "field",
+      "name": "GuestIAR_low",
+      "seq": 18,
+      "value": "0x2a"
+    },
+    {
+      "kind": "field",
+      "name": "GuestRPR_low",
+      "seq": 19,
+      "value": "0x80"
+    },
+    {
+      "kind": "field",
+      "name": "GuestActive_low",
+      "seq": 20,
+      "value": "0x400"
+    },
+    {
+      "kind": "marker",
+      "name": "[gicv2-lab] H8b low active",
+      "seq": 21
+    },
+    {
+      "kind": "field",
+      "name": "GuestPending_high",
+      "seq": 22,
+      "value": "0x800"
+    },
+    {
+      "kind": "field",
+      "name": "GuestIAR_high",
+      "seq": 23,
+      "value": "0x2b"
+    },
+    {
+      "kind": "field",
+      "name": "GuestRPR_both",
+      "seq": 24,
+      "value": "0x20"
+    },
+    {
+      "kind": "field",
+      "name": "GuestActive_both",
+      "seq": 25,
+      "value": "0xc00"
+    },
+    {
+      "kind": "marker",
+      "name": "[gicv2-lab] H8b both active",
+      "seq": 26
+    },
+    {
+      "kind": "field",
+      "name": "GuestRPR_after_high_eoi",
+      "seq": 27,
+      "value": "0x80"
+    },
+    {
+      "kind": "field",
+      "name": "GuestActive_after_high_eoi",
+      "seq": 28,
+      "value": "0x400"
+    },
+    {
+      "kind": "marker",
+      "name": "[gicv2-lab] H8b high completed",
+      "seq": 29
+    },
+    {
+      "kind": "marker",
+      "name": "[gicv2-lab] H8b low completed",
+      "seq": 30
+    },
+    {
+      "kind": "field",
+      "name": "GuestRPR_final",
+      "seq": 31,
+      "value": "0xff"
+    },
+    {
+      "kind": "field",
+      "name": "GuestActive_final",
+      "seq": 32,
+      "value": "0x0"
+    },
+    {
+      "kind": "field",
+      "name": "GuestPending_final",
+      "seq": 33,
+      "value": "0x0"
+    },
+    {
+      "kind": "field",
+      "name": "GuestHPPIR_final",
+      "seq": 34,
+      "value": "0x3ff"
+    },
+    {
+      "kind": "field",
+      "name": "GuestIAR_final",
+      "seq": 35,
+      "value": "0x3ff"
+    },
+    {
+      "kind": "marker",
+      "name": "[gicv2-lab] H8b PASS",
+      "seq": 36
+    }
+  ],
+  "run": {
+    "backend": "synthetic-negative-control",
+    "backend_id": "local mutation; not hardware",
+    "image": {
+      "path": "/private/var/folders/t3/2xm16l9d15b6cnsvvb6nfmm00000gn/T/gicv2-h8-audit-txt5v6zj/h8/priority/bundle/guest.elf",
+      "sha256": "0ae6231073efb14438d7d9383703662e9e0a01d08cbb7b340a850628bb507d77"
+    },
+    "runner_version": "1",
+    "scenario_path": "/private/var/folders/t3/2xm16l9d15b6cnsvvb6nfmm00000gn/T/gicv2-h8-audit-txt5v6zj/h8/priority/bundle/scenario.json",
+    "scenario_sha256": "ae0b014990f421c36e6f83c4fe543479788a32f309047442ec56d611f28cfdf6",
+    "schema": "gicv2-lab.run.v1",
+    "serial": {
+      "path": "/Users/kmehltretter/codex/linux-work/gicv2-lab/results/2026-09-05-h8-local/priority/negative-controls/value/serial.log",
+      "sha256": "c1faee803fb456f674d347ff87ffb5e778ae9ddb032360930ff99f5bd185364b"
+    },
+    "source_serial": {
+      "path": "/Users/kmehltretter/codex/linux-work/gicv2-lab/results/2026-09-05-h8-local/priority/negative-controls/synthetic-value.log",
+      "sha256": "c1faee803fb456f674d347ff87ffb5e778ae9ddb032360930ff99f5bd185364b"
+    },
+    "status": "imported"
+  },
+  "runner_version": "1",
+  "scenario": {
+    "id": "h8b-priority-v1",
+    "sha256": "ae0b014990f421c36e6f83c4fe543479788a32f309047442ec56d611f28cfdf6"
+  },
+  "schema": "gicv2-lab.trace.v1"
+}

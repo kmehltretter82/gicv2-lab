@@ -1,0 +1,484 @@
+{
+  "all_frozen_artifacts_verified": true,
+  "all_prerequisites_verified": null,
+  "all_raw_traces_renormalized": true,
+  "workloads": {
+    "priority": {
+      "entry": "0x40000000",
+      "fields_per_capture": 29,
+      "image_sha256": "0ae6231073efb14438d7d9383703662e9e0a01d08cbb7b340a850628bb507d77",
+      "kvm_captures": 0,
+      "markers_per_capture": 8,
+      "qemu_captures": 20,
+      "raw_trace_hash_counts": {
+        "qemu": {
+          "122344b836d2751d0bfe62b1c54ad4ee80f9f388f86425191a0f1de40febd8d1": 20
+        }
+      },
+      "runs": [
+        {
+          "backend": "qemu",
+          "matches_qemu": true,
+          "run": "run-001",
+          "serial_bytes": 1289,
+          "serial_sha256": "122344b836d2751d0bfe62b1c54ad4ee80f9f388f86425191a0f1de40febd8d1"
+        },
+        {
+          "backend": "qemu",
+          "matches_qemu": true,
+          "run": "run-002",
+          "serial_bytes": 1289,
+          "serial_sha256": "122344b836d2751d0bfe62b1c54ad4ee80f9f388f86425191a0f1de40febd8d1"
+        },
+        {
+          "backend": "qemu",
+          "matches_qemu": true,
+          "run": "run-003",
+          "serial_bytes": 1289,
+          "serial_sha256": "122344b836d2751d0bfe62b1c54ad4ee80f9f388f86425191a0f1de40febd8d1"
+        },
+        {
+          "backend": "qemu",
+          "matches_qemu": true,
+          "run": "run-004",
+          "serial_bytes": 1289,
+          "serial_sha256": "122344b836d2751d0bfe62b1c54ad4ee80f9f388f86425191a0f1de40febd8d1"
+        },
+        {
+          "backend": "qemu",
+          "matches_qemu": true,
+          "run": "run-005",
+          "serial_bytes": 1289,
+          "serial_sha256": "122344b836d2751d0bfe62b1c54ad4ee80f9f388f86425191a0f1de40febd8d1"
+        },
+        {
+          "backend": "qemu",
+          "matches_qemu": true,
+          "run": "run-006",
+          "serial_bytes": 1289,
+          "serial_sha256": "122344b836d2751d0bfe62b1c54ad4ee80f9f388f86425191a0f1de40febd8d1"
+        },
+        {
+          "backend": "qemu",
+          "matches_qemu": true,
+          "run": "run-007",
+          "serial_bytes": 1289,
+          "serial_sha256": "122344b836d2751d0bfe62b1c54ad4ee80f9f388f86425191a0f1de40febd8d1"
+        },
+        {
+          "backend": "qemu",
+          "matches_qemu": true,
+          "run": "run-008",
+          "serial_bytes": 1289,
+          "serial_sha256": "122344b836d2751d0bfe62b1c54ad4ee80f9f388f86425191a0f1de40febd8d1"
+        },
+        {
+          "backend": "qemu",
+          "matches_qemu": true,
+          "run": "run-009",
+          "serial_bytes": 1289,
+          "serial_sha256": "122344b836d2751d0bfe62b1c54ad4ee80f9f388f86425191a0f1de40febd8d1"
+        },
+        {
+          "backend": "qemu",
+          "matches_qemu": true,
+          "run": "run-010",
+          "serial_bytes": 1289,
+          "serial_sha256": "122344b836d2751d0bfe62b1c54ad4ee80f9f388f86425191a0f1de40febd8d1"
+        },
+        {
+          "backend": "qemu",
+          "matches_qemu": true,
+          "run": "run-011",
+          "serial_bytes": 1289,
+          "serial_sha256": "122344b836d2751d0bfe62b1c54ad4ee80f9f388f86425191a0f1de40febd8d1"
+        },
+        {
+          "backend": "qemu",
+          "matches_qemu": true,
+          "run": "run-012",
+          "serial_bytes": 1289,
+          "serial_sha256": "122344b836d2751d0bfe62b1c54ad4ee80f9f388f86425191a0f1de40febd8d1"
+        },
+        {
+          "backend": "qemu",
+          "matches_qemu": true,
+          "run": "run-013",
+          "serial_bytes": 1289,
+          "serial_sha256": "122344b836d2751d0bfe62b1c54ad4ee80f9f388f86425191a0f1de40febd8d1"
+        },
+        {
+          "backend": "qemu",
+          "matches_qemu": true,
+          "run": "run-014",
+          "serial_bytes": 1289,
+          "serial_sha256": "122344b836d2751d0bfe62b1c54ad4ee80f9f388f86425191a0f1de40febd8d1"
+        },
+        {
+          "backend": "qemu",
+          "matches_qemu": true,
+          "run": "run-015",
+          "serial_bytes": 1289,
+          "serial_sha256": "122344b836d2751d0bfe62b1c54ad4ee80f9f388f86425191a0f1de40febd8d1"
+        },
+        {
+          "backend": "qemu",
+          "matches_qemu": true,
+          "run": "run-016",
+          "serial_bytes": 1289,
+          "serial_sha256": "122344b836d2751d0bfe62b1c54ad4ee80f9f388f86425191a0f1de40febd8d1"
+        },
+        {
+          "backend": "qemu",
+          "matches_qemu": true,
+          "run": "run-017",
+          "serial_bytes": 1289,
+          "serial_sha256": "122344b836d2751d0bfe62b1c54ad4ee80f9f388f86425191a0f1de40febd8d1"
+        },
+        {
+          "backend": "qemu",
+          "matches_qemu": true,
+          "run": "run-018",
+          "serial_bytes": 1289,
+          "serial_sha256": "122344b836d2751d0bfe62b1c54ad4ee80f9f388f86425191a0f1de40febd8d1"
+        },
+        {
+          "backend": "qemu",
+          "matches_qemu": true,
+          "run": "run-019",
+          "serial_bytes": 1289,
+          "serial_sha256": "122344b836d2751d0bfe62b1c54ad4ee80f9f388f86425191a0f1de40febd8d1"
+        },
+        {
+          "backend": "qemu",
+          "matches_qemu": true,
+          "run": "run-020",
+          "serial_bytes": 1289,
+          "serial_sha256": "122344b836d2751d0bfe62b1c54ad4ee80f9f388f86425191a0f1de40febd8d1"
+        }
+      ],
+      "scenario_sha256": "ae0b014990f421c36e6f83c4fe543479788a32f309047442ec56d611f28cfdf6",
+      "truncation_and_marker_order_rejected": true,
+      "value_and_shared_forbidden_rejected": true,
+      "workload": "priority"
+    },
+    "redelivery": {
+      "entry": "0x40000000",
+      "fields_per_capture": 35,
+      "image_sha256": "ec0ea3b41d08976bfc7aea338940d2fa2ef56a17a95681d137814559184bd848",
+      "kvm_captures": 0,
+      "markers_per_capture": 9,
+      "qemu_captures": 20,
+      "raw_trace_hash_counts": {
+        "qemu": {
+          "fb52a95880809ca8f9939049dc549b378281609886a2df9ddd0e84c40146c143": 20
+        }
+      },
+      "runs": [
+        {
+          "backend": "qemu",
+          "matches_qemu": true,
+          "run": "run-001",
+          "serial_bytes": 1658,
+          "serial_sha256": "fb52a95880809ca8f9939049dc549b378281609886a2df9ddd0e84c40146c143"
+        },
+        {
+          "backend": "qemu",
+          "matches_qemu": true,
+          "run": "run-002",
+          "serial_bytes": 1658,
+          "serial_sha256": "fb52a95880809ca8f9939049dc549b378281609886a2df9ddd0e84c40146c143"
+        },
+        {
+          "backend": "qemu",
+          "matches_qemu": true,
+          "run": "run-003",
+          "serial_bytes": 1658,
+          "serial_sha256": "fb52a95880809ca8f9939049dc549b378281609886a2df9ddd0e84c40146c143"
+        },
+        {
+          "backend": "qemu",
+          "matches_qemu": true,
+          "run": "run-004",
+          "serial_bytes": 1658,
+          "serial_sha256": "fb52a95880809ca8f9939049dc549b378281609886a2df9ddd0e84c40146c143"
+        },
+        {
+          "backend": "qemu",
+          "matches_qemu": true,
+          "run": "run-005",
+          "serial_bytes": 1658,
+          "serial_sha256": "fb52a95880809ca8f9939049dc549b378281609886a2df9ddd0e84c40146c143"
+        },
+        {
+          "backend": "qemu",
+          "matches_qemu": true,
+          "run": "run-006",
+          "serial_bytes": 1658,
+          "serial_sha256": "fb52a95880809ca8f9939049dc549b378281609886a2df9ddd0e84c40146c143"
+        },
+        {
+          "backend": "qemu",
+          "matches_qemu": true,
+          "run": "run-007",
+          "serial_bytes": 1658,
+          "serial_sha256": "fb52a95880809ca8f9939049dc549b378281609886a2df9ddd0e84c40146c143"
+        },
+        {
+          "backend": "qemu",
+          "matches_qemu": true,
+          "run": "run-008",
+          "serial_bytes": 1658,
+          "serial_sha256": "fb52a95880809ca8f9939049dc549b378281609886a2df9ddd0e84c40146c143"
+        },
+        {
+          "backend": "qemu",
+          "matches_qemu": true,
+          "run": "run-009",
+          "serial_bytes": 1658,
+          "serial_sha256": "fb52a95880809ca8f9939049dc549b378281609886a2df9ddd0e84c40146c143"
+        },
+        {
+          "backend": "qemu",
+          "matches_qemu": true,
+          "run": "run-010",
+          "serial_bytes": 1658,
+          "serial_sha256": "fb52a95880809ca8f9939049dc549b378281609886a2df9ddd0e84c40146c143"
+        },
+        {
+          "backend": "qemu",
+          "matches_qemu": true,
+          "run": "run-011",
+          "serial_bytes": 1658,
+          "serial_sha256": "fb52a95880809ca8f9939049dc549b378281609886a2df9ddd0e84c40146c143"
+        },
+        {
+          "backend": "qemu",
+          "matches_qemu": true,
+          "run": "run-012",
+          "serial_bytes": 1658,
+          "serial_sha256": "fb52a95880809ca8f9939049dc549b378281609886a2df9ddd0e84c40146c143"
+        },
+        {
+          "backend": "qemu",
+          "matches_qemu": true,
+          "run": "run-013",
+          "serial_bytes": 1658,
+          "serial_sha256": "fb52a95880809ca8f9939049dc549b378281609886a2df9ddd0e84c40146c143"
+        },
+        {
+          "backend": "qemu",
+          "matches_qemu": true,
+          "run": "run-014",
+          "serial_bytes": 1658,
+          "serial_sha256": "fb52a95880809ca8f9939049dc549b378281609886a2df9ddd0e84c40146c143"
+        },
+        {
+          "backend": "qemu",
+          "matches_qemu": true,
+          "run": "run-015",
+          "serial_bytes": 1658,
+          "serial_sha256": "fb52a95880809ca8f9939049dc549b378281609886a2df9ddd0e84c40146c143"
+        },
+        {
+          "backend": "qemu",
+          "matches_qemu": true,
+          "run": "run-016",
+          "serial_bytes": 1658,
+          "serial_sha256": "fb52a95880809ca8f9939049dc549b378281609886a2df9ddd0e84c40146c143"
+        },
+        {
+          "backend": "qemu",
+          "matches_qemu": true,
+          "run": "run-017",
+          "serial_bytes": 1658,
+          "serial_sha256": "fb52a95880809ca8f9939049dc549b378281609886a2df9ddd0e84c40146c143"
+        },
+        {
+          "backend": "qemu",
+          "matches_qemu": true,
+          "run": "run-018",
+          "serial_bytes": 1658,
+          "serial_sha256": "fb52a95880809ca8f9939049dc549b378281609886a2df9ddd0e84c40146c143"
+        },
+        {
+          "backend": "qemu",
+          "matches_qemu": true,
+          "run": "run-019",
+          "serial_bytes": 1658,
+          "serial_sha256": "fb52a95880809ca8f9939049dc549b378281609886a2df9ddd0e84c40146c143"
+        },
+        {
+          "backend": "qemu",
+          "matches_qemu": true,
+          "run": "run-020",
+          "serial_bytes": 1658,
+          "serial_sha256": "fb52a95880809ca8f9939049dc549b378281609886a2df9ddd0e84c40146c143"
+        }
+      ],
+      "scenario_sha256": "d304006e7f741beb041a4b9e4aaec296ad2f45f8679e40c2ed0fcaaab8402559",
+      "truncation_and_marker_order_rejected": true,
+      "value_and_shared_forbidden_rejected": true,
+      "workload": "redelivery"
+    },
+    "split-eoi": {
+      "entry": "0x40000000",
+      "fields_per_capture": 26,
+      "image_sha256": "51a7b685042acdb681744affa46178094791f8d6d0cd37618d47222f2f2f7007",
+      "kvm_captures": 0,
+      "markers_per_capture": 7,
+      "qemu_captures": 20,
+      "raw_trace_hash_counts": {
+        "qemu": {
+          "c9bdb58e0ef2c3c236150719e465b2efb7ed18eb0b7ec1845a5e3af42d8fdf3b": 20
+        }
+      },
+      "runs": [
+        {
+          "backend": "qemu",
+          "matches_qemu": true,
+          "run": "run-001",
+          "serial_bytes": 1178,
+          "serial_sha256": "c9bdb58e0ef2c3c236150719e465b2efb7ed18eb0b7ec1845a5e3af42d8fdf3b"
+        },
+        {
+          "backend": "qemu",
+          "matches_qemu": true,
+          "run": "run-002",
+          "serial_bytes": 1178,
+          "serial_sha256": "c9bdb58e0ef2c3c236150719e465b2efb7ed18eb0b7ec1845a5e3af42d8fdf3b"
+        },
+        {
+          "backend": "qemu",
+          "matches_qemu": true,
+          "run": "run-003",
+          "serial_bytes": 1178,
+          "serial_sha256": "c9bdb58e0ef2c3c236150719e465b2efb7ed18eb0b7ec1845a5e3af42d8fdf3b"
+        },
+        {
+          "backend": "qemu",
+          "matches_qemu": true,
+          "run": "run-004",
+          "serial_bytes": 1178,
+          "serial_sha256": "c9bdb58e0ef2c3c236150719e465b2efb7ed18eb0b7ec1845a5e3af42d8fdf3b"
+        },
+        {
+          "backend": "qemu",
+          "matches_qemu": true,
+          "run": "run-005",
+          "serial_bytes": 1178,
+          "serial_sha256": "c9bdb58e0ef2c3c236150719e465b2efb7ed18eb0b7ec1845a5e3af42d8fdf3b"
+        },
+        {
+          "backend": "qemu",
+          "matches_qemu": true,
+          "run": "run-006",
+          "serial_bytes": 1178,
+          "serial_sha256": "c9bdb58e0ef2c3c236150719e465b2efb7ed18eb0b7ec1845a5e3af42d8fdf3b"
+        },
+        {
+          "backend": "qemu",
+          "matches_qemu": true,
+          "run": "run-007",
+          "serial_bytes": 1178,
+          "serial_sha256": "c9bdb58e0ef2c3c236150719e465b2efb7ed18eb0b7ec1845a5e3af42d8fdf3b"
+        },
+        {
+          "backend": "qemu",
+          "matches_qemu": true,
+          "run": "run-008",
+          "serial_bytes": 1178,
+          "serial_sha256": "c9bdb58e0ef2c3c236150719e465b2efb7ed18eb0b7ec1845a5e3af42d8fdf3b"
+        },
+        {
+          "backend": "qemu",
+          "matches_qemu": true,
+          "run": "run-009",
+          "serial_bytes": 1178,
+          "serial_sha256": "c9bdb58e0ef2c3c236150719e465b2efb7ed18eb0b7ec1845a5e3af42d8fdf3b"
+        },
+        {
+          "backend": "qemu",
+          "matches_qemu": true,
+          "run": "run-010",
+          "serial_bytes": 1178,
+          "serial_sha256": "c9bdb58e0ef2c3c236150719e465b2efb7ed18eb0b7ec1845a5e3af42d8fdf3b"
+        },
+        {
+          "backend": "qemu",
+          "matches_qemu": true,
+          "run": "run-011",
+          "serial_bytes": 1178,
+          "serial_sha256": "c9bdb58e0ef2c3c236150719e465b2efb7ed18eb0b7ec1845a5e3af42d8fdf3b"
+        },
+        {
+          "backend": "qemu",
+          "matches_qemu": true,
+          "run": "run-012",
+          "serial_bytes": 1178,
+          "serial_sha256": "c9bdb58e0ef2c3c236150719e465b2efb7ed18eb0b7ec1845a5e3af42d8fdf3b"
+        },
+        {
+          "backend": "qemu",
+          "matches_qemu": true,
+          "run": "run-013",
+          "serial_bytes": 1178,
+          "serial_sha256": "c9bdb58e0ef2c3c236150719e465b2efb7ed18eb0b7ec1845a5e3af42d8fdf3b"
+        },
+        {
+          "backend": "qemu",
+          "matches_qemu": true,
+          "run": "run-014",
+          "serial_bytes": 1178,
+          "serial_sha256": "c9bdb58e0ef2c3c236150719e465b2efb7ed18eb0b7ec1845a5e3af42d8fdf3b"
+        },
+        {
+          "backend": "qemu",
+          "matches_qemu": true,
+          "run": "run-015",
+          "serial_bytes": 1178,
+          "serial_sha256": "c9bdb58e0ef2c3c236150719e465b2efb7ed18eb0b7ec1845a5e3af42d8fdf3b"
+        },
+        {
+          "backend": "qemu",
+          "matches_qemu": true,
+          "run": "run-016",
+          "serial_bytes": 1178,
+          "serial_sha256": "c9bdb58e0ef2c3c236150719e465b2efb7ed18eb0b7ec1845a5e3af42d8fdf3b"
+        },
+        {
+          "backend": "qemu",
+          "matches_qemu": true,
+          "run": "run-017",
+          "serial_bytes": 1178,
+          "serial_sha256": "c9bdb58e0ef2c3c236150719e465b2efb7ed18eb0b7ec1845a5e3af42d8fdf3b"
+        },
+        {
+          "backend": "qemu",
+          "matches_qemu": true,
+          "run": "run-018",
+          "serial_bytes": 1178,
+          "serial_sha256": "c9bdb58e0ef2c3c236150719e465b2efb7ed18eb0b7ec1845a5e3af42d8fdf3b"
+        },
+        {
+          "backend": "qemu",
+          "matches_qemu": true,
+          "run": "run-019",
+          "serial_bytes": 1178,
+          "serial_sha256": "c9bdb58e0ef2c3c236150719e465b2efb7ed18eb0b7ec1845a5e3af42d8fdf3b"
+        },
+        {
+          "backend": "qemu",
+          "matches_qemu": true,
+          "run": "run-020",
+          "serial_bytes": 1178,
+          "serial_sha256": "c9bdb58e0ef2c3c236150719e465b2efb7ed18eb0b7ec1845a5e3af42d8fdf3b"
+        }
+      ],
+      "scenario_sha256": "04f56c5cb817ed157a570766235c9f6ecd90b82c053ada3fbad72c4aa5be448a",
+      "truncation_and_marker_order_rejected": true,
+      "value_and_shared_forbidden_rejected": true,
+      "workload": "split-eoi"
+    }
+  }
+}

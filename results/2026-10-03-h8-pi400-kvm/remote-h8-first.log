@@ -1,0 +1,8 @@
+h8-qemu-campaign.tar.xz: OK
+{
+  "workload": "split-eoi",
+  "image_sha256": "51a7b685042acdb681744affa46178094791f8d6d0cd37618d47222f2f2f7007",
+  "scenario_sha256": "04f56c5cb817ed157a570766235c9f6ecd90b82c053ada3fbad72c4aa5be448a",
+  "entry": "0x40000000"
+}
+gicv2-lab H7: KVM did not produce a complete passing trace

@@ -1,0 +1,34 @@
+[gicv2-lab] H8a begin
+GuestCurrentEL=0x0000000000000001
+GuestDAIF=0x00000000000003c0
+GuestSCTLR_MCI=0x0000000000000000
+GICD_TYPER=0x0000000000000008
+GuestGICC_CTLR=0x0000000000000201
+GuestGICC_PMR=0x00000000000000f8
+GuestGICC_BPR=0x0000000000000002
+GuestIAR_initial=0x00000000000003ff
+GuestRPR_initial=0x00000000000000ff
+GuestPending_initial=0x0000000000000000
+GuestActive_initial=0x0000000000000000
+[gicv2-lab] H8a pending
+GuestPending_before_iar=0x0000000000000400
+GuestHPPIR_pending=0x000000000000002a
+[gicv2-lab] H8a pending
+GuestIAR_active=0x000000000000002a
+GuestRPR_active=0x0000000000000040
+GuestActive_after_iar=0x0000000000000400
+GuestPending_after_iar=0x0000000000000000
+[gicv2-lab] H8a active
+GuestRPR_after_eoir=0x00000000000000ff
+GuestActive_after_eoir=0x0000000000000400
+GuestPending_after_eoir=0x0000000000000000
+GuestIAR_before_dir=0x00000000000003ff
+[gicv2-lab] H8a priority dropped
+GuestActive_after_dir=0x0000000000000000
+[gicv2-lab] H8a deactivated
+GuestRPR_final=0x00000000000000ff
+GuestActive_final=0x0000000000000000
+GuestPending_final=0x0000000000000000
+GuestHPPIR_final=0x00000000000003ff
+GuestIAR_final=0x00000000000003ff
+[gicv2-lab] H8a PASS

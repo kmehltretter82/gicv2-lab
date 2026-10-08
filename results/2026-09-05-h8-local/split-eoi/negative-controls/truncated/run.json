@@ -1,0 +1,21 @@
+{
+  "backend": "synthetic-negative-control",
+  "backend_id": "local mutation; not hardware",
+  "image": {
+    "path": "/private/var/folders/t3/2xm16l9d15b6cnsvvb6nfmm00000gn/T/gicv2-h8-audit-txt5v6zj/h8/split-eoi/bundle/guest.elf",
+    "sha256": "51a7b685042acdb681744affa46178094791f8d6d0cd37618d47222f2f2f7007"
+  },
+  "runner_version": "1",
+  "scenario_path": "/private/var/folders/t3/2xm16l9d15b6cnsvvb6nfmm00000gn/T/gicv2-h8-audit-txt5v6zj/h8/split-eoi/bundle/scenario.json",
+  "scenario_sha256": "04f56c5cb817ed157a570766235c9f6ecd90b82c053ada3fbad72c4aa5be448a",
+  "schema": "gicv2-lab.run.v1",
+  "serial": {
+    "path": "/Users/kmehltretter/codex/linux-work/gicv2-lab/results/2026-09-05-h8-local/split-eoi/negative-controls/truncated/serial.log",
+    "sha256": "a16e3a4958e28ce185a7dfdbb64aa114ec88317a58edf02869f85cec4402210e"
+  },
+  "source_serial": {
+    "path": "/Users/kmehltretter/codex/linux-work/gicv2-lab/results/2026-09-05-h8-local/split-eoi/negative-controls/synthetic-truncated.log",
+    "sha256": "a16e3a4958e28ce185a7dfdbb64aa114ec88317a58edf02869f85cec4402210e"
+  },
+  "status": "invalid-trace"
+}

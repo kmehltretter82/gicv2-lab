@@ -1,0 +1,31 @@
+{
+  "started_utc": "2026-09-05T05:27:17.360489+00:00",
+  "controller_pid": 12727,
+  "ssh": [
+    "ssh",
+    "-o",
+    "BatchMode=yes",
+    "-o",
+    "ConnectTimeout=10",
+    "karl@192.168.1.15"
+  ],
+  "driver_command": [
+    "bash",
+    "/Users/kmehltretter/codex/linux-work/gicv2-lab/build/2026-09-05-pi400-hardware/h6/gate/source/scripts/h6-repeat.sh",
+    "100",
+    "/Users/kmehltretter/codex/linux-work/gicv2-lab/build/2026-09-05-pi400-hardware/h6/gate"
+  ],
+  "environment": {
+    "PI_HOST": "karl@192.168.1.15",
+    "PORT": "/dev/cu.usbserial-B0043XBS",
+    "PYTHON": "/opt/homebrew/bin/python3",
+    "PYTHONDONTWRITEBYTECODE": "1"
+  },
+  "deployment_script": "remote-h6-deploy.sh",
+  "restoration_script": "remote-h6-restore.sh",
+  "deployment_exit_status": 0,
+  "driver_pid": 12763,
+  "driver_exit_status": 0,
+  "restoration_exit_status": 1,
+  "finished_utc": "2026-09-05T06:59:16.792948+00:00"
+}

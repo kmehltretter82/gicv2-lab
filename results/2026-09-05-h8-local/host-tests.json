@@ -1,0 +1,15 @@
+{
+  "command": [
+    "make",
+    "h5-test",
+    "h6-test",
+    "h7-test"
+  ],
+  "exit_status": 0,
+  "test_counts": {
+    "h5": 7,
+    "h6": 11,
+    "h7": 11
+  },
+  "source_snapshot": "Each frozen bundle includes the tested source and tests."
+}

@@ -1,0 +1,186 @@
+gicv2-lab H7: KVM did not produce a complete passing trace
+H8 split-eoi KVM run 002 capture_rc=2 compare_rc=skipped serial_sha256=e5d5514e74966d33
+gicv2-lab H7: KVM did not produce a complete passing trace
+H8 split-eoi KVM run 003 capture_rc=2 compare_rc=skipped serial_sha256=e5d5514e74966d33
+gicv2-lab H7: KVM did not produce a complete passing trace
+H8 split-eoi KVM run 004 capture_rc=2 compare_rc=skipped serial_sha256=e5d5514e74966d33
+gicv2-lab H7: KVM did not produce a complete passing trace
+H8 split-eoi KVM run 005 capture_rc=2 compare_rc=skipped serial_sha256=e5d5514e74966d33
+gicv2-lab H7: KVM did not produce a complete passing trace
+H8 split-eoi KVM run 006 capture_rc=2 compare_rc=skipped serial_sha256=e5d5514e74966d33
+gicv2-lab H7: KVM did not produce a complete passing trace
+H8 split-eoi KVM run 007 capture_rc=2 compare_rc=skipped serial_sha256=e5d5514e74966d33
+gicv2-lab H7: KVM did not produce a complete passing trace
+H8 split-eoi KVM run 008 capture_rc=2 compare_rc=skipped serial_sha256=e5d5514e74966d33
+gicv2-lab H7: KVM did not produce a complete passing trace
+H8 split-eoi KVM run 009 capture_rc=2 compare_rc=skipped serial_sha256=e5d5514e74966d33
+gicv2-lab H7: KVM did not produce a complete passing trace
+H8 split-eoi KVM run 010 capture_rc=2 compare_rc=skipped serial_sha256=e5d5514e74966d33
+gicv2-lab H7: KVM did not produce a complete passing trace
+H8 split-eoi KVM run 011 capture_rc=2 compare_rc=skipped serial_sha256=e5d5514e74966d33
+gicv2-lab H7: KVM did not produce a complete passing trace
+H8 split-eoi KVM run 012 capture_rc=2 compare_rc=skipped serial_sha256=e5d5514e74966d33
+gicv2-lab H7: KVM did not produce a complete passing trace
+H8 split-eoi KVM run 013 capture_rc=2 compare_rc=skipped serial_sha256=e5d5514e74966d33
+gicv2-lab H7: KVM did not produce a complete passing trace
+H8 split-eoi KVM run 014 capture_rc=2 compare_rc=skipped serial_sha256=e5d5514e74966d33
+gicv2-lab H7: KVM did not produce a complete passing trace
+H8 split-eoi KVM run 015 capture_rc=2 compare_rc=skipped serial_sha256=e5d5514e74966d33
+gicv2-lab H7: KVM did not produce a complete passing trace
+H8 split-eoi KVM run 016 capture_rc=2 compare_rc=skipped serial_sha256=e5d5514e74966d33
+gicv2-lab H7: KVM did not produce a complete passing trace
+H8 split-eoi KVM run 017 capture_rc=2 compare_rc=skipped serial_sha256=e5d5514e74966d33
+gicv2-lab H7: KVM did not produce a complete passing trace
+H8 split-eoi KVM run 018 capture_rc=2 compare_rc=skipped serial_sha256=e5d5514e74966d33
+gicv2-lab H7: KVM did not produce a complete passing trace
+H8 split-eoi KVM run 019 capture_rc=2 compare_rc=skipped serial_sha256=e5d5514e74966d33
+gicv2-lab H7: KVM did not produce a complete passing trace
+H8 split-eoi KVM run 020 capture_rc=2 compare_rc=skipped serial_sha256=e5d5514e74966d33
+--- split-eoi run-001 serial
+[gicv2-lab] H8a begin
+GuestCurrentEL=0x0000000000000001
+GuestDAIF=0x00000000000003c0
+GuestSCTLR_MCI=0x0000000000000000
+GICD_TYPER=0x0000000000000001
+GuestGICC_CTLR=0x0000000000000201
+GuestGICC_PMR=0x00000000000000f8
+GuestGICC_BPR=0x0000000000000002
+GuestIAR_initial=0x00000000000003ff
+GuestRPR_initial=0x00000000000000ff
+GuestPending_initial=0x0000000000000000
+GuestActive_initial=0x0000000000000000
+[gicv2-lab] H8a interface ready
+GuestPending_before_iar=0x0000000000000400
+GuestHPPIR_pending=0x000000000000002a
+[gicv2-lab] H8a pending
+GuestIAR_active=0x000000000000002a
+GuestRPR_active=0x0000000000000040
+GuestActive_after_iar=0x0000000000000400
+GuestPending_after_iar=0x0000000000000400
+[gicv2-lab] H8a FAIL: contract violation
+gicv2-lab H7: KVM did not produce a complete passing trace
+H8 priority KVM run 001 capture_rc=2 compare_rc=skipped serial_sha256=468598e4e6a4f8ba
+gicv2-lab H7: KVM did not produce a complete passing trace
+H8 priority KVM run 002 capture_rc=2 compare_rc=skipped serial_sha256=468598e4e6a4f8ba
+gicv2-lab H7: KVM did not produce a complete passing trace
+H8 priority KVM run 003 capture_rc=2 compare_rc=skipped serial_sha256=468598e4e6a4f8ba
+gicv2-lab H7: KVM did not produce a complete passing trace
+H8 priority KVM run 004 capture_rc=2 compare_rc=skipped serial_sha256=23379dedd35a551a
+gicv2-lab H7: KVM did not produce a complete passing trace
+H8 priority KVM run 005 capture_rc=2 compare_rc=skipped serial_sha256=468598e4e6a4f8ba
+gicv2-lab H7: KVM did not produce a complete passing trace
+H8 priority KVM run 006 capture_rc=2 compare_rc=skipped serial_sha256=468598e4e6a4f8ba
+gicv2-lab H7: KVM did not produce a complete passing trace
+H8 priority KVM run 007 capture_rc=2 compare_rc=skipped serial_sha256=468598e4e6a4f8ba
+gicv2-lab H7: KVM did not produce a complete passing trace
+H8 priority KVM run 008 capture_rc=2 compare_rc=skipped serial_sha256=468598e4e6a4f8ba
+gicv2-lab H7: KVM did not produce a complete passing trace
+H8 priority KVM run 009 capture_rc=2 compare_rc=skipped serial_sha256=468598e4e6a4f8ba
+gicv2-lab H7: KVM did not produce a complete passing trace
+H8 priority KVM run 010 capture_rc=2 compare_rc=skipped serial_sha256=7292e417c79b929c
+gicv2-lab H7: KVM did not produce a complete passing trace
+H8 priority KVM run 011 capture_rc=2 compare_rc=skipped serial_sha256=468598e4e6a4f8ba
+gicv2-lab H7: KVM did not produce a complete passing trace
+H8 priority KVM run 012 capture_rc=2 compare_rc=skipped serial_sha256=468598e4e6a4f8ba
+gicv2-lab H7: KVM did not produce a complete passing trace
+H8 priority KVM run 013 capture_rc=2 compare_rc=skipped serial_sha256=468598e4e6a4f8ba
+gicv2-lab H7: KVM did not produce a complete passing trace
+H8 priority KVM run 014 capture_rc=2 compare_rc=skipped serial_sha256=468598e4e6a4f8ba
+gicv2-lab H7: KVM did not produce a complete passing trace
+H8 priority KVM run 015 capture_rc=2 compare_rc=skipped serial_sha256=468598e4e6a4f8ba
+gicv2-lab H7: KVM did not produce a complete passing trace
+H8 priority KVM run 016 capture_rc=2 compare_rc=skipped serial_sha256=468598e4e6a4f8ba
+gicv2-lab H7: KVM did not produce a complete passing trace
+H8 priority KVM run 017 capture_rc=2 compare_rc=skipped serial_sha256=468598e4e6a4f8ba
+gicv2-lab H7: KVM did not produce a complete passing trace
+H8 priority KVM run 018 capture_rc=2 compare_rc=skipped serial_sha256=468598e4e6a4f8ba
+gicv2-lab H7: KVM did not produce a complete passing trace
+H8 priority KVM run 019 capture_rc=2 compare_rc=skipped serial_sha256=468598e4e6a4f8ba
+gicv2-lab H7: KVM did not produce a complete passing trace
+H8 priority KVM run 020 capture_rc=2 compare_rc=skipped serial_sha256=468598e4e6a4f8ba
+--- priority run-001 serial
+[gicv2-lab] H8b begin
+GuestCurrentEL=0x0000000000000001
+GuestDAIF=0x00000000000003c0
+GuestSCTLR_MCI=0x0000000000000000
+GICD_TYPER=0x0000000000000001
+GuestGICC_CTLR=0x0000000000000001
+GuestGICC_PMR=0x00000000000000f8
+GuestGICC_BPR=0x0000000000000002
+GuestIAR_initial=0x00000000000003ff
+GuestRPR_initial=0x00000000000000ff
+GuestPending_initial=0x0000000000000000
+GuestActive_initial=0x0000000000000000
+[gicv2-lab] H8b interface ready
+GuestPMR_masked=0x0000000000000080
+GuestPending_masked=0x0000000000000400
+GuestIAR_masked=0x00000000000003ff
+GuestRPR_masked=0x00000000000000ff
+GuestActive_masked=0x0000000000000000
+[gicv2-lab] H8b priority masked
+GuestIAR_low=0x000000000000002a
+GuestRPR_low=0x0000000000000080
+GuestActive_low=0x0000000000000400
+[gicv2-lab] H8b low active
+GuestPending_high=0x0000000000000c00
+[gicv2-lab] H8b FAIL: contract violation
+gicv2-lab H7: KVM did not produce a complete passing trace
+H8 redelivery KVM run 001 capture_rc=2 compare_rc=skipped serial_sha256=834a305138dc59c6
+gicv2-lab H7: KVM did not produce a complete passing trace
+H8 redelivery KVM run 002 capture_rc=2 compare_rc=skipped serial_sha256=834a305138dc59c6
+gicv2-lab H7: KVM did not produce a complete passing trace
+H8 redelivery KVM run 003 capture_rc=2 compare_rc=skipped serial_sha256=834a305138dc59c6
+gicv2-lab H7: KVM did not produce a complete passing trace
+H8 redelivery KVM run 004 capture_rc=2 compare_rc=skipped serial_sha256=834a305138dc59c6
+gicv2-lab H7: KVM did not produce a complete passing trace
+H8 redelivery KVM run 005 capture_rc=2 compare_rc=skipped serial_sha256=834a305138dc59c6
+gicv2-lab H7: KVM did not produce a complete passing trace
+H8 redelivery KVM run 006 capture_rc=2 compare_rc=skipped serial_sha256=834a305138dc59c6
+gicv2-lab H7: KVM did not produce a complete passing trace
+H8 redelivery KVM run 007 capture_rc=2 compare_rc=skipped serial_sha256=834a305138dc59c6
+gicv2-lab H7: KVM did not produce a complete passing trace
+H8 redelivery KVM run 008 capture_rc=2 compare_rc=skipped serial_sha256=834a305138dc59c6
+gicv2-lab H7: KVM did not produce a complete passing trace
+H8 redelivery KVM run 009 capture_rc=2 compare_rc=skipped serial_sha256=834a305138dc59c6
+gicv2-lab H7: KVM did not produce a complete passing trace
+H8 redelivery KVM run 010 capture_rc=2 compare_rc=skipped serial_sha256=834a305138dc59c6
+gicv2-lab H7: KVM did not produce a complete passing trace
+H8 redelivery KVM run 011 capture_rc=2 compare_rc=skipped serial_sha256=834a305138dc59c6
+gicv2-lab H7: KVM did not produce a complete passing trace
+H8 redelivery KVM run 012 capture_rc=2 compare_rc=skipped serial_sha256=834a305138dc59c6
+gicv2-lab H7: KVM did not produce a complete passing trace
+H8 redelivery KVM run 013 capture_rc=2 compare_rc=skipped serial_sha256=834a305138dc59c6
+gicv2-lab H7: KVM did not produce a complete passing trace
+H8 redelivery KVM run 014 capture_rc=2 compare_rc=skipped serial_sha256=834a305138dc59c6
+gicv2-lab H7: KVM did not produce a complete passing trace
+H8 redelivery KVM run 015 capture_rc=2 compare_rc=skipped serial_sha256=834a305138dc59c6
+gicv2-lab H7: KVM did not produce a complete passing trace
+H8 redelivery KVM run 016 capture_rc=2 compare_rc=skipped serial_sha256=834a305138dc59c6
+gicv2-lab H7: KVM did not produce a complete passing trace
+H8 redelivery KVM run 017 capture_rc=2 compare_rc=skipped serial_sha256=834a305138dc59c6
+gicv2-lab H7: KVM did not produce a complete passing trace
+H8 redelivery KVM run 018 capture_rc=2 compare_rc=skipped serial_sha256=834a305138dc59c6
+gicv2-lab H7: KVM did not produce a complete passing trace
+H8 redelivery KVM run 019 capture_rc=2 compare_rc=skipped serial_sha256=834a305138dc59c6
+gicv2-lab H7: KVM did not produce a complete passing trace
+H8 redelivery KVM run 020 capture_rc=2 compare_rc=skipped serial_sha256=834a305138dc59c6
+--- redelivery run-001 serial
+[gicv2-lab] H8c begin
+GuestCurrentEL=0x0000000000000001
+GuestDAIF=0x00000000000003c0
+GuestSCTLR_MCI=0x0000000000000000
+GICD_TYPER=0x0000000000000001
+GuestGICC_CTLR=0x0000000000000201
+GuestGICC_PMR=0x00000000000000f8
+GuestGICC_BPR=0x0000000000000002
+GuestIAR_initial=0x00000000000003ff
+GuestRPR_initial=0x00000000000000ff
+GuestPending_initial=0x0000000000000000
+GuestActive_initial=0x0000000000000000
+[gicv2-lab] H8c interface ready
+GuestIAR_first=0x000000000000002a
+GuestRPR_first=0x0000000000000040
+GuestActive_first=0x0000000000000400
+GuestPending_first=0x0000000000000400
+[gicv2-lab] H8c FAIL: contract violation
+Linux pi400-64 6.18.39+rpt-rpi-v8 #1 SMP PREEMPT Debian 1:6.18.39-1+rpt1 (2026-07-29) aarch64 GNU/Linux

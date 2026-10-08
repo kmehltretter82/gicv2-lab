@@ -26,3 +26,8 @@ The historical result has changed ELF provenance and incomplete archived raw
 captures. Start a fresh campaign when physical execution is requested. Build
 and archive handling, deployment requirements, and the opt-in driver command
 are documented in `docs/H6_PI400_BOOT.md`.
+
+Later on 2026-09-05, a fresh extraction of this bundle completed the full
+100-boot hardware gate. That separate result and successful boot-file cleanup
+are preserved in [the hardware manifest](../2026-09-05-h6-pi400-100/manifest.md).
+This preparation archive still contains zero hardware attempts.

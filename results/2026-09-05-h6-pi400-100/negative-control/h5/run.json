@@ -1,0 +1,21 @@
+{
+  "backend": "pi400",
+  "backend_id": "synthetic-negative-control-from-pi400-run-001",
+  "image": {
+    "path": "/Users/kmehltretter/codex/linux-work/gicv2-lab/build/2026-09-05-pi400-hardware/h6/gate/image/gicv2-lab.elf",
+    "sha256": "e9615fb39589d21eb7eec7d9ff77723b9e670655bceca843fd62887edb2f019c"
+  },
+  "runner_version": "1",
+  "scenario_path": "/Users/kmehltretter/codex/linux-work/gicv2-lab/build/2026-09-05-pi400-hardware/h6/gate/scenario.json",
+  "scenario_sha256": "54e8d2ad32f29350a15d6159c2e026e854cefc3222d32b5732efb8284ce3e2e9",
+  "schema": "gicv2-lab.run.v1",
+  "serial": {
+    "path": "/Users/kmehltretter/codex/linux-work/gicv2-lab/results/2026-09-05-h6-pi400-100/negative-control/h5/serial.log",
+    "sha256": "1b46cf7eefa28ca1e9dfb5097022d84efb98da7938bee91b84bc2243b99ca1ac"
+  },
+  "source_serial": {
+    "path": "/Users/kmehltretter/codex/linux-work/gicv2-lab/results/2026-09-05-h6-pi400-100/negative-control/serial.log",
+    "sha256": "1b46cf7eefa28ca1e9dfb5097022d84efb98da7938bee91b84bc2243b99ca1ac"
+  },
+  "status": "imported"
+}

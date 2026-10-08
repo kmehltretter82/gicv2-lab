@@ -1,0 +1,44 @@
+[gicv2-lab] H8c begin
+GuestCurrentEL=0x0000000000000001
+GuestDAIF=0x00000000000003c0
+GuestSCTLR_MCI=0x0000000000000000
+GICD_TYPER=0x0000000000000008
+GuestGICC_CTLR=0x0000000000000201
+GuestGICC_PMR=0x00000000000000f8
+GuestGICC_BPR=0x0000000000000002
+GuestIAR_initial=0x00000000000003ff
+GuestRPR_initial=0x00000000000000ff
+GuestPending_initial=0x0000000000000000
+GuestActive_initial=0x0000000000000000
+[gicv2-lab] H8c interface ready
+GuestIAR_first=0x000000000000002a
+GuestRPR_first=0x0000000000000040
+GuestActive_first=0x0000000000000400
+GuestPending_first=0x0000000000000000
+[gicv2-lab] H8c first active
+GuestPending_repend=0x0000000000000400
+GuestActive_repend=0x0000000000000400
+GuestHPPIR_repend=0x00000000000003ff
+[gicv2-lab] H8c active and pending
+GuestRPR_after_first_eoir=0x00000000000000ff
+GuestActive_after_first_eoir=0x0000000000000400
+GuestPending_after_first_eoir=0x0000000000000400
+GuestIAR_before_first_dir=0x00000000000003ff
+[gicv2-lab] H8c first priority dropped
+GuestActive_after_first_dir=0x0000000000000000
+GuestPending_after_first_dir=0x0000000000000400
+GuestHPPIR_after_first_dir=0x000000000000002a
+[gicv2-lab] H8c eligible again
+GuestIAR_second=0x000000000000002a
+GuestRPR_second=0x0000000000000040
+GuestActive_second=0x0000000000000400
+GuestPending_second=0x0000000000000000
+[gicv2-lab] H8c second active
+GuestRPR_after_second_eoir=0x00000000000000ff
+GuestActive_after_second_eoir=0x0000000000000400
+[gicv2-lab] H8c second deactivated
+GuestRPR_final=0x00000000000000ff
+GuestActive_final=0x0000000000000000
+GuestPending_final=0x0000000000000000
+GuestHPPIR_final=0x00000000000003ff
+GuestIAR_final=0x00000000000003ff

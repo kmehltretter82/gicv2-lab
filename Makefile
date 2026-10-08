@@ -17,6 +17,7 @@ H5_RUNS ?= 10
 H7_BUILD ?= $(BUILD)/h7
 H7_OUT ?= $(BUILD)/h7-qemu
 H7_RUNS ?= 20
+H7_WORKLOAD ?= spi-lifecycle
 
 CPPFLAGS := -Iinclude
 COMMON_FLAGS := --target=aarch64-none-elf -mcpu=cortex-a72 \
@@ -81,7 +82,7 @@ h7-test:
 # H7 bundles are immutable: select a fresh H7_BUILD for a new build.
 h7-build:
 	PYTHONDONTWRITEBYTECODE=1 $(PYTHON) tools/h7_runner.py build \
-		$(if $(LLVM_BIN),--llvm-bin "$(LLVM_BIN)",) --out "$(H7_BUILD)"
+		$(if $(LLVM_BIN),--llvm-bin "$(LLVM_BIN)",) --out "$(H7_BUILD)" --workload "$(H7_WORKLOAD)"
 
 h7-qemu:
 	PYTHONDONTWRITEBYTECODE=1 $(PYTHON) tools/h7_runner.py capture-qemu \

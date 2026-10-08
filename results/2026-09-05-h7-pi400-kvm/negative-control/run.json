@@ -1,0 +1,38 @@
+{
+  "backend": "kvm",
+  "backend_id": "synthetic-negative-control-from-pi400-run-001",
+  "command": [
+    "/usr/bin/python3",
+    "/home/karl/gicv2-lab-20260905-hardware/h7-kvm/run-001/bundle/source/tools/h7_runner.py",
+    "worker",
+    "--bundle",
+    "/home/karl/gicv2-lab-20260905-hardware/h7-kvm/run-001/bundle"
+  ],
+  "host": {
+    "machine": "aarch64",
+    "node": "pi400-64",
+    "processor": "",
+    "release": "6.18.39+rpt-rpi-v8",
+    "system": "Linux",
+    "version": "#1 SMP PREEMPT Debian 1:6.18.39-1+rpt1 (2026-07-29)"
+  },
+  "image": {
+    "path": "/home/karl/gicv2-lab-20260905-hardware/h7-kvm/run-001/bundle/guest.elf",
+    "sha256": "0b25bfcc1d42d71a459c41ad1fce0570a78953f3bf8a6d9cb993146c290a1207"
+  },
+  "runner_version": "1",
+  "scenario_path": "/home/karl/gicv2-lab-20260905-hardware/h7-kvm/run-001/bundle/scenario.json",
+  "scenario_sha256": "d7ba750715b723a0b23693fd40f2720f5521226a77df078f372b5803db572ec1",
+  "schema": "gicv2-lab.run.v1",
+  "serial": {
+    "path": "/Users/kmehltretter/codex/linux-work/gicv2-lab/results/2026-09-05-h7-pi400-kvm/negative-control/serial.log",
+    "sha256": "290cf56e0cbb162563efd94afd8629d0e001bbb3ac160d79d9e6ab0641d6c609"
+  },
+  "status": "pass",
+  "stderr": {
+    "path": "/home/karl/gicv2-lab-20260905-hardware/h7-kvm/run-001/stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "timeout_seconds": 10,
+  "worker_exit_status": -15
+}

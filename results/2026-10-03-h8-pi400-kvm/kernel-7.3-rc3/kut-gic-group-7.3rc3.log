@@ -1,0 +1,31 @@
+boot-backup
+edge
+gicv2-lab.bin
+h7
+h7-existing-tests
+h7-existing-tests-7.3.0-rc3-p13rtguardfinal-00511-gd4e2f1e3e415
+h7-kvm
+h7-kvm-evidence.tar.gz
+h7-native-abi-check.log
+h8
+h8-edge-diagnostic.tar.xz
+h8-edge-kvm-evidence.tar.xz
+h8-kvm-evidence.tar.xz
+h8-qemu-campaign.tar.xz
+host-kernel
+host-kernel-provenance.tar.xz
+kut-prerequisite-manual
+kvm-unit-tests
+preflight.log
+qemu-campaign.tar.gz
+tryboot-h6.txt
+/dev/root        15G   13G  1.5G  90% /
+arm/gic.flat
+f20b0b8 2026-07-16
+PASS gicv2-ipi (3 tests)
+PASS gicv2-mmio (17 tests)
+PASS gicv2-mmio-up (17 tests)
+PASS gicv2-mmio-3p (17 tests)
+SKIP gicv3-ipi (qemu-system-aarch64: KVM does not support GICv3 emulation)
+PASS gicv2-active (1 tests)
+SKIP gicv3-active (qemu-system-aarch64: KVM does not support GICv3 emulation)

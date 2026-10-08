@@ -303,3 +303,17 @@ The H6 exit gate is 100 consecutive fresh hardware boots whose traces each
 compare equal to a frozen qemu-pi4 baseline of the identical ELF, with no
 timeout, no FAIL marker, and no provenance rejection. See the recorded result
 directory for whether it has been met and with which revision.
+
+The gate passed on 2026-09-05: 100 consecutive captures matched the frozen
+baseline, with 25 markers and 221 fields per capture. Every raw serial capture
+and the full image/source/QEMU bundle are preserved in
+[the complete hardware result](../results/2026-09-05-h6-pi400-100/manifest.md).
+The archive passed verification after extraction into a fresh directory.
+
+The original boot files were restored and hash-verified, and the temporary
+image was removed. The initial restoration copied the correct bytes but
+`cp -p` returned an ownership-preservation error on the FAT boot partition.
+Rerunning the idempotent restoration verified the restored bytes and completed
+cleanup. Both the initial error and successful recovery are preserved. Future
+restoration helpers should verify file contents without requiring Unix
+ownership preservation on FAT.

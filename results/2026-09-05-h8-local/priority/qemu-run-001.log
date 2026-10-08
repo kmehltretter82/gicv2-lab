@@ -1,0 +1,38 @@
+[gicv2-lab] H8b begin
+GuestCurrentEL=0x0000000000000001
+GuestDAIF=0x00000000000003c0
+GuestSCTLR_MCI=0x0000000000000000
+GICD_TYPER=0x0000000000000008
+GuestGICC_CTLR=0x0000000000000001
+GuestGICC_PMR=0x00000000000000f8
+GuestGICC_BPR=0x0000000000000002
+GuestIAR_initial=0x00000000000003ff
+GuestRPR_initial=0x00000000000000ff
+GuestPending_initial=0x0000000000000000
+GuestActive_initial=0x0000000000000000
+[gicv2-lab] H8b interface ready
+GuestPMR_masked=0x0000000000000080
+GuestPending_masked=0x0000000000000400
+GuestIAR_masked=0x00000000000003ff
+GuestRPR_masked=0x00000000000000ff
+GuestActive_masked=0x0000000000000000
+[gicv2-lab] H8b priority masked
+GuestIAR_low=0x000000000000002a
+GuestRPR_low=0x0000000000000080
+GuestActive_low=0x0000000000000400
+[gicv2-lab] H8b low active
+GuestPending_high=0x0000000000000800
+GuestIAR_high=0x000000000000002b
+GuestRPR_both=0x0000000000000020
+GuestActive_both=0x0000000000000c00
+[gicv2-lab] H8b both active
+GuestRPR_after_high_eoi=0x0000000000000080
+GuestActive_after_high_eoi=0x0000000000000400
+[gicv2-lab] H8b high completed
+[gicv2-lab] H8b low completed
+GuestRPR_final=0x00000000000000ff
+GuestActive_final=0x0000000000000000
+GuestPending_final=0x0000000000000000
+GuestHPPIR_final=0x00000000000003ff
+GuestIAR_final=0x00000000000003ff
+[gicv2-lab] H8b PASS

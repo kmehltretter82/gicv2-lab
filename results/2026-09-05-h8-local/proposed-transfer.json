@@ -1,0 +1,14 @@
+{
+  "status": "not-executed; rejected by automatic approval review",
+  "payload_sha256": "ea9fbac61d3a12162dfb3928dc6649b2450477540873c045cd7b67174ae43f79",
+  "command": [
+    "scp",
+    "-o",
+    "BatchMode=yes",
+    "-o",
+    "ConnectTimeout=10",
+    "build/2026-09-05-h8-contracts/h8-qemu-campaign.tar.xz",
+    "karl@192.168.1.15:/home/karl/gicv2-lab-20260905-hardware/h8-qemu-campaign.tar.xz"
+  ],
+  "reason": "Automatic review restricted the earlier upload approval to H6/H7 payloads and requires explicit approval for this H8 bundle."
+}
